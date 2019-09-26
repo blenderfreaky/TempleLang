@@ -10,10 +10,11 @@
     /// <typeparam name="TAstNodeType">The </typeparam>
     /// <typeparam name="TToken"></typeparam>
     /// <typeparam name="TTokenType"></typeparam>
-    public interface IAstParser<out TTerminalAstNode, out TAstNode, in TAstNodeType, in TToken, in TTokenType>
-        where TTerminalAstNode : TAstNode, IAstNodeTerminal<TAstNode, TAstNodeType, TToken, TTokenType>
+    public interface IAstParser<out TTerminalAstNode, out TAstNode, in TAstNodeType, in TToken, in TTokenType, in TFile>
+        where TTerminalAstNode : TAstNode, IAstNodeTerminal<TAstNode, TAstNodeType, TToken, TTokenType, TFile>
         where TAstNode : class, IAstNode<TAstNode, TAstNodeType>
-        where TToken : IToken<TTokenType>
+        where TToken : IToken<TTokenType, TFile>
+        where TFile : IFile
     {
         /// <summary>
         /// Parses one non-terminal AST Node of the given type

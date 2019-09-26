@@ -13,9 +13,10 @@ namespace TempleLang.Parser.Abstractions
     /// <typeparam name="TAstNodeType">The AstNodeType enum to classify the AST Node type with</typeparam>
     /// <typeparam name="TToken">The <see cref="IToken{TTokenType}"/> implementation to use for tokens</typeparam>
     /// <typeparam name="TTokenType">The <see cref="TTokenType"/> implementation to use for the Tokens</typeparam>
-    public interface IAstNodeTerminal<out TAstNode, out TAstNodeType, out TToken, out TTokenType> : IAstNode<TAstNode, TAstNodeType>
+    public interface IAstNodeTerminal<out TAstNode, out TAstNodeType, out TToken, out TTokenType, out TFile> : IAstNode<TAstNode, TAstNodeType>
         where TAstNode : class, IAstNode<TAstNode, TAstNodeType>
-        where TToken : IToken<TTokenType>
+        where TToken : IToken<TTokenType, TFile>
+        where TFile : IFile
     {
         /// <summary>
         /// Returns the Token the terminal represents

@@ -7,7 +7,7 @@
     using System.Text;
     using TempleLang.Lexer.Abstractions;
 
-    public class Lexer : ILexer<Token, TokenType>
+    public class Lexer : ILexer<Token<TokenType, File>, TokenType, File>
     {
         public Lexer()
         {
@@ -25,7 +25,7 @@
             ["not"] = TokenType.Not,
         };
 
-        public IEnumerable<Token> Step(TextReader textReader, IFile file)
+        public IEnumerable<Token<TokenType, File>> Tokenize(TextReader textReader, File file)
         {
             int currentTokenIndex = -1;
             int currentCharIndex = -1;
