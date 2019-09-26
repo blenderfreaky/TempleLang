@@ -6,28 +6,23 @@
     /// <summary>
     /// Represents a node of the Abstract Syntax tree
     /// </summary>
-    /// <typeparam name="TTokenType">The IDogeTokenType implementation to use for the Tokens</typeparam>
-    public interface IAstNode<out TToken, out TAstNode, out TTokenType, out TAstNodeType>
-        where TToken : IToken<TTokenType>
-        where TAstNode : class, IAstNode<TToken, TAstNode, TTokenType, TAstNodeType>
+    /// <typeparam name="TAstNode">The type of the parent and child AST Nodes, should generally match the type itself</typeparam>
+    /// <typeparam name="TAstNodeType">The AstNodeType enum to classify the AST Node type with</typeparam>
+    public interface IAstNode<out TAstNode, out TAstNodeType>
+        where TAstNode : class, IAstNode<TAstNode, TAstNodeType>
     {
         /// <summary>
-        /// The type of this specific node
+        /// Returns the type of this specific node
         /// </summary>
         TAstNodeType NodeType { get; }
 
         /// <summary>
-        /// The Tokens the AST Node contains
-        /// </summary>
-        IEnumerable<TToken> Tokens { get; }
-
-        /// <summary>
-        /// The AST Node this is a child to. Null if it is a root node
+        /// Returns the AST Node this is a child to. Null if it is a root node
         /// </summary>
         TAstNode? Parent { get; }
 
         /// <summary>
-        /// All AST Nodes that have this node as their Parent
+        /// Returns all AST Nodes that have this node as their Parent
         /// </summary>
         IEnumerable<TAstNode> Children { get; }
     }

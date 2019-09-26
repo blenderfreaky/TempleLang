@@ -5,7 +5,14 @@
     /// </summary>
     public interface IFile
     {
+        /// <summary>
+        /// Returns the short name of the file
+        /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Returns the path to the file
+        /// </summary>
         string? Path { get; }
     }
 }
