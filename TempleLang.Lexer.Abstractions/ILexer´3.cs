@@ -8,16 +8,16 @@
     /// </summary>
     /// <typeparam name="TToken">The Type of the token the lexer returns. Must implement <see cref="IToken{TTokenType}"/></typeparam>
     /// <typeparam name="TTokenType">The Token Type used by the Token</typeparam>
-    public interface ILexer<out TToken, out TTokenType, in TFile>
-        where TToken : IToken<TTokenType, TFile>
-        where TFile : IFile
+    public interface ILexer<out TToken, out TTokenType, in TSourceFile>
+        where TToken : IToken<TTokenType, TSourceFile>
+        where TSourceFile : ISourceFile
     {
         /// <summary>
         /// Splits the text from the <see cref="TextReader"/> into an <see cref="IEnumerable{TToken}"/>
         /// </summary>
         /// <param name="textReader">The <see cref="TextReader"/> reading the text to tokenize</param>
-        /// <param name="file">The file instance to assign to the Tokens</param>
+        /// <param name="sourceFile">The file instance to assign to the Tokens</param>
         /// <returns>The <see cref="IEnumerable{TToken}"/> containing the tokens</returns>
-        IEnumerable<TToken> Tokenize(TextReader textReader, TFile file);
+        IEnumerable<TToken> Tokenize(TextReader textReader, TSourceFile sourceFile);
     }
 }

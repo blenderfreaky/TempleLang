@@ -16,7 +16,7 @@ namespace TempleLang.Parser.Abstractions
     public interface IAstNodeTerminal<out TAstNode, out TAstNodeType, out TToken, out TTokenType, out TFile> : IAstNode<TAstNode, TAstNodeType>
         where TAstNode : class, IAstNode<TAstNode, TAstNodeType>
         where TToken : IToken<TTokenType, TFile>
-        where TFile : IFile
+        where TFile : ISourceFile
     {
         /// <summary>
         /// Returns the Token the terminal represents

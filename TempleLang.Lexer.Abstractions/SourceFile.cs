@@ -4,7 +4,7 @@
     using TempleLang.Lexer.Abstractions;
 
     /// <inheritdoc/>
-    public struct File : IFile
+    public struct SourceFile : ISourceFile
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -12,14 +12,14 @@
         /// <inheritdoc/>
         public string Path { get; }
 
-        public File(string name, string path)
+        public SourceFile(string name, string path)
         {
             Name = name;
             Path = path;
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object? obj) => obj is File file && Name == file.Name && Path == file.Path;
+        public override bool Equals(object? obj) => obj is SourceFile file && Name == file.Name && Path == file.Path;
 
         /// <inheritdoc/>
         public override int GetHashCode()
@@ -30,12 +30,12 @@
             return hashCode;
         }
 
-        public static bool operator ==(File left, File right)
+        public static bool operator ==(SourceFile left, SourceFile right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(File left, File right)
+        public static bool operator !=(SourceFile left, SourceFile right)
         {
             return !(left == right);
         }

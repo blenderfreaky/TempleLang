@@ -14,7 +14,7 @@
         where TTerminalAstNode : TAstNode, IAstNodeTerminal<TAstNode, TAstNodeType, TToken, TTokenType, TFile>
         where TAstNode : class, IAstNode<TAstNode, TAstNodeType>
         where TToken : IToken<TTokenType, TFile>
-        where TFile : IFile
+        where TFile : ISourceFile
     {
         /// <summary>
         /// Parses one non-terminal AST Node of the given type

@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a file used by the parser
     /// </summary>
-    public interface IFile
+    public interface ISourceFile
     {
         /// <summary>
         /// Returns the short name of the file
