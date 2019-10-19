@@ -34,6 +34,9 @@
                 }
 
                 char character = (char)characterInt;
+
+                if (char.IsWhiteSpace(character)) continue;
+
                 buffer.Append(character);
 
                 switch (character)
@@ -211,8 +214,6 @@
 
                 if (character == '.')
                 {
-                    buffer.Append(character);
-
                     dot = true;
 
                     int nextCharacterInt = peekChar();
