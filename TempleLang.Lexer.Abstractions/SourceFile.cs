@@ -30,14 +30,10 @@
             return hashCode;
         }
 
-        public static bool operator ==(SourceFile left, SourceFile right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(SourceFile left, SourceFile right) => left.Equals(right);
 
-        public static bool operator !=(SourceFile left, SourceFile right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(SourceFile left, SourceFile right) => !(left == right);
+
+        public override string ToString() => $"{Name}";
     }
 }
