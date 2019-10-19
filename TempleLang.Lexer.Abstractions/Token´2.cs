@@ -60,6 +60,6 @@
 
         public static bool operator !=(Token<TTokenType, TSourceFile> left, Token<TTokenType, TSourceFile> right) => !(left == right);
 
-        public override string ToString() => $"{nameof(TokenType)}.{TokenType} \"{Text}\":{TokenIndex}@{SourceFile}:({FirstCharIndex}-{LastCharIndex})";
+        public override string ToString() => $"\"{Text}\" {nameof(TokenType)}.{TokenType}:{TokenIndex}@{SourceFile}:({FirstCharIndex}-{LastCharIndex})";
     }
 }
