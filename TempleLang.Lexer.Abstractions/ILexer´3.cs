@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Lexer.Abstractions
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
 

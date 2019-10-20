@@ -1,11 +1,13 @@
 ﻿namespace TempleLang.Lexer.Abstractions
 {
+    using System;
+
     /// <summary>
     /// Represents a string and its associated token type
     /// </summary>
     /// <typeparam name="TTokenType">The TokenType enum to classify the token type with</typeparam>
     /// <typeparam name="TSourceFile">The implementation of <see cref="ISourceFile"/> to use</typeparam>
-    public interface IToken<out TTokenType, out TSourceFile>
+    public interface IToken<out TTokenType, out TSourceFile>
         where TSourceFile : ISourceFile
     {
         /// <summary>
@@ -16,7 +18,7 @@
         /// <summary>
         /// This tokens type
         /// </summary>
-        TTokenType TokenType { get; }
+        TTokenType Type { get; }
 
         /// <summary>
         /// The File the token was generated from
