@@ -6,6 +6,7 @@
     using System.IO;
     using System.Linq;
     using System.Text;
+    using TempleLang.Lexer.Abstractions.Exceptions;
 
     public static class Lexer
     {
@@ -138,20 +139,20 @@
                         yield return makeToken(greaterType);
                         continue;
                     case '\'':
-                        lexEscapableChar();
-                        lexChar('\'', "lexing Char literal");
+                        lexEscapableChar(TokenType.CharacterLiteral);
+                        lexChar('\'', TokenType.CharacterLiteral);
                         yield return makeToken(TokenType.CharacterLiteral);
                         continue;
                     case '\"':
                         while (true)
                         {
                             int nextCharacterInt = peekChar();
-                            
+
                             if (nextCharacterInt == -1)
                             {
-                                throw new UnexpectedCharException(null, "a char or a string delimiter", "lexing String literal");
+                                throw UnexpectedCharException.Create(null, TokenType.StringLiteral, "a char or a string delimiter");
                             }
-                            
+
                             char nextCharacter = (char)nextCharacterInt;
 
                             if (nextCharacter == '\"')
@@ -160,7 +161,7 @@
                                 break;
                             }
 
-                            lexEscapableChar();
+                            lexEscapableChar(TokenType.StringLiteral);
                         }
                         yield return makeToken(TokenType.StringLiteral);
                         continue;
@@ -204,7 +205,7 @@
                         buffer.Append((char)nextCharacterInt);
                     }
 
-                    yield return _keywords.TryGetValue(buffer.ToString(), out TokenType keyword) 
+                    yield return _keywords.TryGetValue(buffer.ToString(), out TokenType keyword)
                         ? makeToken(keyword)
                         : makeToken(TokenType.Identifier);
                     continue;
@@ -220,14 +221,14 @@
 
                     if (nextCharacterInt == -1)
                     {
-                        throw new UnexpectedCharException(null, "Digit", "lexing " + nameof(TokenType.RealLiteral));
+                        throw UnexpectedCharException.Create(null, TokenType.RealLiteral, "Digit");
                     }
 
                     character = (char)nextCharacterInt;
 
                     if (!char.IsDigit(character))
                     {
-                        throw new UnexpectedCharException(character, "Digit", "lexing " + nameof(TokenType.RealLiteral));
+                        throw UnexpectedCharException.Create(character, TokenType.RealLiteral, "Digit");
                     }
                 }
 
@@ -286,19 +287,6 @@
                 return token;
             }
 
-            /*TokenType switchOnNextCharacter(TokenType fallback, Dictionary<char, TokenType> options)
-            {
-                int characterInt = peekChar();
-                if (characterInt == -1) return fallback;
-                if (options.TryGetValue((char)characterInt, out TokenType next))
-                {
-                    buffer.Append((char)characterInt);
-                    readChar();
-                    return next;
-                }
-                return fallback;
-            }*/
-
             TokenType switchOnNextCharacter(TokenType fallback, params (char character, TokenType tokenType)[] options)
             {
                 int characterInt = peekChar();
@@ -316,10 +304,10 @@
                 return fallback;
             }
 
-            void lexEscapableChar()
+            void lexEscapableChar(TokenType context)
             {
                 int characterInt = peekChar();
-                
+
                 if (characterInt == -1) return;
 
                 char character = (char)characterInt;
@@ -331,7 +319,7 @@
 
                     int nextCharacterInt = peekChar();
 
-                    if (nextCharacterInt == -1) throw new UnexpectedCharException(null, "escapable char", "lexing escaped character");
+                    if (nextCharacterInt == -1) throw UnexpectedCharException.Create(null, context, "escapable char");
 
                     char nextCharacter = (char)nextCharacterInt;
 
@@ -348,18 +336,22 @@
                             break;
                         case 'u':
                             readChar();
-                            lexHexDigit();
-                            lexHexDigit();
-                            lexHexDigit();
-                            lexHexDigit();
+                            lexHexDigit(context);
+                            lexHexDigit(context);
+                            lexHexDigit(context);
+                            lexHexDigit(context);
                             break;
                     }
 
                     buffer.Append(nextCharacter);
                 }
+                else
+                {
+                    buffer.Append(character);
+                }
             }
 
-            void lexHexDigit()
+            void lexHexDigit(TokenType context)
             {
                 int characterInt = peekChar();
 
@@ -375,13 +367,13 @@
                     && character != 'e' && character != 'E'
                     && character != 'f' && character != 'F')
                 {
-                    throw new UnexpectedCharException(character, "Hex digit", "lexing Hex digit");
+                    throw UnexpectedCharException.Create(character, context, "Hex digit");
                 }
 
                 readChar();
             }
 
-            void lexChar(char characterToMatch, string context)
+            void lexChar(char characterToMatch, TokenType context)
             {
                 int characterInt = peekChar();
 
@@ -391,7 +383,7 @@
 
                 if (character != characterToMatch)
                 {
-                    throw new UnexpectedCharException(character, context, characterToMatch);
+                    throw UnexpectedCharException.Create(character, context, characterToMatch);
                 }
 
                 readChar();
