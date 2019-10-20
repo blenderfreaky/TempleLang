@@ -9,26 +9,20 @@
     /// <typeparam name="TAstNode">The type of the parent and child AST Nodes, should generally match the type itself</typeparam>
     /// <typeparam name="TAstNodeType">The AstNodeType enum to classify the AST Node type with</typeparam>
     public interface IAstNode<out TAstNode, out TAstNodeType>
-        where TAstNode : IAstNode<TAstNode, TAstNodeType>
+        where TAstNode : class, IAstNode<TAstNode, TAstNodeType>
     {
         /// <summary>
-        /// Gets the type of this specific node
+        /// Returns the type of this specific node
         /// </summary>
         TAstNodeType NodeType { get; }
 
         /// <summary>
-        /// Gets a bool specifying whether the node has a parent node
+        /// Returns the AST Node this is a child to. Null if it is a root node
         /// </summary>
-        bool HasParent { get; }
+        TAstNode? Parent { get; }
 
         /// <summary>
-        /// Gets the AST Node this is a child to
-        /// </summary>
-        /// <remarks>May throw of HasParent is false</remarks>
-        TAstNode Parent { get; }
-
-        /// <summary>
-        /// Gets all AST Nodes that have this node as their Parent
+        /// Returns all AST Nodes that have this node as their Parent
         /// </summary>
         IEnumerable<TAstNode> Children { get; }
     }
