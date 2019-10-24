@@ -13,7 +13,7 @@
         private static readonly Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType>
         {
             ["if"] = TokenType.If,
-            ["if"] = TokenType.Else,
+            ["else"] = TokenType.Else,
             ["for"] = TokenType.For,
             ["While"] = TokenType.While,
         };

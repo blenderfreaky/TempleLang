@@ -2,6 +2,7 @@
 {
     using Lexer;
     using System;
+    using System.Collections.Generic;
     using System.Runtime.Serialization;
     using TempleLang.Lexer.Abstractions;
 
@@ -17,7 +18,7 @@
         /// <summary>
         /// Gets the token types that would've been accepted
         /// </summary>
-        public TTokenType[]? Expected { get; }
+        public IReadOnlyCollection<TTokenType>? Expected { get; }
 
         /// <summary>
         /// Gets the simplified description of the expectation (i.e. "Compound Assignment" for Expected = [+=, -=, /= ...])

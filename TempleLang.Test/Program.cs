@@ -9,7 +9,11 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(string.Join('\n', Lexer.Tokenize(new StringReader("abc[1] + 2.3 ^ .2 - (-3)"), new SourceFile("Console", null))));
+            using var stringReader = new StringReader("abc[1] + 2.3 ^ .2 - (-3)");
+
+            Console.WriteLine(string.Join('\n', Lexer.Tokenize(
+                stringReader,
+                new SourceFile("Console", null))));
         }
     }
 }

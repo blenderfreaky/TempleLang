@@ -1,6 +1,7 @@
 ﻿namespace TempleLang.Lexer.Abstractions.Exceptions
 {
     using System;
+    using System.Collections.Generic;
     using System.Runtime.Serialization;
 
     /// <summary>
@@ -12,7 +13,7 @@
         /// <summary>
         /// Gets the chars that would've been accepted
         /// </summary>
-        public char[]? Expected { get; }
+        public IReadOnlyCollection<char>? Expected { get; }
 
         /// <summary>
         /// Gets the simplified description of the expectation (i.e. "Digit" for Expected = ['0', '1', ... '9'])
