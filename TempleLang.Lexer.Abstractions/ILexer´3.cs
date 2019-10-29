@@ -1,24 +1,20 @@
 ﻿namespace TempleLang.Lexer.Abstractions
 {
-    using System;
-    using System.Collections.Generic;
     using System.IO;
 
     /// <summary>
-    /// Represents a lexer, able to tokenize any <see cref="TextReader"/> to an <see cref="IEnumerable{TTokenType}"/> of TToken
+    /// Represents a lexer, able to lex the input from a <see cref="TextReader"/>
     /// </summary>
-    /// <typeparam name="TToken">The Type of the token the lexer returns. Must implement <see cref="IToken{TTokenType}"/></typeparam>
-    /// <typeparam name="TTokenType">The Token Type used by the Token</typeparam>
-    public interface ILexer<out TToken, out TTokenType, in TSourceFile>
-        where TToken : IToken<TTokenType, TSourceFile>
+    /// <typeparam name="TLexeme">The Type of the lexeme the lexer returns. Must implement <see cref="ILexeme{TToken, TSourceFile}"/></typeparam>
+    /// <typeparam name="TToken">The Token Type used by the Lexeme</typeparam>
+    public interface ILexer<out TLexeme, out TToken, in TSourceFile>
+        where TLexeme : ILexeme<TToken, TSourceFile>
         where TSourceFile : ISourceFile
     {
         /// <summary>
-        /// Splits the text from the <see cref="TextReader"/> into an <see cref="IEnumerable{TToken}"/>
+        /// Lexes the text far enough to generate one lexeme
         /// </summary>
-        /// <param name="textReader">The <see cref="TextReader"/> reading the text to tokenize</param>
-        /// <param name="sourceFile">The file instance to assign to the Tokens</param>
-        /// <returns>The <see cref="IEnumerable{TToken}"/> containing the tokens</returns>
-        IEnumerable<TToken> Tokenize(TextReader textReader, TSourceFile sourceFile);
+        /// <returns>The topmost token from the text</returns>
+        TLexeme LexOne();
     }
 }

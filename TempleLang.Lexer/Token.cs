@@ -1,6 +1,6 @@
 ﻿namespace TempleLang.Lexer
 {
-    public enum TokenType
+    public enum Token
     {
         StatementDelimiter,
         Declarator,
@@ -69,6 +69,8 @@
         CharacterLiteral,
         BooleanLiteral,
         Identifier,
-        StaticAccessor
+        StaticAccessor,
+
+        EoF,
     }
 }

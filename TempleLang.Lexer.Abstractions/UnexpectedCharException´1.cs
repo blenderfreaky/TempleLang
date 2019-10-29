@@ -8,7 +8,7 @@
     /// The exception that is thrown, when a lexer program encounters an unexpected character
     /// </summary>
     [Serializable]
-    public class UnexpectedCharException<TTokenType> : Exception
+    public class UnexpectedCharException<TToken> : Exception
     {
         /// <summary>
         /// Gets the chars that would've been accepted
@@ -29,7 +29,7 @@
         /// <remarks>
         /// Should be able to finish the sentence $"Got {Actual}, expected {ExpectedDescription}, while {Context}"
         /// </remarks>
-        public TTokenType Context { get; }
+        public TToken Context { get; }
 
         /// <summary>
         /// Returns the actual read char
@@ -38,14 +38,14 @@
         public char? Actual { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnexpectedCharException{TTokenType}"/> class.
+        /// Initializes a new instance of the <see cref="UnexpectedCharException{TToken}"/> class.
         /// </summary>
         /// <param name="actual">The char that was read. Null if EoF</param>
         /// <param name="context">Short description of the context under which the char was encountered</param>
         /// <param name="expectedDescription">A short description of the chars expected to be read, 
         /// finishing the sentence $"Got {Actual}, expected {ExpectedDescription}"</param>
         /// <param name="expected">The full list of all expected characters</param>
-        public UnexpectedCharException(char? actual, TTokenType context, string expectedDescription, params char[] expected)
+        public UnexpectedCharException(char? actual, TToken context, string expectedDescription, params char[] expected)
             : base($"Got {actual?.ToString() ?? "EoF"}, expected {expectedDescription} ({expected}), while lexing {context}")
         {
             Actual = actual;
@@ -55,13 +55,13 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnexpectedCharException{TTokenType}"/> class.
+        /// Initializes a new instance of the <see cref="UnexpectedCharException{TToken}"/> class.
         /// </summary>
         /// <param name="actual">The char that was read. Null if EoF</param>
         /// <param name="context">Short description of the context under which the char was encountered</param>
         /// <param name="expectedDescription">A short description of the chars expected to be read,
         /// finishing the sentence $"Got {Actual}, expected {ExpectedDescription}"</param>
-        public UnexpectedCharException(char? actual, TTokenType context, string expectedDescription)
+        public UnexpectedCharException(char? actual, TToken context, string expectedDescription)
             : base($"Got {actual?.ToString() ?? "EoF"}, expected {expectedDescription}, while lexing {context}")
         {
             Actual = actual;
@@ -70,12 +70,12 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnexpectedCharException{TTokenType}"/> class.
+        /// Initializes a new instance of the <see cref="UnexpectedCharException{TToken}"/> class.
         /// </summary>
         /// <param name="actual">The char that was read. Null if EoF</param>
         /// <param name="context">Short description of the context under which the char was encountered</param>
         /// <param name="expected">The full list of all expected characters</param>
-        public UnexpectedCharException(char? actual, TTokenType context, params char[] expected)
+        public UnexpectedCharException(char? actual, TToken context, params char[] expected)
             : base($"Got {actual?.ToString() ?? "EoF"}, expected {expected}, while lexing {context}")
         {
             Actual = actual;

@@ -1,393 +1,396 @@
 ﻿namespace TempleLang.Lexer
 {
-    using Abstractions;
+    using TempleLang.Lexer.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Text;
     using TempleLang.Lexer.Abstractions.Exceptions;
 
-    public static class Lexer
+    /// <summary>
+    /// Represents a lexer, able to tokenize a <see cref="System.IO.TextReader"/> to an <see cref="IEnumerable{TToken}"/> of TLexeme
+    /// </summary>
+    public class Lexer : ILexer<Lexeme<Token, SourceFile>, Token, SourceFile>
     {
-        private static readonly Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType>
+        private static readonly Dictionary<string, Token> _keywords = new Dictionary<string, Token>
         {
-            ["if"] = TokenType.If,
-            ["else"] = TokenType.Else,
-            ["for"] = TokenType.For,
-            ["While"] = TokenType.While,
+            ["if"] = Token.If,
+            ["else"] = Token.Else,
+            ["for"] = Token.For,
+            ["while"] = Token.While,
         };
 
-        public static IEnumerable<Token<TokenType, SourceFile>> Tokenize(
-            TextReader textReader, SourceFile sourceFile)
+        public Lexer(TextReader textReader, SourceFile sourceFile)
         {
-            int tokenIndex = 0, tokenCharStartIndex = 0, currentCharIndex = 0;
+            TextReader = textReader;
+            SourceFile = sourceFile;
 
-            StringBuilder buffer = new StringBuilder();
+            TokenBuffer = new StringBuilder();
+        }
 
-            while (true)
+        private int TokenIndex, TokenCharStartIndex, CurrentCharIndex;
+        private readonly StringBuilder TokenBuffer;
+        private readonly TextReader TextReader;
+        private readonly SourceFile SourceFile;
+
+        /// <summary>
+        /// Splits the text from the <see cref="System.IO.TextReader"/> into an <see cref="IEnumerable{Token}"/>
+        /// </summary>
+        /// <param name="textReader">The <see cref="System.IO.TextReader"/> reading the text to tokenize</param>
+        /// <param name="sourceFile">The file instance to assign to the Lexemes</param>
+        /// <returns>The <see cref="IEnumerable{Token}"/> containing the tokens</returns>
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public Lexeme<Token, SourceFile> LexOne()
+        {
+            int characterInt;
+            char character;
+
+            do
             {
-                int characterInt = readChar();
+                characterInt = AdvanceChar();
 
                 if (characterInt == -1)
                 {
-                    yield break;
+                    return MakeLexeme(Token.EoF);
                 }
 
-                char character = (char)characterInt;
+                character = (char)characterInt;
+            } while (char.IsWhiteSpace(character));
 
-                if (char.IsWhiteSpace(character)) continue;
+            TokenBuffer.Append(character);
 
-                buffer.Append(character);
-
-                switch (character)
-                {
-                    case '+':
-                        yield return makeToken(switchOnNextCharacter(
-                            TokenType.Add,
-                            ('=', TokenType.AddCompoundAssign)));
-                        continue;
-                    case '-':
-                        yield return makeToken(switchOnNextCharacter(
-                            TokenType.Subtract,
-                            ('=', TokenType.SubtractCompoundAssign)));
-                        continue;
-                    case '*':
-                        yield return makeToken(switchOnNextCharacter(
-                            TokenType.Multiply,
-                            ('=', TokenType.MultiplyCompoundAssign)));
-                        continue;
-                    case '/':
-                        yield return makeToken(switchOnNextCharacter(
-                            TokenType.Divide,
-                            ('=', TokenType.DivideCompoundAssign)));
-                        continue;
-                    case '%':
-                        yield return makeToken(switchOnNextCharacter(
-                            TokenType.Remainder,
-                            ('=', TokenType.RemainderCompoundAssign)));
-                        continue;
-                    case '!':
-                        yield return makeToken(
-                            switchOnNextCharacter(TokenType.Not,
-                            ('=', TokenType.ComparisonNotEqual)));
-                        continue;
-                    case '~':
-                        yield return makeToken(
-                            TokenType.BitwiseNot);
-                        continue;
-                    case '^':
-                        yield return makeToken(switchOnNextCharacter(
-                            TokenType.BitwiseXor,
-                            ('=', TokenType.BitwiseXorCompoundAssign)));
-                        continue;
-                    case '=':
-                        yield return makeToken(switchOnNextCharacter(
-                            TokenType.Assign,
-                            ('=', TokenType.ComparisonEqual)));
-                        continue;
-                    case '&':
-                        var andType = switchOnNextCharacter(
-                            TokenType.BitwiseAnd,
-                            ('=', TokenType.BitwiseAndCompoundAssign),
-                            ('&', TokenType.And));
-                        if (andType == TokenType.And)
-                        {
-                            andType = switchOnNextCharacter(
-                                TokenType.And,
-                                ('=', TokenType.AndCompoundAssign));
-                        }
-                        yield return makeToken(andType);
-                        continue;
-                    case '|':
-                        var orType = switchOnNextCharacter(
-                            TokenType.BitwiseOr,
-                            ('=', TokenType.BitwiseOrCompoundAssign),
-                            ('|', TokenType.Or));
-                        if (orType == TokenType.Or)
-                        {
-                            orType = switchOnNextCharacter(
-                                TokenType.Or,
-                                ('=', TokenType.OrCompoundAssign));
-                        }
-                        yield return makeToken(orType);
-                        continue;
-                    case '<':
-                        var lessType = switchOnNextCharacter(
-                            TokenType.ComparisonLessThan,
-                            ('=', TokenType.ComparisonLessOrEqualThan),
-                            ('<', TokenType.BitshiftLeft));
-                        if (lessType == TokenType.BitshiftLeft)
-                        {
-                            lessType = switchOnNextCharacter(
-                                TokenType.BitshiftLeft,
-                                ('=', TokenType.BitshiftLeftCompoundAssign));
-                        }
-                        yield return makeToken(lessType);
-                        continue;
-                    case '>':
-                        var greaterType = switchOnNextCharacter(
-                            TokenType.ComparisonGreaterThan,
-                            ('=', TokenType.ComparisonGreaterOrEqualThan),
-                            ('>', TokenType.BitshiftRight));
-                        if (greaterType == TokenType.BitshiftRight)
-                        {
-                            greaterType = switchOnNextCharacter(
-                                TokenType.BitshiftRight,
-                                ('=', TokenType.BitshiftRightCompoundAssign));
-                        }
-                        yield return makeToken(greaterType);
-                        continue;
-                    case '\'':
-                        lexEscapableChar(TokenType.CharacterLiteral);
-                        lexChar('\'', TokenType.CharacterLiteral);
-                        yield return makeToken(TokenType.CharacterLiteral);
-                        continue;
-                    case '\"':
-                        while (true)
-                        {
-                            int nextCharacterInt = peekChar();
-
-                            if (nextCharacterInt == -1)
-                            {
-                                throw UnexpectedCharException.Create(null, TokenType.StringLiteral, "a char or a string delimiter");
-                            }
-
-                            char nextCharacter = (char)nextCharacterInt;
-
-                            if (nextCharacter == '\"')
-                            {
-                                buffer.Append(nextCharacter);
-                                break;
-                            }
-
-                            lexEscapableChar(TokenType.StringLiteral);
-                        }
-                        yield return makeToken(TokenType.StringLiteral);
-                        continue;
-                    case '{':
-                        yield return makeToken(TokenType.LeftCodeDelimiter);
-                        continue;
-                    case '}':
-                        yield return makeToken(TokenType.RightCodeDelimiter);
-                        continue;
-                    case '[':
-                        yield return makeToken(TokenType.LeftEnumerationDelimiter);
-                        continue;
-                    case ']':
-                        yield return makeToken(TokenType.RightEnumerationDelimiter);
-                        continue;
-                    case '(':
-                        yield return makeToken(TokenType.LeftExpressionDelimiter);
-                        continue;
-                    case ')':
-                        yield return makeToken(TokenType.RightExpressionDelimiter);
-                        continue;
-                    case ';':
-                        yield return makeToken(TokenType.StatementDelimiter);
-                        continue;
-                }
-
-                if (char.IsLetter(character) || character == '_')
-                {
+            switch (character)
+            {
+                case '+':
+                    return MakeLexeme(SwitchOnNextCharacter(
+                       Token.Add,
+                       ('=', Token.AddCompoundAssign)));
+                case '-':
+                    return MakeLexeme(SwitchOnNextCharacter(
+                       Token.Subtract,
+                       ('=', Token.SubtractCompoundAssign)));
+                case '*':
+                    return MakeLexeme(SwitchOnNextCharacter(
+                       Token.Multiply,
+                       ('=', Token.MultiplyCompoundAssign)));
+                case '/':
+                    return MakeLexeme(SwitchOnNextCharacter(
+                       Token.Divide,
+                       ('=', Token.DivideCompoundAssign)));
+                case '%':
+                    return MakeLexeme(SwitchOnNextCharacter(
+                       Token.Remainder,
+                       ('=', Token.RemainderCompoundAssign)));
+                case '!':
+                    return MakeLexeme(
+                       SwitchOnNextCharacter(Token.Not,
+                       ('=', Token.ComparisonNotEqual)));
+                case '~':
+                    return MakeLexeme(
+                       Token.BitwiseNot);
+                case '^':
+                    return MakeLexeme(SwitchOnNextCharacter(
+                       Token.BitwiseXor,
+                       ('=', Token.BitwiseXorCompoundAssign)));
+                case '=':
+                    return MakeLexeme(SwitchOnNextCharacter(
+                       Token.Assign,
+                       ('=', Token.ComparisonEqual)));
+                case '&':
+                    var andType = SwitchOnNextCharacter(
+                        Token.BitwiseAnd,
+                        ('=', Token.BitwiseAndCompoundAssign),
+                        ('&', Token.And));
+                    if (andType == Token.And)
+                    {
+                        andType = SwitchOnNextCharacter(
+                            Token.And,
+                            ('=', Token.AndCompoundAssign));
+                    }
+                    return MakeLexeme(andType);
+                case '|':
+                    var orType = SwitchOnNextCharacter(
+                        Token.BitwiseOr,
+                        ('=', Token.BitwiseOrCompoundAssign),
+                        ('|', Token.Or));
+                    if (orType == Token.Or)
+                    {
+                        orType = SwitchOnNextCharacter(
+                            Token.Or,
+                            ('=', Token.OrCompoundAssign));
+                    }
+                    return MakeLexeme(orType);
+                case '<':
+                    var lessType = SwitchOnNextCharacter(
+                        Token.ComparisonLessThan,
+                        ('=', Token.ComparisonLessOrEqualThan),
+                        ('<', Token.BitshiftLeft));
+                    if (lessType == Token.BitshiftLeft)
+                    {
+                        lessType = SwitchOnNextCharacter(
+                            Token.BitshiftLeft,
+                            ('=', Token.BitshiftLeftCompoundAssign));
+                    }
+                    return MakeLexeme(lessType);
+                case '>':
+                    var greaterType = SwitchOnNextCharacter(
+                        Token.ComparisonGreaterThan,
+                        ('=', Token.ComparisonGreaterOrEqualThan),
+                        ('>', Token.BitshiftRight));
+                    if (greaterType == Token.BitshiftRight)
+                    {
+                        greaterType = SwitchOnNextCharacter(
+                            Token.BitshiftRight,
+                            ('=', Token.BitshiftRightCompoundAssign));
+                    }
+                    return MakeLexeme(greaterType);
+                case '\'':
+                    LexEscapableChar(Token.CharacterLiteral);
+                    LexChar('\'', Token.CharacterLiteral);
+                    return MakeLexeme(Token.CharacterLiteral);
+                case '\"':
                     while (true)
                     {
-                        int nextCharacterInt = peekChar();
+                        int nextCharacterInt = PeekChar();
 
-                        if (nextCharacterInt == -1) break;
+                        if (nextCharacterInt == -1)
+                        {
+                            throw UnexpectedCharException.Create(null, Token.StringLiteral, "a char or a string delimiter");
+                        }
 
                         char nextCharacter = (char)nextCharacterInt;
 
-                        if (!char.IsLetterOrDigit(nextCharacter) && nextCharacter != '_') break;
+                        if (nextCharacter == '\"')
+                        {
+                            TokenBuffer.Append(nextCharacter);
+                            break;
+                        }
 
-                        readChar();
-
-                        buffer.Append((char)nextCharacterInt);
+                        LexEscapableChar(Token.StringLiteral);
                     }
+                    return MakeLexeme(Token.StringLiteral);
+                case '{':
+                    return MakeLexeme(Token.LeftCodeDelimiter);
+                case '}':
+                    return MakeLexeme(Token.RightCodeDelimiter);
+                case '[':
+                    return MakeLexeme(Token.LeftEnumerationDelimiter);
+                case ']':
+                    return MakeLexeme(Token.RightEnumerationDelimiter);
+                case '(':
+                    return MakeLexeme(Token.LeftExpressionDelimiter);
+                case ')':
+                    return MakeLexeme(Token.RightExpressionDelimiter);
+                case ';':
+                    return MakeLexeme(Token.StatementDelimiter);
+            }
 
-                    yield return _keywords.TryGetValue(buffer.ToString(), out TokenType keyword)
-                        ? makeToken(keyword)
-                        : makeToken(TokenType.Identifier);
-                    continue;
+            // Identifier or keyword
+            if (char.IsLetter(character) || character == '_')
+            {
+                while (true)
+                {
+                    int nextCharacterInt = PeekChar();
+
+                    if (nextCharacterInt == -1) break;
+
+                    char nextCharacter = (char)nextCharacterInt;
+
+                    if (!char.IsLetterOrDigit(nextCharacter) && character != '_') break;
+
+                    TokenBuffer.Append(nextCharacter);
                 }
 
-                bool dot = false;
+                return MakeLexeme(_keywords.TryGetValue(TokenBuffer.ToString(), out Token keyword) ? keyword : Token.Identifier);
+            }
+
+            // Numerical literal
+            {
+                bool reachedDot = false;
 
                 if (character == '.')
                 {
-                    dot = true;
+                    reachedDot = true;
 
-                    int nextCharacterInt = peekChar();
+                    int nextCharacterInt = PeekChar();
 
                     if (nextCharacterInt == -1)
                     {
-                        throw UnexpectedCharException.Create(null, TokenType.RealLiteral, "Digit");
+                        throw UnexpectedCharException.Create(null, Token.RealLiteral, "Digit");
                     }
 
                     character = (char)nextCharacterInt;
 
                     if (!char.IsDigit(character))
                     {
-                        throw UnexpectedCharException.Create(character, TokenType.RealLiteral, "Digit");
+                        throw UnexpectedCharException.Create(character, Token.RealLiteral, "Digit");
                     }
                 }
 
                 if (char.IsDigit(character))
                 {
-                    while (true)
+                    LexNumber(ref reachedDot);
+
+                    return reachedDot
+                       ? MakeLexeme(Token.RealLiteral)
+                       : MakeLexeme(Token.IntegerLiteral);
+                }
+            }
+
+            throw UnexpectedCharException.Create(character, Token.EoF, "EoF");
+        }
+
+        private void LexNumber(ref bool reachedDot)
+        {
+            while (true)
+            {
+                int nextCharacterInt = PeekChar();
+
+                if (nextCharacterInt == -1) break;
+
+                char nextCharacter = (char)nextCharacterInt;
+
+                if (!char.IsDigit(nextCharacter))
+                {
+                    if (!reachedDot && nextCharacter == '.')
                     {
-                        int nextCharacterInt = peekChar();
-
-                        if (nextCharacterInt == -1) break;
-
-                        char nextCharacter = (char)nextCharacterInt;
-
-                        if (!char.IsDigit(nextCharacter))
-                        {
-                            if (!dot && nextCharacter == '.')
-                            {
-                                dot = true;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-
-                        readChar();
-
-                        buffer.Append(nextCharacter);
+                        reachedDot = true;
                     }
-
-                    yield return dot
-                        ? makeToken(TokenType.RealLiteral)
-                        : makeToken(TokenType.IntegerLiteral);
-                    continue;
-                }
-            }
-
-            int peekChar()
-            {
-                return textReader.Peek();
-            }
-
-            int readChar()
-            {
-                currentCharIndex++;
-                return textReader.Read();
-            }
-
-            Token<TokenType, SourceFile> makeToken(TokenType tokenType)
-            {
-                var token = new Token<TokenType, SourceFile>(buffer.ToString(), tokenType, sourceFile, tokenIndex, tokenCharStartIndex, currentCharIndex);
-
-                tokenCharStartIndex = ++tokenIndex;
-                buffer.Clear();
-
-                return token;
-            }
-
-            TokenType switchOnNextCharacter(TokenType fallback, params (char character, TokenType tokenType)[] options)
-            {
-                int characterInt = peekChar();
-                if (characterInt == -1) return fallback;
-
-                var match = Array.Find(options, x => x.character == (char)characterInt);
-
-                if (match != default)
-                {
-                    buffer.Append((char)characterInt);
-                    readChar();
-                    return match.tokenType;
-                }
-
-                return fallback;
-            }
-
-            void lexEscapableChar(TokenType context)
-            {
-                int characterInt = peekChar();
-
-                if (characterInt == -1) return;
-
-                char character = (char)characterInt;
-
-                if (character == '\\')
-                {
-                    buffer.Append(character);
-                    readChar();
-
-                    int nextCharacterInt = peekChar();
-
-                    if (nextCharacterInt == -1) throw UnexpectedCharException.Create(null, context, "escapable char");
-
-                    char nextCharacter = (char)nextCharacterInt;
-
-                    switch (nextCharacter)
+                    else
                     {
-                        case '\'':
-                        case '"':
-                        case '\\':
-                        case 'n':
-                        case 'r':
-                        case 't':
-                        case '0':
-                            readChar();
-                            break;
-                        case 'u':
-                            readChar();
-                            lexHexDigit(context);
-                            lexHexDigit(context);
-                            lexHexDigit(context);
-                            lexHexDigit(context);
-                            break;
+                        break;
                     }
+                }
 
-                    buffer.Append(nextCharacter);
-                }
-                else
-                {
-                    buffer.Append(character);
-                }
+                AdvanceChar();
+
+                TokenBuffer.Append(nextCharacter);
             }
+        }
 
-            void lexHexDigit(TokenType context)
+        private int PeekChar()
+        {
+            return TextReader.Peek();
+        }
+
+        private int AdvanceChar()
+        {
+            CurrentCharIndex++;
+            return TextReader.Read();
+        }
+
+        private void LexChar(char characterToMatch, Token context)
+        {
+            int characterInt = PeekChar();
+
+            if (characterInt == -1) return;
+
+            char character = (char)characterInt;
+
+            if (character != characterToMatch)
             {
-                int characterInt = peekChar();
-
-                if (characterInt == -1) return;
-
-                char character = (char)characterInt;
-
-                if (!char.IsDigit(character)
-                    && character != 'a' && character != 'A'
-                    && character != 'b' && character != 'B'
-                    && character != 'c' && character != 'C'
-                    && character != 'd' && character != 'D'
-                    && character != 'e' && character != 'E'
-                    && character != 'f' && character != 'F')
-                {
-                    throw UnexpectedCharException.Create(character, context, "Hex digit");
-                }
-
-                readChar();
+                throw UnexpectedCharException.Create(character, context, characterToMatch);
             }
 
-            void lexChar(char characterToMatch, TokenType context)
+            AdvanceChar();
+        }
+
+        private Lexeme<Token, SourceFile> MakeLexeme(Token tokenType)
+        {
+            var token = new Lexeme<Token, SourceFile>(TokenBuffer.ToString(), tokenType, SourceFile, TokenIndex, TokenCharStartIndex, CurrentCharIndex);
+
+            TokenCharStartIndex = CurrentCharIndex + 1;
+            TokenIndex++;
+            TokenBuffer.Clear();
+
+            return token;
+        }
+
+        private Token SwitchOnNextCharacter(Token fallback, params (char character, Token tokenType)[] options)
+        {
+            int characterInt = PeekChar();
+            if (characterInt == -1) return fallback;
+
+            var match = Array.Find(options, x => x.character == (char)characterInt);
+
+            if (match != default)
             {
-                int characterInt = peekChar();
+                TokenBuffer.Append((char)characterInt);
+                AdvanceChar();
+                return match.tokenType;
+            }
 
-                if (characterInt == -1) return;
+            return fallback;
+        }
 
-                char character = (char)characterInt;
+        private void LexEscapableChar(Token context)
+        {
+            int characterInt = PeekChar();
 
-                if (character != characterToMatch)
+            if (characterInt == -1) return;
+
+            char character = (char)characterInt;
+
+            if (character == '\\')
+            {
+                TokenBuffer.Append(character);
+                AdvanceChar();
+
+                int nextCharacterInt = PeekChar();
+
+                if (nextCharacterInt == -1) throw UnexpectedCharException.Create(null, context, "escapable char");
+
+                char nextCharacter = (char)nextCharacterInt;
+
+                switch (nextCharacter)
                 {
-                    throw UnexpectedCharException.Create(character, context, characterToMatch);
+                    case '\'':
+                    case '"':
+                    case '\\':
+                    case 'n':
+                    case 'r':
+                    case 't':
+                    case '0':
+                        AdvanceChar();
+                        break;
+                    case 'u':
+                        AdvanceChar();
+                        LexHexDigit(context);
+                        LexHexDigit(context);
+                        LexHexDigit(context);
+                        LexHexDigit(context);
+                        break;
                 }
 
-                readChar();
+                TokenBuffer.Append(nextCharacter);
             }
+            else
+            {
+                TokenBuffer.Append(character);
+            }
+        }
+
+        private void LexHexDigit(Token context)
+        {
+            int characterInt = PeekChar();
+
+            if (characterInt == -1) return;
+
+            char character = (char)characterInt;
+
+            if (!char.IsDigit(character)
+                && character != 'a' && character != 'A'
+                && character != 'b' && character != 'B'
+                && character != 'c' && character != 'C'
+                && character != 'd' && character != 'D'
+                && character != 'e' && character != 'E'
+                && character != 'f' && character != 'F')
+            {
+                throw UnexpectedCharException.Create(character, context, "Hex digit");
+            }
+
+            AdvanceChar();
         }
     }
 }
