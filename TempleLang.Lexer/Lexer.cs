@@ -9,8 +9,10 @@
     using TempleLang.Lexer.Abstractions.Exceptions;
 
     /// <summary>
-    /// Represents a lexer, able to tokenize a <see cref="System.IO.TextReader"/> to an <see cref="IEnumerable{TToken}"/> of TLexeme
+    /// Represents a lexer, able to lex the input from a <see cref="TextReader"/>
     /// </summary>
+    /// <typeparam name="TLexeme">The Type of the lexeme the lexer returns. Must implement <see cref="ILexeme{TToken, TSourceFile}"/></typeparam>
+    /// <typeparam name="TToken">The Token Type used by the Lexeme</typeparam>
     public class Lexer : ILexer<Lexeme<Token, SourceFile>, Token, SourceFile>
     {
         private static readonly Dictionary<string, Token> _keywords = new Dictionary<string, Token>
@@ -35,11 +37,9 @@
         private readonly SourceFile SourceFile;
 
         /// <summary>
-        /// Splits the text from the <see cref="System.IO.TextReader"/> into an <see cref="IEnumerable{Token}"/>
+        /// Lexes the text far enough to generate one lexeme
         /// </summary>
-        /// <param name="textReader">The <see cref="System.IO.TextReader"/> reading the text to tokenize</param>
-        /// <param name="sourceFile">The file instance to assign to the Lexemes</param>
-        /// <returns>The <see cref="IEnumerable{Token}"/> containing the tokens</returns>
+        /// <returns>The topmost token from the text</returns>
         [MethodImpl(MethodImplOptions.Synchronized)]
         public Lexeme<Token, SourceFile> LexOne()
         {
