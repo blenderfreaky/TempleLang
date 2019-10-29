@@ -199,6 +199,8 @@
 
                     if (!char.IsLetterOrDigit(nextCharacter) && character != '_') break;
 
+                    AdvanceChar();
+
                     TokenBuffer.Append(nextCharacter);
                 }
 
