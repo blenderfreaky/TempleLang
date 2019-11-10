@@ -56,7 +56,8 @@
                 }
 
                 character = (char)characterInt;
-            } while (char.IsWhiteSpace(character));
+            }
+            while (char.IsWhiteSpace(character));
 
             TokenBuffer.Append(character);
 

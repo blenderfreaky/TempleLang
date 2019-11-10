@@ -3,7 +3,7 @@
     using Abstractions;
     using TempleLang.Lexer;
     using TempleLang.Lexer.Abstractions;
-    using Lexeme = TempleLang.Lexer.Lexeme<TempleLang.Lexer.Token, TempleLang.Lexer.SourceFile>;
+    using Lexeme = Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>;
     //using Lexer = Lexer.Lexer;
 
     public class Parser
@@ -54,7 +54,9 @@
             }
         }
 
-        private bool IsPrefixOperator(Lexeme lexeme) => lexeme.Token switch
+        private bool ParseBinaryExpression(Token operatorToken, Parser)
+
+        private static bool IsPrefixOperator(this Token token) => token switch
         {
             Token.Subtract => true,
             Token.BitwiseNot => true,
@@ -62,7 +64,7 @@
             _ => false
         };
 
-        private bool IsBinaryOperator(Lexeme lexeme) => lexeme.Token switch
+        private static bool IsBinaryOperator(this Token token) => token switch
         {
             Token.Add => true,
             Token.Subtract => true,
@@ -79,6 +81,34 @@
             Token.BitshiftLeft => true,
             Token.BitshiftRight => true,
 
+            Token.Assign => true,
+
+            Token.AddCompoundAssign => true,
+            Token.SubtractCompoundAssign => true,
+            Token.MultiplyCompoundAssign => true,
+            Token.DivideCompoundAssign => true,
+            Token.RemainderCompoundAssign => true,
+            Token.OrCompoundAssign => true,
+            Token.BitwiseOrCompoundAssign => true,
+            Token.AndCompoundAssign => true,
+            Token.BitwiseAndCompoundAssign => true,
+            Token.BitwiseXorCompoundAssign => true,
+            Token.BitshiftLeftCompoundAssign => true,
+            Token.BitshiftRightCompoundAssign => true,
+
+            Token.ComparisonGreaterThan => true,
+            Token.ComparisonGreaterOrEqualThan => true,
+            Token.ComparisonLessThan => true,
+            Token.ComparisonLessOrEqualThan => true,
+            Token.ComparisonEqual => true,
+            Token.ComparisonNotEqual => true,
+
+            _ => false
+        };
+
+
+        private static bool IsAssignment(this Token token) => token switch
+        {
             Token.Assign => true,
 
             Token.AddCompoundAssign => true,
