@@ -27,7 +27,7 @@
                 var lexeme = lexer.LexOne();
                 yield return lexeme;
 
-                if (EqualityComparer<TToken>.Default.Equals(lexeme.Type, eof)) yield break;
+                if (EqualityComparer<TToken>.Default.Equals(lexeme.Token, eof)) yield break;
             }
         }
     }

@@ -12,7 +12,7 @@
         public string Text { get; }
 
         /// <inheritdoc/>
-        public TToken Type { get; }
+        public TToken Token { get; }
 
         /// <inheritdoc/>
         public TSourceFile SourceFile { get; }
@@ -29,7 +29,7 @@
         public Lexeme(string text, TToken tokenType, TSourceFile sourceFile, int tokenIndex, int firstCharIndex, int lastCharIndex)
         {
             Text = text;
-            Type = tokenType;
+            Token = tokenType;
             SourceFile = sourceFile;
             LexemeIndex = tokenIndex;
             FirstCharIndex = firstCharIndex;
@@ -39,7 +39,7 @@
         /// <inheritdoc/>
         public override bool Equals(object? obj) => obj is Lexeme<TToken, TSourceFile> token
             && Text == token.Text
-            && EqualityComparer<TToken>.Default.Equals(Type, token.Type)
+            && EqualityComparer<TToken>.Default.Equals(Token, token.Token)
             && EqualityComparer<ISourceFile>.Default.Equals(SourceFile, token.SourceFile)
             && LexemeIndex == token.LexemeIndex && FirstCharIndex == token.FirstCharIndex
             && LastCharIndex == token.LastCharIndex;
@@ -49,7 +49,7 @@
         {
             var hashCode = -1476409121;
             hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Text);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<TToken>.Default.GetHashCode(Type);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<TToken>.Default.GetHashCode(Token);
             hashCode = (hashCode * -1521134295) + EqualityComparer<TSourceFile>.Default.GetHashCode(SourceFile);
             hashCode = (hashCode * -1521134295) + LexemeIndex.GetHashCode();
             hashCode = (hashCode * -1521134295) + FirstCharIndex.GetHashCode();
@@ -61,6 +61,6 @@
 
         public static bool operator !=(Lexeme<TToken, TSourceFile> left, Lexeme<TToken, TSourceFile> right) => !(left == right);
 
-        public override string ToString() => $"\"{Text}\" {nameof(Type)}.{Type}:{LexemeIndex}@{SourceFile}:({FirstCharIndex}-{LastCharIndex})";
+        public override string ToString() => $"\"{Text}\" {nameof(Token)}.{Token}:{LexemeIndex}@{SourceFile}:({FirstCharIndex}-{LastCharIndex})";
     }
 }

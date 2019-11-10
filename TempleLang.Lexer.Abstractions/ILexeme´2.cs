@@ -17,7 +17,7 @@
         /// <summary>
         /// This tokens type
         /// </summary>
-        TToken Type { get; }
+        TToken Token { get; }
 
         /// <summary>
         /// The File the token was generated from
