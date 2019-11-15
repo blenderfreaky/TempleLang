@@ -1,8 +1,6 @@
 ﻿namespace TempleLang.Lexer.Abstractions
 {
-    using System;
     using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
 
     public static class ILexerExtensions
     {
@@ -22,8 +20,6 @@
                 {
                     return new LexemeString<TLexeme, TToken, TSourceFile>(lexemeBuffer.ToArray());
                 }
-
-                lexemeBuffer.Add(lexeme);
             }
         }
     }

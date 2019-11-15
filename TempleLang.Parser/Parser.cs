@@ -1,62 +1,23 @@
 ﻿namespace TempleLang.Parser
 {
-    using Abstractions;
+    using Lexer.Abstractions;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using TempleLang.Lexer;
-    using TempleLang.Lexer.Abstractions;
+    using TempleLang.Parser.Abstractions;
     using Lexeme = Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>;
-    //using Lexer = Lexer.Lexer;
+    using LexemeString = Lexer.Abstractions.LexemeString<Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>, Lexer.Token, Lexer.SourceFile>;
 
     public class Parser
     {
-        private readonly LookaheadLexer<Lexer, Lexeme, Token, SourceFile> Lexer;
+        private readonly LexemeString LexemeString;
 
-        public static CodeExpression ParseExpression()
-        {
+        public static readonly Dictionary<Token, NamedParser<Lexeme, Lexeme, Token, SourceFile>> Tokens = ((IEnumerable<Token>)Enum.GetValues(typeof(Token))).ToDictionary(x => x, x => x.Match<Lexeme, Token, SourceFile>());
 
-        }
+        public static NamedParser<Literals, Lexeme, Token, SourceFile> 
 
-        public static CodeExpression ParseTerm(Precedence precedence)
-        {
-            switch (precedence)
-            {
-                case Precedence.Postfix:
-
-                    break;
-                case Precedence.Prefix:
-                    break;
-                case Precedence.Multiplicative:
-                    break;
-                case Precedence.Additive:
-                    break;
-                case Precedence.Shift:
-                    break;
-                case Precedence.Relational:
-                    break;
-                case Precedence.Equality:
-                    break;
-                case Precedence.BitwiseAnd:
-                    break;
-                case Precedence.BitwiseXor:
-                    break;
-                case Precedence.BitwiseOr:
-                    break;
-                case Precedence.LogicalAnd:
-                    break;
-                case Precedence.LogicalOr:
-                    break;
-                case Precedence.Ternary:
-                    break;
-                case Precedence.Assignment:
-                    Lexer.MatchToken(Token.);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private bool ParseBinaryExpression(Token operatorToken, Parser)
-
-        private static bool IsPrefixOperator(this Token token) => token switch
+        private static bool IsPrefixOperator(Token token) => token switch
         {
             Token.Subtract => true,
             Token.BitwiseNot => true,
@@ -64,7 +25,7 @@
             _ => false
         };
 
-        private static bool IsBinaryOperator(this Token token) => token switch
+        private static bool IsBinaryOperator(Token token) => token switch
         {
             Token.Add => true,
             Token.Subtract => true,
@@ -107,7 +68,7 @@
         };
 
 
-        private static bool IsAssignment(this Token token) => token switch
+        private static bool IsAssignment(oken token) => token switch
         {
             Token.Assign => true,
 

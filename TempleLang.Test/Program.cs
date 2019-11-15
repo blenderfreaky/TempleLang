@@ -5,30 +5,30 @@
     using System.IO;
     using TempleLang.Lexer;
     using TempleLang.Lexer.Abstractions;
+    using TempleLang.Parser.Abstractions;
+    using Lexeme = Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>;
 
     public static class Program
     {
         public static void Main(string[] args)
         {
-            using var stringReader = new StringReader("abc[1] + 2.3 ^ .2 - (-3)");
+            //using var stringReader = new StringReader("abc[1] + 2.3 ^ .2 - (-3)");
+            using var stringReader = new StringReader(Console.ReadLine());
 
-            Console.WriteLine(string.Join('\n', new Lexer(
+            var lexemes = new Lexer(
                 stringReader,
                 new SourceFile("Console", null))
-                .EnumerateLexemes(Token.EoF)));
-        }
+                .LexUntil(Token.EoF);
 
-        public static IEnumerable<TLexeme> EnumerateLexemes<TLexeme, TToken, TSourceFile>(this ILexer<TLexeme, TToken, TSourceFile> lexer, TToken eof)
-            where TLexeme : ILexeme<TToken, TSourceFile>
-            where TSourceFile : ISourceFile
-        {
-            while (true)
-            {
-                var lexeme = lexer.LexOne();
-                yield return lexeme;
+            Console.WriteLine(string.Join('\n', lexemes));
 
-                if (EqualityComparer<TToken>.Default.Equals(lexeme.Token, eof)) yield break;
-            }
+            var add = Token.IntegerLiteral.Match<Lexeme, Token, SourceFile>().SeparatedBy(Token.Add.Match<Lexeme, Token, SourceFile>());
+
+
+            ParserResult<List<Lexeme<Token, SourceFile>>, Lexeme<Token, SourceFile>, Token, SourceFile> parserResult = add.Parse(lexemes);
+
+
+            Console.WriteLine(parserResult.Result);
         }
     }
 }

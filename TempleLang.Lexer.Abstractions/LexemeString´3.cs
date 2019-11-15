@@ -1,10 +1,9 @@
 ﻿namespace TempleLang.Lexer.Abstractions
 {
-    using System;
+    using System.Collections;
     using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
 
-    public readonly struct LexemeString<TLexeme, TToken, TSourceFile>
+    public readonly struct LexemeString<TLexeme, TToken, TSourceFile> : IEnumerable<TLexeme>
         where TLexeme : ILexeme<TToken, TSourceFile>
         where TSourceFile : ISourceFile
     {
@@ -35,6 +34,9 @@
             hashCode = (hashCode * -1521134295) + _offset.GetHashCode();
             return hashCode;
         }
+
+        public IEnumerator<TLexeme> GetEnumerator() => ((IEnumerable<TLexeme>)_lexemes).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TLexeme>)_lexemes).GetEnumerator();
 
         public static bool operator ==(LexemeString<TLexeme, TToken, TSourceFile> left, LexemeString<TLexeme, TToken, TSourceFile> right) => left.Equals(right);
 

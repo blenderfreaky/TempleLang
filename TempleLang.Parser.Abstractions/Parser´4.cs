@@ -10,12 +10,18 @@
         public readonly string Name;
         public readonly Parser<T, TLexeme, TToken, TSourceFile> Parser;
 
-        public ParserResult<T> Parse(LexemeString<TLexeme, TToken, TSourceFile> lexemeString) => Parser(lexemeString);
+        public ParserResult<T, TLexeme, TToken, TSourceFile> Parse(LexemeString<TLexeme, TToken, TSourceFile> lexemeString) => Parser(lexemeString);
 
-        /// </inheritdoc>
+        public NamedParser(string name, Parser<T, TLexeme, TToken, TSourceFile> parser) : this()
+        {
+            Name = name;
+            Parser = parser;
+        }
+
+        /// <inheritdoc/>
         public override bool Equals(object? obj) => obj is NamedParser<T, TLexeme, TToken, TSourceFile> parser && Name == parser.Name && EqualityComparer<Parser<T, TLexeme, TToken, TSourceFile>>.Default.Equals(Parser, parser.Parser);
 
-        /// </inheritdoc>
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             var hashCode = -713333808;
@@ -24,49 +30,16 @@
             return hashCode;
         }
 
-        /// </inheritdoc>
+        /// <inheritdoc/>
         public static bool operator ==(NamedParser<T, TLexeme, TToken, TSourceFile> left, NamedParser<T, TLexeme, TToken, TSourceFile> right) => left.Equals(right);
 
-        /// </inheritdoc>
+        /// <inheritdoc/>
         public static bool operator !=(NamedParser<T, TLexeme, TToken, TSourceFile> left, NamedParser<T, TLexeme, TToken, TSourceFile> right) => !(left == right);
+
+        public static implicit operator Parser<T, TLexeme, TToken, TSourceFile>(NamedParser<T, TLexeme, TToken, TSourceFile> parser) => parser.Parser; 
     }
 
-    public delegate ParserResult<T> Parser<T, TLexeme, TToken, TSourceFile>(LexemeString<TLexeme, TToken, TSourceFile> lexemeString)
+    public delegate ParserResult<T, TLexeme, TToken, TSourceFile> Parser<T, TLexeme, TToken, TSourceFile>(LexemeString<TLexeme, TToken, TSourceFile> lexemeString)
         where TLexeme : ILexeme<TToken, TSourceFile>
         where TSourceFile : ISourceFile;
-
-    public static class Parser
-    {
-        public static Parser<T, TLexeme, TToken, TSourceFile> Or<T, TLexeme, TToken, TSourceFile>(this Parser<T, TLexeme, TToken, TSourceFile> left, Parser<T, TLexeme, TToken, TSourceFile> right)
-            where TLexeme : ILexeme<TToken, TSourceFile>
-            where TSourceFile : ISourceFile =>
-            lexemeString =>
-            {
-                var leftResult = left(lexemeString);
-
-                if (leftResult.IsSuccessful) return leftResult;
-
-                var rightResult = right(lexemeString);
-
-                if (rightResult.IsSuccessful) return rightResult;
-
-                return ParserResult<T>.Failure(ParserError.AggregateError(leftResult.Error!.Value, rightResult.Error!.Value));
-            };
-
-        public static Parser<T, TLexeme, TToken, TSourceFile> Then<T, TLexeme, TToken, TSourceFile>(Parser<T, TLexeme, TToken, TSourceFile> left, Parser<T, TLexeme, TToken, TSourceFile> right)
-            where TLexeme : ILexeme<TToken, TSourceFile>
-            where TSourceFile : ISourceFile =>
-            lexemeString =>
-            {
-                var leftResult = left(lexemeString);
-
-                if (!leftResult.IsSuccessful) return ParserResult<T>.Failure(leftResult.Error!.Value);
-
-                var rightResult = right(lexemeString);
-
-                if (!rightResult.IsSuccessful) return ParserResult<T>.Failure(rightResult.Error!.Value);
-
-                return ParserResult<T>.Failure(ParserError.AggregateError(leftResult.Error!.Value, rightResult.Error!.Value));
-            };
-    }
 }
