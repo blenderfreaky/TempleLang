@@ -220,14 +220,14 @@
 
                     if (nextCharacterInt == -1)
                     {
-                        throw UnexpectedCharException.Create(null, Token.RealLiteral, "Digit");
+                        throw UnexpectedCharException.Create(null, Token.FloatLiteral, "Digit");
                     }
 
                     character = (char)nextCharacterInt;
 
                     if (!char.IsDigit(character))
                     {
-                        throw UnexpectedCharException.Create(character, Token.RealLiteral, "Digit");
+                        throw UnexpectedCharException.Create(character, Token.FloatLiteral, "Digit");
                     }
                 }
 
@@ -236,7 +236,7 @@
                     LexNumber(ref reachedDot);
 
                     return reachedDot
-                       ? MakeLexeme(Token.RealLiteral)
+                       ? MakeLexeme(Token.FloatLiteral)
                        : MakeLexeme(Token.IntegerLiteral);
                 }
             }

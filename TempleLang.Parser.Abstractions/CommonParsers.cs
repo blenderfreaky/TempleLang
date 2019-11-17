@@ -10,10 +10,14 @@
             where TLexeme : ILexeme<TToken, TSourceFile>
             where TSourceFile : ISourceFile =>
             parser
-            .Then(separator
-                .Then(parser)
+            .And(separator
+                .And(parser)
                 .Transform(x => x.Item2)
                 .Many(least: 0))
-            .Transform(x => new[] { x.Item1 }.Concat(x.Item2).ToList());
+            .Transform(x =>
+            {
+                x.Item2.Insert(0, x.Item1);
+                return x.Item2;
+            });
     }
 }
