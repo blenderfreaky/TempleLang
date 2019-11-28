@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TempleLang.Lexer\TempleLang.Lexer.csproj" />
     <ProjectReference Include="..\TempleLang.Parser.Abstractions\TempleLang.Parser.Abstractions.csproj" />
   </ItemGroup>

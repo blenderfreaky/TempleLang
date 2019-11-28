@@ -152,6 +152,36 @@
                 return ParserResult.Success(elements, lexemeString);
             }, parser.Name + "[" + least + ".." + most + "]");
 
+        public static NamedParser<U, TLexeme, TToken, TSourceFile> Many<T, U, TLexeme, TToken, TSourceFile>(this NamedParser<T, TLexeme, TToken, TSourceFile> parser, Func<T, U, U> aggregator, U start = default, int least = 1, int most = int.MaxValue)
+            where TLexeme : ILexeme<TToken, TSourceFile>
+            where TSourceFile : ISourceFile =>
+            WithName<U, TLexeme, TToken, TSourceFile>(_lexemeString =>
+            {
+                var lexemeString = _lexemeString;
+
+                U aggregate = start;
+
+                for (int i = 0; i < most; i++)
+                {
+                    var result = parser.Parse(lexemeString);
+
+                    if (result.IsSuccessful)
+                    {
+                        lexemeString = result.RemainingLexemeString;
+
+                        aggregate = aggregator(result.Result, aggregate);
+                    }
+                    else
+                    {
+                        if (i < least) return ParserResult.Failure<U, TLexeme, TToken, TSourceFile>(result.Error!.Value);
+
+                        return ParserResult.Success(aggregate, lexemeString);
+                    }
+                }
+
+                return ParserResult.Success(aggregate, lexemeString);
+            }, parser.Name + "[" + least + ".." + most + "]");
+
         public static NamedParser<U, TLexeme, TToken, TSourceFile> Transform<T, U, TLexeme, TToken, TSourceFile>(this NamedParser<T, TLexeme, TToken, TSourceFile> parser, Func<T, U> func)
             where TLexeme : ILexeme<TToken, TSourceFile>
             where TSourceFile : ISourceFile =>
@@ -200,6 +230,18 @@
 
                 return ParserResult.Failure<U, TLexeme, TToken, TSourceFile>(result.Error!.Value);
             }, "f(" + parser.Name + ")");
+
+        public static NamedParser<U, TLexeme, TToken, TSourceFile> Null<T, U, TLexeme, TToken, TSourceFile>(this NamedParser<T, TLexeme, TToken, TSourceFile> parser)
+            where TLexeme : ILexeme<TToken, TSourceFile>
+            where TSourceFile : ISourceFile =>
+            WithName<U, TLexeme, TToken, TSourceFile>(lexemeString =>
+            {
+                var result = parser.Parse(lexemeString);
+
+                if (result.IsSuccessful) return ParserResult.Success(default(U)!, result.RemainingLexemeString);
+
+                return ParserResult.Failure<U, TLexeme, TToken, TSourceFile>(result.Error!.Value);
+            }, "null(" + parser.Name + ")");
 
         public static NamedParser<T, TLexeme, TToken, TSourceFile> WithName<T, TLexeme, TToken, TSourceFile>(this Parser<T, TLexeme, TToken, TSourceFile> parser, string name)
             where TLexeme : ILexeme<TToken, TSourceFile>

@@ -27,13 +27,16 @@
         Remainder,
         Not,
         BitwiseNot,
-        Or,
+        LogicalOr,
         BitwiseOr,
-        And,
+        LogicalAnd,
         BitwiseAnd,
         BitwiseXor,
         BitshiftLeft,
         BitshiftRight,
+
+        Increment,
+        Decrement,
 
         Assign,
 

@@ -3,20 +3,27 @@
     using System.Collections.Generic;
     using TempleLang.Lexer.Abstractions;
 
-    public readonly struct NamedParser<T, TLexeme, TToken, TSourceFile>
+    public struct NamedParser<T, TLexeme, TToken, TSourceFile>
         where TLexeme : ILexeme<TToken, TSourceFile>
         where TSourceFile : ISourceFile
     {
-        public readonly string Name;
-        public readonly Parser<T, TLexeme, TToken, TSourceFile> Parser;
+        public string Name { get; }
+        public Parser<T, TLexeme, TToken, TSourceFile> Parser { get; private set; }
 
         public ParserResult<T, TLexeme, TToken, TSourceFile> Parse(LexemeString<TLexeme, TToken, TSourceFile> lexemeString) => Parser(lexemeString);
+
+        public static NamedParser<T, TLexeme, TToken, TSourceFile> Empty =>
+            new NamedParser<T, TLexeme, TToken, TSourceFile>(
+                "Empty",
+                s => ParserResult.Success(default(T)!, s));
 
         public NamedParser(string name, Parser<T, TLexeme, TToken, TSourceFile> parser) : this()
         {
             Name = name;
             Parser = parser;
         }
+
+        public void OverrideParser(Parser<T, TLexeme, TToken, TSourceFile> newParser) => Parser = newParser;
 
         /// <inheritdoc/>
         public override bool Equals(object? obj) => obj is NamedParser<T, TLexeme, TToken, TSourceFile> parser && Name == parser.Name && EqualityComparer<Parser<T, TLexeme, TToken, TSourceFile>>.Default.Equals(Parser, parser.Parser);

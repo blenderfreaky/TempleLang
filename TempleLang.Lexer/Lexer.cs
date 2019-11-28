@@ -66,10 +66,12 @@
                 case '+':
                     return MakeLexeme(SwitchOnNextCharacter(
                        Token.Add,
+                       ('+', Token.Increment),
                        ('=', Token.AddCompoundAssign)));
                 case '-':
                     return MakeLexeme(SwitchOnNextCharacter(
                        Token.Subtract,
+                       ('-', Token.Decrement),
                        ('=', Token.SubtractCompoundAssign)));
                 case '*':
                     return MakeLexeme(SwitchOnNextCharacter(
@@ -102,11 +104,11 @@
                     var andType = SwitchOnNextCharacter(
                         Token.BitwiseAnd,
                         ('=', Token.BitwiseAndCompoundAssign),
-                        ('&', Token.And));
-                    if (andType == Token.And)
+                        ('&', Token.LogicalAnd));
+                    if (andType == Token.LogicalAnd)
                     {
                         andType = SwitchOnNextCharacter(
-                            Token.And,
+                            Token.LogicalAnd,
                             ('=', Token.AndCompoundAssign));
                     }
                     return MakeLexeme(andType);
@@ -114,11 +116,11 @@
                     var orType = SwitchOnNextCharacter(
                         Token.BitwiseOr,
                         ('=', Token.BitwiseOrCompoundAssign),
-                        ('|', Token.Or));
-                    if (orType == Token.Or)
+                        ('|', Token.LogicalOr));
+                    if (orType == Token.LogicalOr)
                     {
                         orType = SwitchOnNextCharacter(
-                            Token.Or,
+                            Token.LogicalOr,
                             ('=', Token.OrCompoundAssign));
                     }
                     return MakeLexeme(orType);
@@ -164,6 +166,7 @@
 
                         if (nextCharacter == '\"')
                         {
+                            AdvanceChar();
                             TokenBuffer.Append(nextCharacter);
                             break;
                         }
@@ -370,6 +373,7 @@
             }
             else
             {
+                AdvanceChar();
                 TokenBuffer.Append(character);
             }
         }

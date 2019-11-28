@@ -1,8 +1,44 @@
-﻿using System;
-
-namespace TempleLang.Parser
+﻿namespace TempleLang.Parser
 {
-    public abstract class Literal : Expression
+    using System.Collections.Generic;
+    using TempleLang.Lexer;
+    using TempleLang.Parser.Abstractions;
+    using Lexeme = Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>;
+    using LexemeString = Lexer.Abstractions.LexemeString<Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>, Lexer.Token, Lexer.SourceFile>;
+    using static Abstractions.ParserExtensions;
+    using System.Net.Http.Headers;
+    using System.Linq;
+    using System.Collections;
+    using System;
+
+    public static partial class Parser
+    {
+        public static readonly NamedParser<NullLiteral, Lexeme, Token, SourceFile> NullLiteral =
+            Tokens[Token.NullLiteral].As(() => new NullLiteral());
+
+        public static readonly NamedParser<BoolLiteral, Lexeme, Token, SourceFile> BoolLiteral =
+            Tokens[Token.BooleanFalseLiteral].As(() => new BoolLiteral(false))
+            .Or(Tokens[Token.BooleanTrueLiteral].As(() => new BoolLiteral(true)));
+
+        public static readonly NamedParser<NumberLiteral, Lexeme, Token, SourceFile> NumberLiteral =
+            Tokens[Token.IntegerLiteral]
+            .And(Or(
+                Tokens[Token.Int8Suffix].As(NumberFlags.Int8),
+                Tokens[Token.Int16Suffix].As(NumberFlags.Int16),
+                Tokens[Token.Int32Suffix].As(NumberFlags.Int32),
+                Tokens[Token.Int64Suffix].As(NumberFlags.Int64),
+                Tokens[Token.FloatSingleSuffix].As(NumberFlags.Single),
+                Tokens[Token.FloatDoubleSuffix].As(NumberFlags.Double),
+                Tokens[Token.UnsignedSuffix].As(NumberFlags.Unsigned))
+            .Many(aggregator: (NumberFlags x, NumberFlags a) => a | x))
+            .Transform(v => new NumberLiteral(v.Item1.Text, v.Item2));
+
+        public static readonly NamedParser<StringLiteral, Lexeme, Token, SourceFile> StringLiteral =
+            Tokens[Token.StringLiteral]
+            .Transform(s => new StringLiteral(s.Text.Substring(1, s.Text.Length - 2)));
+    }
+
+    public abstract class Literal : Atomic
     {
     }
 
@@ -17,20 +53,8 @@ namespace TempleLang.Parser
         public BoolLiteral(bool value) => Value = value;
     }
 
-    public class IntLiteral : Literal
-    {
-        public readonly long Value;
-        public readonly IntFlags Flags;
-
-        public IntLiteral(long value, IntFlags flags)
-        {
-            Value = value;
-            Flags = flags;
-        }
-    }
-
     [Flags]
-    public enum IntFlags
+    public enum NumberFlags
     {
         None = 0,
 
@@ -39,28 +63,22 @@ namespace TempleLang.Parser
         Int32 = 1 << 2,
         Int64 = 1 << 3,
 
-        Unsigned = 1 << 4,
+        Single = 1 << 4,
+        Double = 1 << 5,
+
+        Unsigned = 1 << 6,
     }
 
-    public class FloatLiteral : Literal
+    public class NumberLiteral : Literal
     {
-        public readonly double Value;
-        public readonly FloatFlags Flags;
+        public readonly string Value;
+        public readonly NumberFlags Flags;
 
-        public FloatLiteral(double value, FloatFlags flags)
+        public NumberLiteral(string value, NumberFlags flags)
         {
             Value = value;
             Flags = flags;
         }
-    }
-
-    [Flags]
-    public enum FloatFlags
-    {
-        None = 0,
-        Single = 1 << 0,
-        Double = 1 << 1,
-        Unsigned = 1 << 2,
     }
 
     public class StringLiteral : Literal

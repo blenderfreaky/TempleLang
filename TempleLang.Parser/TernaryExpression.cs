@@ -1,6 +1,6 @@
 ﻿namespace TempleLang.Parser
 {
-    public class TernaryExpression
+    public class TernaryExpression : Expression
     {
         public readonly Expression Condition;
         public readonly Expression TrueValue;
