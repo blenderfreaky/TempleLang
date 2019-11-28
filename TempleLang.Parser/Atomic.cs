@@ -10,17 +10,19 @@
     using System.Linq;
     using System.Collections;
     using System;
+    using static Parser;
+    using static LiteralParser;
 
-    public static partial class Parser
+    public static class AtomicParser
     {
         public static readonly NamedParser<Identifier, Lexeme, Token, SourceFile> Identifier =
             TransformToken(Token.Identifier, l => new Identifier(l.Text));
 
         public static readonly NamedParser<Literal, Lexeme, Token, SourceFile> Literal = Or(
-            NullLiteral.Cast<NullLiteral, Literal, Lexeme, Token, SourceFile>(),
-            BoolLiteral.Cast<BoolLiteral, Literal, Lexeme, Token, SourceFile>(),
-            NumberLiteral.Cast<NumberLiteral, Literal, Lexeme, Token, SourceFile>(),
-            StringLiteral.Cast<StringLiteral, Literal, Lexeme, Token, SourceFile>());
+            LiteralParser.NullLiteral.Cast<NullLiteral, Literal, Lexeme, Token, SourceFile>(),
+            LiteralParser.BoolLiteral.Cast<BoolLiteral, Literal, Lexeme, Token, SourceFile>(),
+            LiteralParser.NumberLiteral.Cast<NumberLiteral, Literal, Lexeme, Token, SourceFile>(),
+            LiteralParser.StringLiteral.Cast<StringLiteral, Literal, Lexeme, Token, SourceFile>());
     }
 
     public class Atomic : Expression

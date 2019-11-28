@@ -10,7 +10,8 @@
         public string Name { get; }
         public Parser<T, TLexeme, TToken, TSourceFile> Parser { get; private set; }
 
-        public ParserResult<T, TLexeme, TToken, TSourceFile> Parse(LexemeString<TLexeme, TToken, TSourceFile> lexemeString) => Parser(lexemeString);
+        public ParserResult<T, TLexeme, TToken, TSourceFile> Parse(LexemeString<TLexeme, TToken, TSourceFile> lexemeString) =>
+            Parser(lexemeString);
 
         public static NamedParser<T, TLexeme, TToken, TSourceFile> Empty =>
             new NamedParser<T, TLexeme, TToken, TSourceFile>(
@@ -21,6 +22,12 @@
         {
             Name = name;
             Parser = parser;
+        }
+
+        public NamedParser(string name) : this()
+        {
+            Name = name;
+            Parser = s => ParserResult.Success(default(T)!, s);
         }
 
         public void OverrideParser(Parser<T, TLexeme, TToken, TSourceFile> newParser) => Parser = newParser;
@@ -36,6 +43,8 @@
             hashCode = (hashCode * -1521134295) + EqualityComparer<Parser<T, TLexeme, TToken, TSourceFile>>.Default.GetHashCode(Parser);
             return hashCode;
         }
+
+        public override string ToString() => Name;
 
         /// <inheritdoc/>
         public static bool operator ==(NamedParser<T, TLexeme, TToken, TSourceFile> left, NamedParser<T, TLexeme, TToken, TSourceFile> right) => left.Equals(right);

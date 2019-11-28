@@ -27,7 +27,7 @@
             //ParserResult<List<Lexeme<Token, SourceFile>>, Lexeme<Token, SourceFile>, Token, SourceFile> parserResult = add.Parse(lexemes);
 
             ParserResult<Expression, Lexeme<Token, SourceFile>, Token, SourceFile> parserResult =
-                Parser.Expression.Parse(lexemes);
+                ExpressionParser.Expression.Parse(lexemes);
 
             Console.WriteLine(parserResult.Result);
         }

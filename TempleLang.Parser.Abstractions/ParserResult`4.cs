@@ -34,5 +34,7 @@
         public static bool operator ==(ParserResult<T, TLexeme, TToken, TSourceFile> left, ParserResult<T, TLexeme, TToken, TSourceFile> right) => left.Equals(right);
 
         public static bool operator !=(ParserResult<T, TLexeme, TToken, TSourceFile> left, ParserResult<T, TLexeme, TToken, TSourceFile> right) => !(left == right);
+
+        public override string ToString() => IsSuccessful ? "Success(" + Result + ")" : "Error(" + Error + ")";
     }
 }

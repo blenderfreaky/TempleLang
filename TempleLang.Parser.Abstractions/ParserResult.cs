@@ -25,7 +25,7 @@
         public static ParserResult<T, TLexeme, TToken, TSourceFile> Failure<T, TLexeme, TToken, TSourceFile>(IEnumerable<ParserError<TLexeme, TToken, TSourceFile>?> errors)
             where TLexeme : ILexeme<TToken, TSourceFile>
             where TSourceFile : ISourceFile =>
-            Failure<T, TLexeme, TToken, TSourceFile>(errors.Where(x => x != null));
+            Failure<T, TLexeme, TToken, TSourceFile>(errors.Where(x => x != null).Select(x => x!.Value));
 
         public static ParserResult<T, TLexeme, TToken, TSourceFile> Failure<T, TLexeme, TToken, TSourceFile>(LexemeString<TLexeme, TToken, TSourceFile> lexemeString, TToken expected, TLexeme actual)
 

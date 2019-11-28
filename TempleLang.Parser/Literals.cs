@@ -10,8 +10,9 @@
     using System.Linq;
     using System.Collections;
     using System;
+    using static Parser;
 
-    public static partial class Parser
+    public static class LiteralParser
     {
         public static readonly NamedParser<NullLiteral, Lexeme, Token, SourceFile> NullLiteral =
             Tokens[Token.NullLiteral].As(() => new NullLiteral());

@@ -54,7 +54,7 @@
 
                     if (rightResult.IsSuccessful) return rightResult;
 
-                    errors[i + 1] = rightResult.Error!.Value;
+                    errors[i] = rightResult.Error!.Value;
                 }
 
                 return ParserResult.Failure<T, TLexeme, TToken, TSourceFile>(errors);
