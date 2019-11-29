@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="actual">The char that was read. Null if EoF</param>
         /// <param name="context">Short description of the context under which the char was encountered</param>
-        /// <param name="expectedDescription">A short description of the chars expected to be read, 
+        /// <param name="expectedDescription">A short description of the chars expected to be read,
         /// finishing the sentence $"Got {Actual}, expected {ExpectedDescription}"</param>
         /// <param name="expected">The full list of all expected characters</param>
         public static UnexpectedCharException<TToken>

@@ -1,27 +1,21 @@
 ﻿namespace TempleLang.Parser
 {
-    using System.Collections.Generic;
+    using System;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
-    using Lexeme = Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>;
-    using LexemeString = Lexer.Abstractions.LexemeString<Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>, Lexer.Token, Lexer.SourceFile>;
     using static Abstractions.ParserExtensions;
-    using System.Net.Http.Headers;
-    using System.Linq;
-    using System.Collections;
-    using System;
     using static Parser;
 
     public static class LiteralParser
     {
-        public static readonly NamedParser<NullLiteral, Lexeme, Token, SourceFile> NullLiteral =
+        public static readonly NamedParser<NullLiteral, Token> NullLiteral =
             Tokens[Token.NullLiteral].As(() => new NullLiteral());
 
-        public static readonly NamedParser<BoolLiteral, Lexeme, Token, SourceFile> BoolLiteral =
+        public static readonly NamedParser<BoolLiteral, Token> BoolLiteral =
             Tokens[Token.BooleanFalseLiteral].As(() => new BoolLiteral(false))
             .Or(Tokens[Token.BooleanTrueLiteral].As(() => new BoolLiteral(true)));
 
-        public static readonly NamedParser<NumberLiteral, Lexeme, Token, SourceFile> NumberLiteral =
+        public static readonly NamedParser<NumberLiteral, Token> NumberLiteral =
             Tokens[Token.IntegerLiteral]
             .And(Or(
                 Tokens[Token.Int8Suffix].As(NumberFlags.Int8),
@@ -34,7 +28,7 @@
             .Many(aggregator: (NumberFlags x, NumberFlags a) => a | x))
             .Transform(v => new NumberLiteral(v.Item1.Text, v.Item2));
 
-        public static readonly NamedParser<StringLiteral, Lexeme, Token, SourceFile> StringLiteral =
+        public static readonly NamedParser<StringLiteral, Token> StringLiteral =
             Tokens[Token.StringLiteral]
             .Transform(s => new StringLiteral(s.Text.Substring(1, s.Text.Length - 2)));
     }

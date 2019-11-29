@@ -4,11 +4,9 @@
 
     public static class ILexerExtensions
     {
-        public static LexemeString<TLexeme, TToken, TSourceFile> LexUntil<TLexeme, TToken, TSourceFile>(this ILexer<TLexeme, TToken, TSourceFile> lexer, TToken terminator)
-            where TLexeme : ILexeme<TToken, TSourceFile>
-            where TSourceFile : ISourceFile
+        public static LexemeString<TToken> LexUntil<TToken>(this ILexer<TToken> lexer, TToken terminator)
         {
-            var lexemeBuffer = new List<TLexeme>();
+            var lexemeBuffer = new List<Lexeme<TToken>>();
 
             while (true)
             {
@@ -18,7 +16,7 @@
 
                 if (EqualityComparer<TToken>.Default.Equals(lexeme.Token, terminator))
                 {
-                    return new LexemeString<TLexeme, TToken, TSourceFile>(lexemeBuffer.ToArray());
+                    return new LexemeString<TToken>(lexemeBuffer.ToArray());
                 }
             }
         }

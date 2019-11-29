@@ -3,16 +3,14 @@
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
-    using TempleLang.Lexer.Abstractions;
+    using TempleLang.Lexer;
 
     /// <summary>
     /// The exception that is thrown, when a parser encounters an unexpected token
     /// </summary>
     /// <typeparam name="TToken"></typeparam>
     [Serializable]
-    public class UnexpectedLexemeException<TParseTreeNodeType, TLexeme, TToken, TSourceFile> : Exception
-        where TLexeme : ILexeme<TToken, TSourceFile>
-        where TSourceFile : ISourceFile
+    public class UnexpectedLexemeException<TParseTreeNodeType, TToken> : Exception
     {
         /// <summary>
         /// Gets the token types that would've been accepted
@@ -35,18 +33,18 @@
         /// <summary>
         /// Gets the actual read token
         /// </summary>
-        public TLexeme Actual { get; }
+        public Lexeme<TToken> Actual { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnexpectedLexemeException{TParseTreeNodeType, TLexeme, TToken, TSourceFile}"/> class.
+        /// Initializes a new instance of the <see cref="UnexpectedLexemeException{TParseTreeNodeType,  TToken}"/> class.
         /// </summary>
         /// <param name="actual">The token that was read</param>
         /// <param name="context">Short description of the context under which the token was encountered</param>
-        /// <param name="expectedDescription">A short description of the token types expected to be read, 
+        /// <param name="expectedDescription">A short description of the token types expected to be read,
         /// finishing the sentence $"Got {Actual}, expected {ExpectedDescription}"</param>
         /// <param name="expected">The full list of all expected token types</param>
-        public UnexpectedLexemeException(TLexeme actual, TParseTreeNodeType context, string expectedDescription, params TToken[] expected)
-            : base($"Got {actual?.ToString() ?? "EoF"}, expected {expectedDescription} ({expected}), while parsing {context}")
+        public UnexpectedLexemeException(Lexeme<TToken> actual, TParseTreeNodeType context, string expectedDescription, params TToken[] expected)
+            : base($"Got {actual.ToString() ?? "EoF"}, expected {expectedDescription} ({expected}), while parsing {context}")
         {
             Actual = actual;
             ExpectedDescription = expectedDescription;
@@ -55,14 +53,14 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnexpectedLexemeException{TParseTreeNodeType, TLexeme, TToken, TSourceFile}"/> class.
+        /// Initializes a new instance of the <see cref="UnexpectedLexemeException{TParseTreeNodeType,  TToken}"/> class.
         /// </summary>
         /// <param name="actual">The token that was read</param>
         /// <param name="context">Short description of the context under which the token was encountered</param>
         /// <param name="expectedDescription">A short description of the token types expected to be read,
         /// finishing the sentence $"Got {Actual}, expected {ExpectedDescription}"</param>
-        public UnexpectedLexemeException(TLexeme actual, TParseTreeNodeType context, string expectedDescription)
-            : base($"Got {actual?.ToString() ?? "EoF"}, expected {expectedDescription}, while parsing {context}")
+        public UnexpectedLexemeException(Lexeme<TToken> actual, TParseTreeNodeType context, string expectedDescription)
+            : base($"Got {actual.ToString() ?? "EoF"}, expected {expectedDescription}, while parsing {context}")
         {
             Actual = actual;
             ExpectedDescription = expectedDescription;
@@ -70,13 +68,13 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnexpectedLexemeException{TParseTreeNodeType, TLexeme, TToken, TSourceFile}"/> class.
+        /// Initializes a new instance of the <see cref="UnexpectedLexemeException{TParseTreeNodeType,  TToken}"/> class.
         /// </summary>
         /// <param name="actual">The token that was read</param>
         /// <param name="context">Short description of the context under which the token was encountered</param>
         /// <param name="expected">The full list of all expected token types</param>
-        public UnexpectedLexemeException(TLexeme actual, TParseTreeNodeType context, params TToken[] expected)
-            : base($"Got {actual?.ToString() ?? "EoF"}, expected {expected}, while parsing {context}")
+        public UnexpectedLexemeException(Lexeme<TToken> actual, TParseTreeNodeType context, params TToken[] expected)
+            : base($"Got {actual.ToString() ?? "EoF"}, expected {expected}, while parsing {context}")
         {
             Actual = actual;
             ExpectedDescription = $"{expected}";
@@ -85,6 +83,7 @@
         }
 
 #nullable disable
+
         // <inheritdoc/>
         public UnexpectedLexemeException() { }
 
@@ -96,6 +95,7 @@
 
         // <inheritdoc/>
         protected UnexpectedLexemeException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+
 #nullable restore
     }
 }

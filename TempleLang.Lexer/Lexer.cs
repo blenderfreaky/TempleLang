@@ -1,19 +1,19 @@
 ﻿namespace TempleLang.Lexer
 {
-    using TempleLang.Lexer.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Runtime.CompilerServices;
     using System.Text;
+    using TempleLang.Lexer.Abstractions;
     using TempleLang.Lexer.Abstractions.Exceptions;
 
     /// <summary>
     /// Represents a lexer, able to lex the input from a <see cref="TextReader"/>
     /// </summary>
-    /// <typeparam name="TLexeme">The Type of the lexeme the lexer returns. Must implement <see cref="ILexeme{TToken, TSourceFile}"/></typeparam>
+    /// <typeparam name="TLexeme">The Type of the lexeme the lexer returns. Must implement <see cref="ILexeme{TToken}"/></typeparam>
     /// <typeparam name="TToken">The Token Type used by the Lexeme</typeparam>
-    public class Lexer : ILexer<Lexeme<Token, SourceFile>, Token, SourceFile>
+    public class Lexer : ILexer<Token>
     {
         private static readonly Dictionary<string, Token> _keywords = new Dictionary<string, Token>
         {
@@ -41,7 +41,7 @@
         /// </summary>
         /// <returns>The topmost token from the text</returns>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public Lexeme<Token, SourceFile> LexOne()
+        public Lexeme<Token> LexOne()
         {
             int characterInt;
             char character;
@@ -68,38 +68,47 @@
                        Token.Add,
                        ('+', Token.Increment),
                        ('=', Token.AddCompoundAssign)));
+
                 case '-':
                     return MakeLexeme(SwitchOnNextCharacter(
                        Token.Subtract,
                        ('-', Token.Decrement),
                        ('=', Token.SubtractCompoundAssign)));
+
                 case '*':
                     return MakeLexeme(SwitchOnNextCharacter(
                        Token.Multiply,
                        ('=', Token.MultiplyCompoundAssign)));
+
                 case '/':
                     return MakeLexeme(SwitchOnNextCharacter(
                        Token.Divide,
                        ('=', Token.DivideCompoundAssign)));
+
                 case '%':
                     return MakeLexeme(SwitchOnNextCharacter(
                        Token.Remainder,
                        ('=', Token.RemainderCompoundAssign)));
+
                 case '!':
                     return MakeLexeme(
                        SwitchOnNextCharacter(Token.Not,
                        ('=', Token.ComparisonNotEqual)));
+
                 case '~':
                     return MakeLexeme(
                        Token.BitwiseNot);
+
                 case '^':
                     return MakeLexeme(SwitchOnNextCharacter(
                        Token.BitwiseXor,
                        ('=', Token.BitwiseXorCompoundAssign)));
+
                 case '=':
                     return MakeLexeme(SwitchOnNextCharacter(
                        Token.Assign,
                        ('=', Token.ComparisonEqual)));
+
                 case '&':
                     var andType = SwitchOnNextCharacter(
                         Token.BitwiseAnd,
@@ -112,6 +121,7 @@
                             ('=', Token.AndCompoundAssign));
                     }
                     return MakeLexeme(andType);
+
                 case '|':
                     var orType = SwitchOnNextCharacter(
                         Token.BitwiseOr,
@@ -124,6 +134,7 @@
                             ('=', Token.OrCompoundAssign));
                     }
                     return MakeLexeme(orType);
+
                 case '<':
                     var lessType = SwitchOnNextCharacter(
                         Token.ComparisonLessThan,
@@ -136,6 +147,7 @@
                             ('=', Token.BitshiftLeftCompoundAssign));
                     }
                     return MakeLexeme(lessType);
+
                 case '>':
                     var greaterType = SwitchOnNextCharacter(
                         Token.ComparisonGreaterThan,
@@ -148,10 +160,12 @@
                             ('=', Token.BitshiftRightCompoundAssign));
                     }
                     return MakeLexeme(greaterType);
+
                 case '\'':
                     LexEscapableChar(Token.CharacterLiteral);
                     LexChar('\'', Token.CharacterLiteral);
                     return MakeLexeme(Token.CharacterLiteral);
+
                 case '\"':
                     while (true)
                     {
@@ -174,18 +188,25 @@
                         LexEscapableChar(Token.StringLiteral);
                     }
                     return MakeLexeme(Token.StringLiteral);
+
                 case '{':
                     return MakeLexeme(Token.LeftCodeDelimiter);
+
                 case '}':
                     return MakeLexeme(Token.RightCodeDelimiter);
+
                 case '[':
                     return MakeLexeme(Token.LeftEnumerationDelimiter);
+
                 case ']':
                     return MakeLexeme(Token.RightEnumerationDelimiter);
+
                 case '(':
                     return MakeLexeme(Token.LeftExpressionDelimiter);
+
                 case ')':
                     return MakeLexeme(Token.RightExpressionDelimiter);
+
                 case ';':
                     return MakeLexeme(Token.StatementDelimiter);
             }
@@ -302,9 +323,9 @@
             AdvanceChar();
         }
 
-        private Lexeme<Token, SourceFile> MakeLexeme(Token tokenType)
+        private Lexeme<Token> MakeLexeme(Token tokenType)
         {
-            var token = new Lexeme<Token, SourceFile>(TokenBuffer.ToString(), tokenType, SourceFile, TokenIndex, TokenCharStartIndex, CurrentCharIndex);
+            var token = new Lexeme<Token>(TokenBuffer.ToString(), tokenType, SourceFile, TokenIndex, TokenCharStartIndex, CurrentCharIndex);
 
             TokenCharStartIndex = CurrentCharIndex + 1;
             TokenIndex++;
@@ -360,6 +381,7 @@
                     case '0':
                         AdvanceChar();
                         break;
+
                     case 'u':
                         AdvanceChar();
                         LexHexDigit(context);

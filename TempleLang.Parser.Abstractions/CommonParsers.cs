@@ -1,14 +1,10 @@
 ﻿namespace TempleLang.Parser.Abstractions
 {
     using System.Collections.Generic;
-    using System.Linq;
-    using TempleLang.Lexer.Abstractions;
 
     public static class CommonParsers
     {
-        public static NamedParser<List<T>, TLexeme, TToken, TSourceFile> SeparatedBy<T, U, TLexeme, TToken, TSourceFile>(this NamedParser<T, TLexeme, TToken, TSourceFile> parser, NamedParser<U, TLexeme, TToken, TSourceFile> separator)
-            where TLexeme : ILexeme<TToken, TSourceFile>
-            where TSourceFile : ISourceFile =>
+        public static NamedParser<List<T>, TToken> SeparatedBy<T, U, TToken>(this NamedParser<T, TToken> parser, NamedParser<U, TToken> separator) =>
             parser
             .And(separator
                 .And(parser)
