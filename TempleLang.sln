@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Test", "TempleLa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Parser", "TempleLang.Parser\TempleLang.Parser.csproj", "{081D9592-73F0-4E36-AC07-DAA34FF90822}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TempleLang.Parser.FSharp", "TempleLang.Parser.FSharp\TempleLang.Parser.FSharp.fsproj", "{0DA57CC5-6E89-4D0B-8737-D09ADAA05A4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{081D9592-73F0-4E36-AC07-DAA34FF90822}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{081D9592-73F0-4E36-AC07-DAA34FF90822}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{081D9592-73F0-4E36-AC07-DAA34FF90822}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DA57CC5-6E89-4D0B-8737-D09ADAA05A4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DA57CC5-6E89-4D0B-8737-D09ADAA05A4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DA57CC5-6E89-4D0B-8737-D09ADAA05A4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DA57CC5-6E89-4D0B-8737-D09ADAA05A4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,6 +58,7 @@ Global
 		{81829B6C-2EDA-4FED-B46A-4FAAA1280156} = {6B1E8D2E-2621-4205-8A52-921C31EB93F5}
 		{E60DBF2D-20FE-4542-8FDA-66F06EF63B63} = {6B1E8D2E-2621-4205-8A52-921C31EB93F5}
 		{081D9592-73F0-4E36-AC07-DAA34FF90822} = {A8A6EF5A-FFE3-4FDA-A33A-C962E09CFEFB}
+		{0DA57CC5-6E89-4D0B-8737-D09ADAA05A4B} = {A8A6EF5A-FFE3-4FDA-A33A-C962E09CFEFB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92D071EE-B8AC-4214-92DD-76CFB27CDA28}
