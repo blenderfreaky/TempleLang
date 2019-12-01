@@ -1,11 +1,13 @@
 ﻿namespace TempleLang.Test
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using TempleLang.Lexer;
     using TempleLang.Lexer.Abstractions;
     using TempleLang.Parser;
     using TempleLang.Parser.Abstractions;
+    using Lexeme = Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>;
 
     public static class Program
     {
@@ -21,16 +23,13 @@
 
             Console.WriteLine(string.Join('\n', lexemes));
 
-            //var add = Token.IntegerLiteral.Match<Token>().SeparatedBy(Token.Add.Match<Token>());
+            //var add = Token.IntegerLiteral.Match<Lexeme, Token, SourceFile>().SeparatedBy(Token.Add.Match<Lexeme, Token, SourceFile>());
             //ParserResult<List<Lexeme<Token, SourceFile>>, Lexeme<Token, SourceFile>, Token, SourceFile> parserResult = add.Parse(lexemes);
 
-            ParserResult<Expression, Token> parserResult =
+            ParserResult<Expression, Lexeme<Token, SourceFile>, Token, SourceFile> parserResult =
                 ExpressionParser.Expression.Parse(lexemes);
 
             Console.WriteLine(parserResult.Result);
-
-            var p = from a in ExpressionParser.Expression.Parser
-                    select a;
         }
     }
 }

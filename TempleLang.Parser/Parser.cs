@@ -13,12 +13,13 @@
         public static readonly Dictionary<Token, NamedParser<Lexeme, Token>> Tokens =
             TokenParsers<Token>();
 
-        public static Parser<Lexeme, Token> TokensWhere(Predicate<Token> predicate) =>
-            from t in Tokens
-            where predicate(t.Key)
-            select t.Value;
+        public static NamedParser<Lexeme, Token> TokensWhere(Predicate<Token> predicate) =>
+            Or(Tokens
+                .Where(x => predicate(x.Key))
+                .Select(x => x.Value)
+                .ToArray());
 
-        public static Parser<T, Token> TransformToken<T>(Token token, Func<Lexeme, T> func) =>
-            from t in Tokens[token] select func(t.Result);
+        public static NamedParser<T, Token> TransformToken<T>(Token token, Func<Lexeme, T> func) =>
+            Tokens[token].Transform(func);
     }
 }

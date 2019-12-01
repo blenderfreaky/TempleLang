@@ -9,7 +9,6 @@
     <ProjectReference Include="..\TempleLang.Lexer.Abstractions\TempleLang.Lexer.Abstractions.csproj" />
     <ProjectReference Include="..\TempleLang.Lexer\TempleLang.Lexer.csproj" />
     <ProjectReference Include="..\TempleLang.Parser.Abstractions\TempleLang.Parser.Abstractions.csproj" />
-    <ProjectReference Include="..\TempleLang.Parser.FSharp\TempleLang.Parser.FSharp.fsproj" />
     <ProjectReference Include="..\TempleLang.Parser\TempleLang.Parser.csproj" />
   </ItemGroup>
 
