@@ -12,5 +12,7 @@
             TrueValue = trueValue;
             FalseValue = falseValue;
         }
+
+        public override string ToString() => $"({Condition}) ? ({TrueValue}) : ({FalseValue})";
     }
 }

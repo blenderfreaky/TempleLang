@@ -39,6 +39,7 @@
 
     public class NullLiteral : Literal
     {
+        public override string ToString() => "null";
     }
 
     public class BoolLiteral : Literal
@@ -46,6 +47,8 @@
         public readonly bool Value;
 
         public BoolLiteral(bool value) => Value = value;
+
+        public override string ToString() => Value.ToString();
     }
 
     [Flags]
@@ -74,6 +77,8 @@
             Value = value;
             Flags = flags;
         }
+
+        public override string ToString() => Value + Flags;
     }
 
     public class StringLiteral : Literal
@@ -84,5 +89,7 @@
         {
             Value = value;
         }
+
+        public override string ToString() => Value;
     }
 }

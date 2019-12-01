@@ -7,7 +7,7 @@
     using TempleLang.Lexer.Abstractions;
     using TempleLang.Parser;
     using TempleLang.Parser.Abstractions;
-    using Lexeme = Lexer.Lexeme<Lexer.Token, Lexer.SourceFile>;
+    using Lexeme = Lexer.Lexeme<Lexer.Token>;
 
     public static class Program
     {
@@ -26,7 +26,7 @@
             //var add = Token.IntegerLiteral.Match<Lexeme, Token, SourceFile>().SeparatedBy(Token.Add.Match<Lexeme, Token, SourceFile>());
             //ParserResult<List<Lexeme<Token, SourceFile>>, Lexeme<Token, SourceFile>, Token, SourceFile> parserResult = add.Parse(lexemes);
 
-            ParserResult<Expression, Lexeme<Token, SourceFile>, Token, SourceFile> parserResult =
+            ParserResult<Expression, Token> parserResult =
                 ExpressionParser.Expression.Parse(lexemes);
 
             Console.WriteLine(parserResult.Result);

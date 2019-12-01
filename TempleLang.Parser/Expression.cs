@@ -10,7 +10,7 @@
     {
         public static readonly NamedParser<Expression, Token> DelimitedExpression =
             Tokens[Token.LeftExpressionDelimiter].Null<Lexeme, Expression, Token>()
-            .And(Expression)
+            .And(Ref(() => Expression).WithName("Expression"))
             .And(Tokens[Token.RightExpressionDelimiter].Null<Lexeme, Expression, Token>())
             .Transform(x => x.Item1.Item2);
 
@@ -167,6 +167,8 @@
             Expression = expression;
             Operator = @operator;
         }
+
+        public override string ToString() => $"({Expression}){Operator}";
     }
 
     public class PrefixExpression : Expression
@@ -180,6 +182,8 @@
             Expression = expression;
             Operator = @operator;
         }
+
+        public override string ToString() => $"{Operator}({Expression})";
     }
 
     public class BinaryExpression : Expression
@@ -195,5 +199,7 @@
             Right = right;
             Operator = @operator;
         }
+
+        public override string ToString() => $"({Left}) {Operator} ({Right})";
     }
 }
