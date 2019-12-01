@@ -14,231 +14,155 @@
             where TToken : Enum =>
             GetEnumVals<TToken>().ToDictionary(x => x, Match<TToken>);
 
-        //public Parser<U, TToken> Bind<T, U, TToken>(this Parser<T, TToken> parser, Func<ParserResult<T, TToken>, Parser<U, TToken>> binder) =>
-        //    lexemeString => binder(parser(lexemeString));
-
-        public static NamedParser<T, TToken> Or<T, TToken>(this NamedParser<T, TToken> left, params NamedParser<T, TToken>[] right) =>
-            WithName<T, TToken>(lexemeString =>
+        public static Parser<U, TToken> Bind<T, U, TToken>(this Parser<T, TToken> parser, Func<ParserResult<T, TToken>, Parser<U, TToken>> binder) =>
+            lexemeString =>
             {
-                var errors = new ParserError<TToken>?[right.Length + 1];
-            
-                var leftResult = left.Parse(lexemeString);
-            
-                if (leftResult.IsSuccessful) return leftResult;
-            
-                errors[0] = leftResult.Error!.Value;
-            
-                for (int i = 0; i < right.Length; i++)
+                var result = parser(lexemeString);
+                return binder(result)(result.RemainingLexemeString);
+            };
+
+        public static Parser<U, TToken> SelectMany<T, U, TToken>(this Parser<T, TToken> parser, Func<ParserResult<T, TToken>, Parser<U, TToken>> binder) =>
+            Bind(parser, binder);
+
+        public static Parser<U, TToken> Bind<T, U, TToken>(this NamedParser<T, TToken> parser, Func<ParserResult<T, TToken>, Parser<U, TToken>> binder) =>
+            parser.Parser.Bind(binder);
+
+        public static Parser<U, TToken> SelectMany<T, U, TToken>(this NamedParser<T, TToken> parser, Func<ParserResult<T, TToken>, Parser<U, TToken>> binder) =>
+            Bind(parser, binder);
+
+        public static Parser<U, TToken> Select<T, U, TToken>(this Parser<T, TToken> parser, Func<ParserResult<T, TToken>, U> binder) =>
+            lexemeString =>
+            {
+                ParserResult<T, TToken> result = parser(lexemeString);
+
+                return result.IsSuccessful
+                    ? ParserResult.Success(binder(result), result.RemainingLexemeString)
+                    : result.CastError<U>();
+            };
+
+        public static Parser<U, TToken> Select<T, U, TToken>(this NamedParser<T, TToken> parser, Func<ParserResult<T, TToken>, U> binder) =>
+            parser.Parser.Select(binder);
+
+        public static Parser<T, TToken> Or<T, TToken>(params Parser<T, TToken>[] parsers)
+        {
+            if (parsers.Length == 0) throw new ArgumentException("Sequence contains no elements", nameof(parsers));
+
+            Parser<T, TToken> parser = parsers[0];
+
+            for (int i = 1; i < parsers.Length; i++)
+            {
+                parser = parser.Bind(r => r.IsSuccessful ? r.AsParser() : parsers[i]);
+            }
+
+            return parser;
+        }
+
+        public static Parser<T, TToken> Or<T, TToken>(this Parser<T, TToken> first, Parser<T, TToken> second) =>
+            first.Bind(r => r.IsSuccessful
+                ? r.AsParser()
+                : second);
+
+        public static Parser<T, TToken> AsParser<T, TToken>(this ParserResult<T, TToken> result) =>
+            _ => result;
+
+        public static Parser<Lexeme<TToken>, TToken> Match<TToken>(this Predicate<TToken> predicate) =>
+            lexemeString =>
+            {
+                var lexeme = lexemeString[0];
+
+                if (predicate(lexeme.Token))
                 {
-                    var rightResult = right[i].Parse(lexemeString);
-            
-                    if (rightResult.IsSuccessful) return rightResult;
-            
-                    errors[i + 1] = rightResult.Error!.Value;
+                    return ParserResult.Success(lexeme, lexemeString.Advance(1));
                 }
-            
-                return ParserResult.Failure<T, TToken>(errors);
-            }, left.Name + " | " + string.Join(" | ", right.Select(x => x.Name)));
 
-        public static NamedParser<T, TToken> Or<T, TToken>(params NamedParser<T, TToken>[] parsers) =>
-            WithName<T, TToken>(lexemeString =>
-            {
-                var errors = new ParserError<TToken>?[parsers.Length];
-            
-                for (int i = 0; i < parsers.Length; i++)
-                {
-                    var rightResult = parsers[i].Parse(lexemeString);
-            
-                    if (rightResult.IsSuccessful) return rightResult;
-            
-                    errors[i] = rightResult.Error!.Value;
-                }
-            
-                return ParserResult.Failure<T, TToken>(errors);
-            }, string.Join(" | ", parsers.Select(x => x.Name)));
+                return ParserResult.Failure<Lexeme<TToken>, TToken>(lexemeString, default! /*TODO*/, lexeme);
+            };
 
-        public static NamedParser<T[], TToken> Then<T, TToken>(this NamedParser<T, TToken> left, params NamedParser<T, TToken>[] right) =>
-            WithName<T[], TToken>(_lexemeString =>
-            {
-                var lexemeString = _lexemeString;
-                var elements = new T[right.Length + 1];
-            
-                var leftResult = left.Parse(lexemeString);
-            
-                if (!leftResult.IsSuccessful) return ParserResult.Failure<T[], TToken>(leftResult.Error!.Value);
-            
-                lexemeString = leftResult.RemainingLexemeString;
-                elements[0] = leftResult.Result;
-            
-                for (int i = 0; i < right.Length; i++)
-                {
-                    var rightResult = right[i].Parse(lexemeString);
-            
-                    if (!rightResult.IsSuccessful) return ParserResult.Failure<T[], TToken>(rightResult.Error!.Value);
-            
-                    lexemeString = rightResult.RemainingLexemeString;
-                    elements[i + 1] = rightResult.Result;
-                }
-            
-                return ParserResult.Success(elements, lexemeString);
-            }, "(" + left.Name + ") & (" + string.Join(") & (", right.Select(x => x.Name)) + ")");
+        public static NamedParser<Lexeme<TToken>, TToken> Match<TToken>(this TToken token) =>
+            Match<TToken>(x => EqualityComparer<TToken>.Default.Equals(x, token))
+            .WithName((token ?? throw new ArgumentNullException(nameof(token))).ToString());
 
-        public static NamedParser<(T, U), TToken> And<T, U, TToken>(this NamedParser<T, TToken> left, NamedParser<U, TToken> right) =>
-            WithName<(T, U), TToken>(_lexemeString =>
+        public static Parser<T, TToken> Maybe<T, TToken>(this Parser<T, TToken> parser) =>
+            lexemeString =>
             {
-                var lexemeString = _lexemeString;
-          
-                var leftResult = left.Parse(lexemeString);
-          
-                if (!leftResult.IsSuccessful) return ParserResult.Failure<(T, U), TToken>(leftResult.Error!.Value);
-          
-                lexemeString = leftResult.RemainingLexemeString;
-          
-                var rightResult = right.Parse(lexemeString);
-          
-                if (!rightResult.IsSuccessful) return ParserResult.Failure<(T, U), TToken>(rightResult.Error!.Value);
-          
-                lexemeString = rightResult.RemainingLexemeString;
-          
-                return ParserResult.Success((leftResult.Result, rightResult.Result), lexemeString);
-            }, "(" + left.Name + ") & (" + right.Name + ")");
+                var result = parser(lexemeString);
 
-        public static NamedParser<T, TToken> Maybe<T, TToken>(this NamedParser<T, TToken> parser) =>
-            WithName<T, TToken>(lexemeString =>
-            {
-                var result = parser.Parse(lexemeString);
-            
                 if (result.IsSuccessful) return result;
-            
-                return default;
-            }, parser.Name + "?");
 
-        public static NamedParser<List<T>, TToken> Many<T, TToken>(this NamedParser<T, TToken> parser, int least = 1, int most = int.MaxValue) =>
-            WithName<List<T>, TToken>(_lexemeString =>
+                return default;
+            };
+
+        public static Parser<List<T>, TToken> Many<T, TToken>(this Parser<T, TToken> parser, int least = 1, int most = int.MaxValue) =>
+            _lexemeString =>
             {
                 var lexemeString = _lexemeString;
-            
+
                 var elements = new List<T>(least);
-            
+
                 for (int i = 0; i < most; i++)
                 {
-                    var result = parser.Parse(lexemeString);
-            
+                    var result = parser(lexemeString);
+
                     if (result.IsSuccessful)
                     {
                         lexemeString = result.RemainingLexemeString;
-            
+
                         elements.Add(result.Result);
                     }
                     else
                     {
                         if (i < least) return ParserResult.Failure<List<T>, TToken>(result.Error!.Value);
-            
+
                         return ParserResult.Success(elements, lexemeString);
                     }
                 }
-            
-                return ParserResult.Success(elements, lexemeString);
-            }, parser.Name + "[" + least + ".." + most + "]");
 
-        public static NamedParser<U, TToken> Many<T, U, TToken>(this NamedParser<T, TToken> parser, Func<T, U, U> aggregator, U start = default, int least = 1, int most = int.MaxValue) =>
-            WithName<U, TToken>(_lexemeString =>
+                return ParserResult.Success(elements, lexemeString);
+            };
+
+        public static Parser<U, TToken> Many<T, U, TToken>(this Parser<T, TToken> parser, Func<T, U, U> aggregator, U start = default, int least = 1, int most = int.MaxValue) =>
+            _lexemeString =>
             {
                 var lexemeString = _lexemeString;
-            
+
                 U aggregate = start;
-            
+
                 for (int i = 0; i < most; i++)
                 {
-                    var result = parser.Parse(lexemeString);
-            
+                    var result = parser(lexemeString);
+
                     if (result.IsSuccessful)
                     {
                         lexemeString = result.RemainingLexemeString;
-            
+
                         aggregate = aggregator(result.Result, aggregate);
                     }
                     else
                     {
                         if (i < least) return ParserResult.Failure<U, TToken>(result.Error!.Value);
-            
+
                         return ParserResult.Success(aggregate, lexemeString);
                     }
                 }
-            
+
                 return ParserResult.Success(aggregate, lexemeString);
-            }, parser.Name + "[" + least + ".." + most + "]");
+            };
 
-        public static NamedParser<U, TToken> Transform<T, U, TToken>(this NamedParser<T, TToken> parser, Func<T, U> func) =>
-            WithName<U, TToken>(lexemeString =>
+        public static Parser<U, TToken> Transform<T, U, TToken>(this Parser<T, TToken> parser, Func<T, U> func) =>
+            lexemeString =>
             {
-                var result = parser.Parse(lexemeString);
-            
+                var result = parser(lexemeString);
+
                 if (result.IsSuccessful) return ParserResult.Success(func(result.Result), result.RemainingLexemeString);
-            
+
                 return ParserResult.Failure<U, TToken>(result.Error!.Value);
-            }, "f(" + parser.Name + ")");
+            };
 
-        public static NamedParser<U, TToken> Cast<T, U, TToken>(this NamedParser<T, TToken> parser)
-            where T : U =>
-            WithName<U, TToken>(lexemeString =>
-            {
-                var result = parser.Parse(lexemeString);
-            
-                if (result.IsSuccessful) return ParserResult.Success((U)result.Result, result.RemainingLexemeString);
-            
-                return ParserResult.Failure<U, TToken>(result.Error!.Value);
-            }, "f(" + parser.Name + ")");
-
-        public static NamedParser<U, TToken> As<T, U, TToken>(this NamedParser<T, TToken> parser, U val) =>
-            WithName<U, TToken>(lexemeString =>
-            {
-                var result = parser.Parse(lexemeString);
-            
-                if (result.IsSuccessful) return ParserResult.Success(val, result.RemainingLexemeString);
-            
-                return ParserResult.Failure<U, TToken>(result.Error!.Value);
-            }, "f(" + parser.Name + ")");
-
-        public static NamedParser<U, TToken> As<T, U, TToken>(this NamedParser<T, TToken> parser, Func<U> val) =>
-            WithName<U, TToken>(lexemeString =>
-            {
-                var result = parser.Parse(lexemeString);
-            
-                if (result.IsSuccessful) return ParserResult.Success(val(), result.RemainingLexemeString);
-            
-                return ParserResult.Failure<U, TToken>(result.Error!.Value);
-            }, "f(" + parser.Name + ")");
-
-        public static NamedParser<U, TToken> Null<T, U, TToken>(this NamedParser<T, TToken> parser) =>
-            WithName<U, TToken>(lexemeString =>
-            {
-                var result = parser.Parse(lexemeString);
-                
-                if (result.IsSuccessful) return ParserResult.Success(default(U)!, result.RemainingLexemeString);
-                
-                return ParserResult.Failure<U, TToken>(result.Error!.Value);
-            }, "null(" + parser.Name + ")");
-
-        public static NamedParser<T, TToken> WithName<T, TToken>(this Parser<T, TToken> parser, string name)
-
-             =>
+        public static NamedParser<T, TToken> WithName<T, TToken>(this Parser<T, TToken> parser, string name) =>
             new NamedParser<T, TToken>(name, parser);
 
         public static NamedParser<T, TToken> WithName<T, TToken>(this NamedParser<T, TToken> parser, string name) =>
             new NamedParser<T, TToken>(name, parser.Parser);
 
-        public static NamedParser<Lexeme<TToken>, TToken> Match<TToken>(this TToken token) =>
-            WithName<Lexeme<TToken>, TToken>(lexemeString =>
-            {
-                var lexeme = lexemeString[0];
-
-                if (EqualityComparer<TToken>.Default.Equals(lexeme.Token, token))
-                {
-                    return ParserResult.Success(lexeme, lexemeString.Advance(1));
-                }
-
-                return ParserResult.Failure<Lexeme<TToken>, TToken>(lexemeString, token, lexeme);
-            }, token?.ToString() ?? "NULL");
     }
 }

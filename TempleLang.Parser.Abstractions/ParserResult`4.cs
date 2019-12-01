@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Parser.Abstractions
 {
+    using System;
     using System.Collections.Generic;
     using TempleLang.Lexer.Abstractions;
 
@@ -17,6 +18,11 @@
             Result = result;
             RemainingLexemeString = remainingLexemeString;
         }
+
+        public ParserResult<U, TToken> CastError<U>() =>
+            IsSuccessful
+            ? throw new InvalidOperationException("Cannot cast ParserResult.Success")
+            : new ParserResult<U, TToken>(false, Error, default!, RemainingLexemeString);
 
         public override bool Equals(object? obj) => obj is ParserResult<T, TToken> result
             && IsSuccessful == result.IsSuccessful
