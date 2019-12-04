@@ -15,7 +15,7 @@
             Operator = @operator;
         }
 
-        public static Parser<PostfixExpression, Token> CreateParser(Parser<Expression, Token> parser, Token @operator) =>
+        public static readonly Parser<PostfixExpression, Token> CreateParser(Parser<Expression, Token> parser, Token @operator) =>
             from val in parser
             from op in Parse.Token(@operator)
             select new PostfixExpression(val, op.Token);

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TempleLang.Lexer;
-using TempleLang.Parser.Abstractions;
-
-namespace TempleLang.Parser
+﻿namespace TempleLang.Parser
 {
+    using System.Linq;
+    using TempleLang.Lexer;
+    using TempleLang.Parser.Abstractions;
 
     public class BinaryExpression : Expression
     {

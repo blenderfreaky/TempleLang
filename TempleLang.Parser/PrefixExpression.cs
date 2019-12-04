@@ -15,7 +15,7 @@
             Operator = @operator;
         }
 
-        public static Parser<PrefixExpression, Token> CreateParser(Parser<Expression, Token> parser, Token @operator) =>
+        public static readonly Parser<PrefixExpression, Token> CreateParser(Parser<Expression, Token> parser, Token @operator) =>
             from op in Parse.Token(@operator)
             from val in parser
             select new PrefixExpression(val, op.Token);
