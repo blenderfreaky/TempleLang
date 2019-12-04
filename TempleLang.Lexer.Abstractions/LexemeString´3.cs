@@ -9,6 +9,8 @@
 
         private readonly int _offset;
 
+        public readonly int Length => _lexemes.Length - _offset;
+
         public Lexeme<TToken> this[int i] => _lexemes[_offset + i];
 
         public LexemeString(Lexeme<TToken>[] lexemes, int offset = 0)
