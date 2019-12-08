@@ -5,21 +5,6 @@
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
 
-    public class Atomic : Expression
-    {
-    }
-
-    public class BoolLiteral : Atomic
-    {
-        public bool Value { get; }
-
-        public BoolLiteral(bool value) => Value = value;
-
-        public static readonly Parser<BoolLiteral, Token> Parser =
-            Parse.Token(Token.BooleanFalseLiteral).Transform(new BoolLiteral(false))
-            .Or(Parse.Token(Token.BooleanTrueLiteral).Transform(new BoolLiteral(true)));
-    }
-
     [Flags]
     public enum NumberFlags
     {
@@ -36,19 +21,21 @@
         Unsigned = 1 << 6,
     }
 
-    public class NumberLiteral : Atomic
+    public sealed class NumberLiteral : Literal
     {
         public string Value { get; }
 
         public NumberFlags Flags { get; }
 
-        public NumberLiteral(string value, NumberFlags flags = NumberFlags.None)
+        private NumberLiteral(string value, NumberFlags flags = NumberFlags.None)
         {
             Value = value;
             Flags = flags;
         }
 
-        private static readonly Parser<string, Token> _numberParser =
+        public override string ToString() => $"{Value}" + (Flags != NumberFlags.None ? $"({Flags})" : "");
+
+        private static readonly Parser<string, Token> _number =
             Parse.Token(Token.IntegerLiteral)
             .Or(Parse.Token(Token.FloatLiteral))
             .Transform(x => x.Text);
@@ -61,10 +48,10 @@
             .Or(Parse.Token(Token.Int32Suffix).As(NumberFlags.SuffixInt32))
             .Or(Parse.Token(Token.Int64Suffix).As(NumberFlags.SuffixInt64))
             .Or(Parse.Token(Token.UnsignedSuffix).As(NumberFlags.Unsigned))
-            .Many().Transform(x => x.Aggregate((a, x) => a | x));
+            .Many().Transform(x => x.Count == 0 ? NumberFlags.None : x.Aggregate((a, y) => a | y));
 
-        public static readonly Parser<NumberLiteral, Token> Parser =
-            from number in _numberParser
+        public static new readonly Parser<NumberLiteral, Token> Parser =
+            from number in _number
             from suffix in _suffix
             select new NumberLiteral(number, suffix);
     }

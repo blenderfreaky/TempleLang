@@ -22,6 +22,8 @@
         public LexemeString<TToken> Advance(int distance = 1) =>
             new LexemeString<TToken>(_lexemes, _offset + distance);
 
+        public override string ToString() => $"Offset: {_offset} Remaining: {Length}";
+
         /// <inheritdoc/>
         /// <remarks>Performs a shallow comparison, not a deep one.</remarks>
         public override bool Equals(object? obj) => obj is LexemeString<TToken> @string

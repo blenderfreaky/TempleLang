@@ -3,6 +3,7 @@
     using Lexer.Abstractions;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     public interface IParserResult<out T, TToken>
     {
@@ -15,6 +16,7 @@
         public LexemeString<TToken> RemainingLexemeString { get; }
     }
 
+    [DebuggerStepThrough]
     public struct ParserResult<T, TToken> : IParserResult<T, TToken>
     {
         public bool IsSuccessful { get; }
@@ -25,6 +27,7 @@
 
         public LexemeString<TToken> RemainingLexemeString { get; }
 
+        [DebuggerStepThrough]
         private ParserResult(bool isSuccessful, string? errorMessage, T result, LexemeString<TToken> remainingLexemeString)
         {
             IsSuccessful = isSuccessful;
@@ -33,11 +36,13 @@
             RemainingLexemeString = remainingLexemeString;
         }
 
+        [DebuggerStepThrough]
         public ParserResult(T result, LexemeString<TToken> remainingLexemeString)
             : this(true, null, result, remainingLexemeString)
         {
         }
 
+        [DebuggerStepThrough]
         public ParserResult(string errorMessage, LexemeString<TToken> remainingLexemeString)
             : this(false, errorMessage, default!, remainingLexemeString)
         {
@@ -59,6 +64,10 @@
             return hashCode;
         }
 
+        public override string ToString() => IsSuccessful
+            ? $"Result: {Result}\nRemaining Lexemes: {RemainingLexemeString}"
+            : "Error: " + ErrorMessage;
+
         public static bool operator ==(ParserResult<T, TToken> left, ParserResult<T, TToken> right) => left.Equals(right);
 
         public static bool operator !=(ParserResult<T, TToken> left, ParserResult<T, TToken> right) => !(left == right);
@@ -66,12 +75,15 @@
 
     public static class ParserResult
     {
+        [DebuggerStepThrough]
         public static ParserResult<T, TToken> Success<T, TToken>(T result, LexemeString<TToken> remainingLexemeString) =>
             new ParserResult<T, TToken>(result, remainingLexemeString);
 
+        [DebuggerStepThrough]
         public static ParserResult<T, TToken> Failure<T, TToken>(string errorMessage, LexemeString<TToken> remainingLexemeString) =>
             new ParserResult<T, TToken>(errorMessage, remainingLexemeString);
 
+        [DebuggerStepThrough]
         public static ParserResult<U, TToken> Failure<T, U, TToken>(IParserResult<T, TToken> error) =>
             error.IsSuccessful
             ? throw new ArgumentException(nameof(error))

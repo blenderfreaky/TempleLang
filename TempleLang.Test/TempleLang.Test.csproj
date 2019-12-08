@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TempleLang.Lexer.Abstractions\TempleLang.Lexer.Abstractions.csproj" />
     <ProjectReference Include="..\TempleLang.Lexer\TempleLang.Lexer.csproj" />
+    <ProjectReference Include="..\TempleLang.Parser\TempleLang.Parser.csproj" />
   </ItemGroup>
 
 </Project>

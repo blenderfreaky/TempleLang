@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Parser
 {
+    using System;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
 
@@ -17,12 +18,19 @@
             FalseValue = falseValue;
         }
 
-        public static Parser<TernaryExpression, Token> CreateParser(Parser<Expression, Token> conditionParser, Parser<Expression, Token> valueParser) =>
-            from condition in conditionParser
+        public override string ToString() => $"({Condition}) ? ({TrueValue}) ({FalseValue})";
+
+        public static new readonly Parser<Expression, Token> Parser = CreateParser(BinaryExpression.LogicalOr);
+
+        public static Parser<Expression, Token> CreateParser(Parser<Expression, Token> parser) =>
+            parser == null ? throw new ArgumentNullException(nameof(parser)) : CreatePureParser(parser).Or(parser);
+
+        public static Parser<TernaryExpression, Token> CreatePureParser(Parser<Expression, Token> parser) =>
+            from condition in parser
             from _ in Parse.Token(Token.TernaryTruePrefix)
-            from trueValue in valueParser
+            from trueValue in parser
             from __ in Parse.Token(Token.TernaryFalsePrefix)
-            from falseValue in valueParser
+            from falseValue in parser
             select new TernaryExpression(condition, trueValue, falseValue);
     }
 }

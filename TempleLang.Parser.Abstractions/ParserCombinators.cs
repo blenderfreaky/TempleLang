@@ -28,7 +28,7 @@
 
                 if (!leftResult.IsSuccessful) return ParserResult.Failure<T, U, TToken>(leftResult);
 
-                var rightResult = right(leftResult.Result)(input);
+                var rightResult = right(leftResult.Result)(leftResult.RemainingLexemeString);
 
                 return rightResult;
             };
@@ -40,15 +40,12 @@
 
                 if (!leftResult.IsSuccessful) return ParserResult.Failure<T, V, TToken>(leftResult);
 
-                var rightResult = right(leftResult.Result)(input);
+                var rightResult = right(leftResult.Result)(leftResult.RemainingLexemeString);
 
                 if (!rightResult.IsSuccessful) return ParserResult.Failure<U, V, TToken>(rightResult);
 
                 return ParserResult.Success(selector(leftResult.Result!, rightResult.Result!), rightResult.RemainingLexemeString);
             };
-
-        public static Parser<T, TToken> Ref<T, TToken>(Func<Parser<T, TToken>> parser) =>
-            input => parser()(input);
 
         public static Parser<U, TToken> Transform<T, U, TToken>(this Parser<T, TToken> parser, Func<T, U> selector) =>
             input =>
