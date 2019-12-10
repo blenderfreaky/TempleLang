@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace TempleLang.Compiler
+﻿namespace TempleLang.Compiler
 {
+    using System;
+    using TempleLang.Intermediate.Statements;
 
     public struct MethodInfo : IMemberInfo
     {
@@ -13,14 +13,14 @@ namespace TempleLang.Compiler
 
         public ITypeInfo ContainingType { get; }
 
-        public Procedure Method { get; }
+        public IStatement EntryPoint { get; }
 
-        public MethodInfo(MemberFlags memberFlags, string name, ITypeInfo containingType, Procedure method)
+        public MethodInfo(MemberFlags memberFlags, string name, ITypeInfo containingType, IStatement entryPoint)
         {
             MemberFlags = memberFlags;
             Name = name;
             ContainingType = containingType;
-            Method = method;
+            EntryPoint = entryPoint;
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections;
-
-namespace TempleLang.Compiler
+﻿namespace TempleLang.Compiler
 {
+    using System;
+    using System.Collections;
+
     public interface IMemberInfo
     {
         MemberType MemberType { get; }
@@ -10,23 +10,6 @@ namespace TempleLang.Compiler
         string Name { get; }
 
         ITypeInfo ContainingType { get; }
-    }
-
-
-
-    public interface ITypeInfo : ISymbolContainer
-    {
-        string Name { get; }
-        string FullyQualifiedName { get; }
-    }
-
-    public interface ISymbolContainer
-    {
-    }
-
-    public class TypeInfo : ITypeInfo
-    {
-
     }
 
     public enum MemberType

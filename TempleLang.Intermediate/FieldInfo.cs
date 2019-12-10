@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace TempleLang.Compiler
+﻿namespace TempleLang.Compiler
 {
+    using System;
 
     public struct FieldInfo : IMemberInfo
     {
