@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Parser.Abstractions
 {
+    using Diagnostic;
     using Lexer.Abstractions;
     using System;
     using System.Collections.Generic;
@@ -60,6 +61,10 @@
         public static Parser<U, TToken> As<T, U, TToken>(this Parser<T, TToken> parser, U value) =>
             parser.Transform(_ => value);
 
+        public static Parser<Positioned<U>, TToken> AsPositioned<T, U, TToken>(this Parser<T, TToken> parser, U value)
+            where T : IPositioned =>
+            parser.Transform(x => x.Location.WithValue(value));
+
         public static Parser<List<T>, TToken> Many<T, TToken>(this Parser<T, TToken> parser, int least = 0, int most = int.MaxValue) =>
             input =>
             {
@@ -85,5 +90,7 @@
 
                 return ParserResult.Success(elements, remainder);
             };
+
+        public static Parser<T, TToken> OfType<T, TToken>(this Parser<T, TToken> parser) => parser;
     }
 }

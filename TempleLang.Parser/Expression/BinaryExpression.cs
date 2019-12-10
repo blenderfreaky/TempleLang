@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Parser
 {
+    using Diagnostic;
     using System;
     using System.Linq;
     using TempleLang.Lexer;
@@ -10,9 +11,9 @@
         public Expression Lhs { get; }
         public Expression Rhs { get; }
 
-        public Token Operator { get; }
+        public Lexeme<Token> Operator { get; }
 
-        public BinaryExpression(Expression lhs, Expression rhs, Token @operator)
+        public BinaryExpression(Expression lhs, Expression rhs, Lexeme<Token> @operator) : base(lhs, rhs, @operator)
         {
             Lhs = lhs;
             Rhs = rhs;
@@ -32,8 +33,8 @@
 
         public static readonly Parser<Expression, Token> Relational =
             CreateParserLR(Bitshift, Parse.Token(
-                Token.ComparisonLessThan, Token.ComparisonLessOrEqualThan,
-                Token.ComparisonGreaterThan, Token.ComparisonGreaterOrEqualThan));
+                Token.ComparisonLessThan, Token.ComparisonLessThanOrEqual,
+                Token.ComparisonGreaterThan, Token.ComparisonGreaterThanOrEqual));
 
         public static readonly Parser<Expression, Token> Equality =
             CreateParserLR(Relational, Parse.Token(Token.ComparisonEqual, Token.ComparisonNotEqual));
@@ -74,7 +75,7 @@
                 (from lhs in parser
                 from op in @operator
                 from rhs in self
-                select new BinaryExpression(lhs, rhs, op.Token))
+                select new BinaryExpression(lhs, rhs, op))
                 .Or(parser));
 
         //public static Parser<Expression, Token> CreateParserRL(Parser<Expression, Token> parser, Parser<Lexeme<Token>, Token> @operator) =>

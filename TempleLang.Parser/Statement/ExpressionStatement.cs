@@ -1,0 +1,23 @@
+﻿namespace TempleLang.Parser
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using TempleLang.Lexer;
+    using TempleLang.Parser.Abstractions;
+
+    public class ExpressionStatement : Statement
+    {
+        public Expression Expression { get; }
+
+        public ExpressionStatement(Expression expression)
+        {
+            Expression = expression;
+        }
+
+        public static new readonly Parser<ExpressionStatement, Token> Parser =
+            from expression in Expression.Parser
+            from _ in Parse.Token(Token.StatementDelimiter)
+            select new ExpressionStatement(expression);
+    }
+}

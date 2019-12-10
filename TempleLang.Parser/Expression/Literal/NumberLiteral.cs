@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using TempleLang.Diagnostic;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
 
@@ -27,7 +28,7 @@
 
         public NumberFlags Flags { get; }
 
-        private NumberLiteral(string value, NumberFlags flags = NumberFlags.None)
+        private NumberLiteral(Positioned<string> value, Positioned<NumberFlags> flags)
         {
             Value = value;
             Flags = flags;
@@ -35,20 +36,21 @@
 
         public override string ToString() => $"{Value}" + (Flags != NumberFlags.None ? $"({Flags})" : "");
 
-        private static readonly Parser<string, Token> _number =
+        private static readonly Parser<Positioned<string>, Token> _number =
             Parse.Token(Token.IntegerLiteral)
             .Or(Parse.Token(Token.FloatLiteral))
-            .Transform(x => x.Text);
+            .Transform(x => x.PositionedText);
 
-        private static readonly Parser<NumberFlags, Token> _suffix =
-            Parse.Token(Token.FloatSingleSuffix).As(NumberFlags.SuffixSingle)
-            .Or(Parse.Token(Token.FloatDoubleSuffix).As(NumberFlags.SuffixDouble))
-            .Or(Parse.Token(Token.Int8Suffix).As(NumberFlags.SuffixInt8))
-            .Or(Parse.Token(Token.Int16Suffix).As(NumberFlags.SuffixInt16))
-            .Or(Parse.Token(Token.Int32Suffix).As(NumberFlags.SuffixInt32))
-            .Or(Parse.Token(Token.Int64Suffix).As(NumberFlags.SuffixInt64))
-            .Or(Parse.Token(Token.UnsignedSuffix).As(NumberFlags.Unsigned))
-            .Many().Transform(x => x.Count == 0 ? NumberFlags.None : x.Aggregate((a, y) => a | y));
+        private static readonly Parser<Positioned<NumberFlags>, Token> _suffix =
+            Parse.Token(Token.FloatSingleSuffix).AsPositioned(NumberFlags.SuffixSingle)
+            .Or(Parse.Token(Token.FloatDoubleSuffix).AsPositioned(NumberFlags.SuffixDouble))
+            .Or(Parse.Token(Token.Int8Suffix).AsPositioned(NumberFlags.SuffixInt8))
+            .Or(Parse.Token(Token.Int16Suffix).AsPositioned(NumberFlags.SuffixInt16))
+            .Or(Parse.Token(Token.Int32Suffix).AsPositioned(NumberFlags.SuffixInt32))
+            .Or(Parse.Token(Token.Int64Suffix).AsPositioned(NumberFlags.SuffixInt64))
+            .Or(Parse.Token(Token.UnsignedSuffix).AsPositioned(NumberFlags.Unsigned))
+            .Many().Transform(x =>
+            x.Count == 0 ? FileLocation.Null.WithValue(NumberFlags.None) : x.Aggregate((a, y) => FileLocation.Concat(a, y).WithValue(a.Value | y.Value)));
 
         public static new readonly Parser<NumberLiteral, Token> Parser =
             from number in _number

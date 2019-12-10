@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Parser
 {
+    using TempleLang.Diagnostic;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
 
@@ -7,9 +8,9 @@
     {
         public Expression Value { get; }
 
-        public Token Operator { get; }
+        public Positioned<Token> Operator { get; }
 
-        public PostfixExpression(Expression value, Token @operator)
+        public PostfixExpression(Expression value, Positioned<Token> @operator) : base(value, @operator)
         {
             Value = value;
             Operator = @operator;
@@ -24,7 +25,7 @@
         public static Parser<Expression, Token> CreateParser(Parser<Expression, Token> parser, Parser<Lexeme<Token>, Token> @operator) =>
             (from val in parser
             from op in @operator
-            select new PostfixExpression(val, op.Token))
+            select new PostfixExpression(val, op))
             .Or(parser);
     }
 }

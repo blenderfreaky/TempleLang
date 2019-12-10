@@ -1,22 +1,22 @@
 ﻿namespace TempleLang.Parser
 {
+    using Diagnostic;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
 
     public class BoolLiteral : Literal
     {
-        public bool Value { get; }
+        public Positioned<bool> Value { get; }
 
-        public static readonly BoolLiteral False = new BoolLiteral(false);
-
-        public static readonly BoolLiteral True = new BoolLiteral(true);
-
-        public BoolLiteral(bool value) => Value = value;
+        public BoolLiteral(Positioned<bool> value) : base(value)
+        {
+            Value = value;
+        }
 
         public override string ToString() => $"{Value}";
 
         public static new readonly Parser<BoolLiteral, Token> Parser =
-            Parse.Token(Token.BooleanFalseLiteral).As(False)
-            .Or(Parse.Token(Token.BooleanTrueLiteral).As(True));
+            Parse.Token(Token.BooleanFalseLiteral).Transform(x => new BoolLiteral(x.Location.WithValue(false)))
+            .Or(Parse.Token(Token.BooleanTrueLiteral).Transform(x => new BoolLiteral(x.Location.WithValue(true))));
     }
 }

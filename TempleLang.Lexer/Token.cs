@@ -54,9 +54,9 @@
         BitshiftRightCompoundAssign,
 
         ComparisonGreaterThan,
-        ComparisonGreaterOrEqualThan,
+        ComparisonGreaterThanOrEqual,
         ComparisonLessThan,
-        ComparisonLessOrEqualThan,
+        ComparisonLessThanOrEqual,
         ComparisonEqual,
         ComparisonNotEqual,
 

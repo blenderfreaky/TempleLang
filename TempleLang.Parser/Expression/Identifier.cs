@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Parser
 {
+    using Diagnostic;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
 
@@ -7,15 +8,15 @@
     {
         public string Value { get; }
 
-        public Identifier(string value)
+        public Identifier(Positioned<string> name) : base(name)
         {
-            Value = value;
+            Value = name.Value;
         }
 
         public override string ToString() => Value;
 
         public static new readonly Parser<Identifier, Token> Parser =
             Parse.Token(Token.Identifier)
-            .Transform(x => new Identifier(x.Text));
+            .Transform(x => new Identifier(x.PositionedText));
     }
 }

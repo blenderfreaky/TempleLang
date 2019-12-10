@@ -1,10 +1,17 @@
 ﻿namespace TempleLang.Parser
 {
+    using TempleLang.Diagnostic;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
 
-    public abstract class Expression
+    public abstract class Expression : Syntax
     {
+        protected Expression(IPositioned location) : base(location) { }
+
+        protected Expression(IPositioned first, IPositioned second) : base(first, second) { }
+
+        protected Expression(params IPositioned[] locations) : base(locations) { }
+
         public static readonly Parser<Expression, Token> Atomic =
             Literal.Parser
             .Or<Expression, Token>(Identifier.Parser)

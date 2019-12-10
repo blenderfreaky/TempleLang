@@ -11,7 +11,7 @@
         public Expression TrueValue { get; }
         public Expression FalseValue { get; }
 
-        public TernaryExpression(Expression condition, Expression trueValue, Expression falseValue)
+        public TernaryExpression(Expression condition, Expression trueValue, Expression falseValue) : base(condition, trueValue, falseValue)
         {
             Condition = condition;
             TrueValue = trueValue;

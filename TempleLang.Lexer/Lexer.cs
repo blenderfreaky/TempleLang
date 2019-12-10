@@ -138,7 +138,7 @@
                 case '<':
                     var lessType = SwitchOnNextCharacter(
                         Token.ComparisonLessThan,
-                        ('=', Token.ComparisonLessOrEqualThan),
+                        ('=', Token.ComparisonLessThanOrEqual),
                         ('<', Token.BitshiftLeft));
                     if (lessType == Token.BitshiftLeft)
                     {
@@ -151,7 +151,7 @@
                 case '>':
                     var greaterType = SwitchOnNextCharacter(
                         Token.ComparisonGreaterThan,
-                        ('=', Token.ComparisonGreaterOrEqualThan),
+                        ('=', Token.ComparisonGreaterThanOrEqual),
                         ('>', Token.BitshiftRight));
                     if (greaterType == Token.BitshiftRight)
                     {
