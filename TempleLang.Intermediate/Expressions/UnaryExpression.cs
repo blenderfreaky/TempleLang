@@ -11,18 +11,31 @@ namespace TempleLang.Intermediate.Expressions
     {
         public IExpression Value { get; }
 
-        public Positioned<Token> Operation { get; }
+        public UnaryOperatorType Operator { get; }
 
         public ITypeInfo ReturnType { get; }
 
         public FileLocation Location { get; }
 
-        public UnaryExpression(IExpression value, Positioned<Token> operation, ITypeInfo returnType, FileLocation location)
+        public UnaryExpression(IExpression value, UnaryOperatorType @operator, ITypeInfo returnType, FileLocation location)
         {
             Value = value;
-            Operation = operation;
+            Operator = @operator;
             ReturnType = returnType;
             Location = location;
         }
+
+        public override string ToString() => $"{Operator}({Value}) : {ReturnType}";
+    }
+
+    public enum UnaryOperatorType
+    {
+        PreIncrement, PostIncrement,
+
+        PreDecrement, PostDecrement,
+
+        LogicalNot, BitwiseNot,
+
+        ERROR,
     }
 }

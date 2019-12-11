@@ -6,11 +6,11 @@
 
     public class BoolLiteral : Literal
     {
-        public Positioned<bool> Value { get; }
+        public bool Value { get; }
 
         public BoolLiteral(Positioned<bool> value) : base(value)
         {
-            Value = value;
+            Value = value.Value;
         }
 
         public override string ToString() => $"{Value}";

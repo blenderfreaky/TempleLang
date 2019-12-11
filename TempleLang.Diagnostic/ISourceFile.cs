@@ -1,4 +1,6 @@
-﻿namespace TempleLang.Lexer.Abstractions
+﻿using System;
+
+namespace TempleLang.Lexer.Abstractions
 {
     /// <summary>
     /// Represents a file used by the parser

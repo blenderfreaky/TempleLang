@@ -1,10 +1,11 @@
 ﻿namespace TempleLang.Lexer
 {
+    using System;
     using System.Collections.Generic;
     using TempleLang.Lexer.Abstractions;
 
     /// <inheritdoc/>
-    public struct SourceFile : ISourceFile
+    public struct SourceFile : ISourceFile, IEquatable<SourceFile>
     {
         /// <inheritdoc/>
         public string Name { get; }
@@ -19,7 +20,13 @@
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object? obj) => obj is SourceFile file && Name == file.Name && Path == file.Path;
+        public override bool Equals(object? obj) =>
+            obj is SourceFile file
+            && Equals(file);
+
+        public bool Equals(SourceFile file) =>
+            Name == file.Name
+            && Path == file.Path;
 
         /// <inheritdoc/>
         public override int GetHashCode()

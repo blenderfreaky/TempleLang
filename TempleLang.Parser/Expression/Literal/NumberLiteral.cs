@@ -28,7 +28,13 @@
 
         public NumberFlags Flags { get; }
 
-        private NumberLiteral(Positioned<string> value, Positioned<NumberFlags> flags)
+        private NumberLiteral(Positioned<string> value) : base(value)
+        {
+            Value = value;
+            Flags = NumberFlags.None;
+        }
+
+        private NumberLiteral(Positioned<string> value, Positioned<NumberFlags> flags) : base(value, flags)
         {
             Value = value;
             Flags = flags;
@@ -55,6 +61,6 @@
         public static new readonly Parser<NumberLiteral, Token> Parser =
             from number in _number
             from suffix in _suffix
-            select new NumberLiteral(number, suffix);
+            select suffix.Value == NumberFlags.None ? new NumberLiteral(number) : new NumberLiteral(number, suffix);
     }
 }

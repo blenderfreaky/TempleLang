@@ -25,10 +25,12 @@ namespace TempleLang.Diagnostic
             File = file;
         }
 
+        public override string ToString() => $"{File}({FirstCharIndex}:{LastCharIndex})";
+
         public Positioned<T> WithValue<T>(T value) => new Positioned<T>(value, this);
 
         public static FileLocation Concat(IPositioned first, IPositioned second) =>
-            first.Location.File != second.Location.File
+            !EqualityComparer<ISourceFile>.Default.Equals(first.Location.File, second.Location.File)
             ? throw new ArgumentException("Concatenated " + nameof(FileLocation) + "s must be in the same file.")
             : new FileLocation(
                 Math.Min(first.Location.FirstCharIndex, second.Location.FirstCharIndex),
@@ -54,7 +56,7 @@ namespace TempleLang.Diagnostic
             {
                 var location = enumerator.Current;
 
-                if (file != location.Location.File) throw new ArgumentException("Concatenated " + nameof(FileLocation) + "s must be in the same file.");
+                if (!EqualityComparer<ISourceFile>.Default.Equals(file, location.Location.File)) throw new ArgumentException("Concatenated " + nameof(FileLocation) + "s must be in the same file.");
 
                 firstCharIndex = Math.Min(firstCharIndex, location.Location.FirstCharIndex);
                 lastCharIndex = Math.Max(lastCharIndex, location.Location.LastCharIndex);

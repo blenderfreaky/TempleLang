@@ -2,5 +2,9 @@
 {
     public enum DiagnosticCode
     {
+        InvalidOperator,
+        InvalidConditionalType,
+        UnknownValue,
+        InvalidNumeric
     }
 }

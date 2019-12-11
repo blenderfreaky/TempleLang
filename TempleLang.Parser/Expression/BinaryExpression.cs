@@ -20,7 +20,7 @@
             Operator = @operator;
         }
 
-        public override string ToString() => $"({Lhs}) {Operator} ({Rhs})";
+        public override string ToString() => $"({Lhs} {Operator.Text} {Rhs})";
 
         public static readonly Parser<Expression, Token> Multiplicative =
             CreateParserLR(PrefixExpression.Parser, Parse.Token(Token.Multiply, Token.Divide));

@@ -11,8 +11,6 @@
     /// <summary>
     /// Represents a lexer, able to lex the input from a <see cref="TextReader"/>
     /// </summary>
-    /// <typeparam name="TLexeme">The Type of the lexeme the lexer returns. Must implement <see cref="ILexeme{TToken}"/></typeparam>
-    /// <typeparam name="TToken">The Token Type used by the Lexeme</typeparam>
     public class Lexer : ILexer<Token>
     {
         private static readonly Dictionary<string, Token> _keywords = new Dictionary<string, Token>
@@ -21,6 +19,7 @@
             ["else"] = Token.Else,
             ["for"] = Token.For,
             ["while"] = Token.While,
+            ["let"] = Token.Declarator,
         };
 
         public Lexer(TextReader textReader, SourceFile sourceFile)
@@ -92,7 +91,7 @@
 
                 case '!':
                     return MakeLexeme(
-                       SwitchOnNextCharacter(Token.Not,
+                       SwitchOnNextCharacter(Token.LogicalNot,
                        ('=', Token.ComparisonNotEqual)));
 
                 case '~':

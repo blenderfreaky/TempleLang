@@ -25,7 +25,7 @@
         Multiply,
         Divide,
         Remainder,
-        Not,
+        LogicalNot,
         BitwiseNot,
         LogicalOr,
         BitwiseOr,

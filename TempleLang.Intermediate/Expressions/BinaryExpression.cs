@@ -12,23 +12,27 @@ namespace TempleLang.Intermediate.Expressions
         public IExpression Lhs { get; }
         public IExpression Rhs { get; }
 
-        public Positioned<Token> Operation { get; }
+        public BinaryOperatorType Operator { get; }
 
         public ITypeInfo ReturnType { get; }
 
         public FileLocation Location { get; }
 
-        public BinaryExpression(IExpression lhs, IExpression rhs, Positioned<Token> operation, ITypeInfo returnType, FileLocation location)
+        public BinaryExpression(IExpression lhs, IExpression rhs, BinaryOperatorType @operator, ITypeInfo returnType, FileLocation location)
         {
             Lhs = lhs;
             Rhs = rhs;
-            Operation = operation;
+            Operator = @operator;
             ReturnType = returnType;
             Location = location;
         }
+
+        public override string ToString() => $"({Lhs} {Operator} {Rhs}) : {ReturnType}";
     }
 
-    /*  Add,
+    public enum BinaryOperatorType
+    {
+        Add,
         Subtract,
         Multiply,
         Divide,
@@ -61,5 +65,7 @@ namespace TempleLang.Intermediate.Expressions
         ComparisonLessThan,
         ComparisonLessThanOrEqual,
         ComparisonEqual,
-        ComparisonNotEqual,*/
+        ComparisonNotEqual,
+        ERROR,
+    }
 }

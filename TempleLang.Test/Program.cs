@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using TempleLang.Binder;
     using TempleLang.Lexer;
     using TempleLang.Lexer.Abstractions;
     using TempleLang.Parser;
@@ -26,9 +27,20 @@
                 //var add = Token.IntegerLiteral.Match<Lexeme, Token, SourceFile>().SeparatedBy(Token.Add.Match<Lexeme, Token, SourceFile>());
                 //ParserResult<List<Lexeme<Token, SourceFile>>, Lexeme<Token, SourceFile>, Token, SourceFile> parserResult = add.Parse(lexemes);
 
-                IParserResult<Expression, Token> parserResult = Expression.Parser(lexemes);
+                var parserResult =
+                    (from r in Statement.Parser
+                    from _ in Parse.Token(Token.EoF)
+                    select r)(lexemes);
 
                 Console.WriteLine(parserResult);
+
+                Binder binder = new Binder();
+
+                var bound = binder.BindStatement(parserResult.Result);
+
+                Console.WriteLine(bound);
+
+                foreach (var diagnostic in binder.Diagnostics) Console.WriteLine(diagnostic);
             }
         }
     }

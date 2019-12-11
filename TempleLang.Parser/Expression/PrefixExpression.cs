@@ -16,12 +16,12 @@
             Operator = @operator;
         }
 
-        public override string ToString() => $"{Operator} ({Value})";
+        public override string ToString() => $"({Operator.Value}{Value})";
 
         public static new readonly Parser<Expression, Token> Parser =
             CreateParser(PostfixExpression.Parser, Parse.Token(
                 Token.Increment, Token.Decrement,
-                Token.Not, Token.BitwiseNot,
+                Token.LogicalNot, Token.BitwiseNot,
                 Token.Add, Token.Subtract));
 
         public static Parser<Expression, Token> CreateParser(Parser<Expression, Token> parser, Parser<Lexeme<Token>, Token> @operator) =>

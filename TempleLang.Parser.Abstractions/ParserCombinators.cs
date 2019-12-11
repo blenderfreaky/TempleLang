@@ -73,7 +73,7 @@
 
                 for (int i = 1; i <= most; i++)
                 {
-                    var result = parser(input);
+                    var result = parser(remainder);
 
                     if (!result.IsSuccessful)
                     {
@@ -85,11 +85,15 @@
                         return ParserResult.Success(elements, remainder);
                     }
 
+                    elements.Add(result.Result);
+
                     remainder = result.RemainingLexemeString;
                 }
 
                 return ParserResult.Success(elements, remainder);
             };
+
+        public static Parser<List<T>, TToken> Maybe<T, TToken>(this Parser<T, TToken> parser) => parser.Many(least: 0, most: 1);
 
         public static Parser<T, TToken> OfType<T, TToken>(this Parser<T, TToken> parser) => parser;
     }

@@ -6,14 +6,14 @@
 
     public class Identifier : Expression
     {
-        public string Value { get; }
+        public string Name { get; }
 
         public Identifier(Positioned<string> name) : base(name)
         {
-            Value = name.Value;
+            Name = name.Value;
         }
 
-        public override string ToString() => Value;
+        public override string ToString() => Name;
 
         public static new readonly Parser<Identifier, Token> Parser =
             Parse.Token(Token.Identifier)

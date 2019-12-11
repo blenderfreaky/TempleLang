@@ -24,5 +24,7 @@ namespace TempleLang.Intermediate.Expressions
             ReturnType = returnType;
             Location = location;
         }
+
+        public override string ToString() => $"({Condition} ? {TrueValue} : {FalseValue}) : {ReturnType}";
     }
 }

@@ -16,7 +16,7 @@
             Operator = @operator;
         }
 
-        public override string ToString() => $"({Value}) {Operator}";
+        public override string ToString() => $"({Value}{Operator.Value})";
 
         public static new readonly Parser<Expression, Token> Parser =
             CreateParser(Atomic, Parse.Token(

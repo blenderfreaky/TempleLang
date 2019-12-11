@@ -10,10 +10,12 @@
     {
         public Expression Expression { get; }
 
-        public ExpressionStatement(Expression expression)
+        public ExpressionStatement(Expression expression) : base(expression)
         {
             Expression = expression;
         }
+
+        public override string ToString() => $"{Expression}";
 
         public static new readonly Parser<ExpressionStatement, Token> Parser =
             from expression in Expression.Parser

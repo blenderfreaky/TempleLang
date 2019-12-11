@@ -18,7 +18,7 @@
             FalseValue = falseValue;
         }
 
-        public override string ToString() => $"({Condition}) ? ({TrueValue}) ({FalseValue})";
+        public override string ToString() => $"({Condition} ? {TrueValue} : {FalseValue})";
 
         public static new readonly Parser<Expression, Token> Parser = CreateParser(BinaryExpression.LogicalOr);
 
