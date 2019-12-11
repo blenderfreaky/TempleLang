@@ -12,13 +12,16 @@
 
         protected Expression(params IPositioned[] locations) : base(locations) { }
 
+        public static readonly Parser<Expression, Token> ParenthesizedExpression =
+            from l in Parse.Token(Token.LeftExpressionDelimiter)
+            from expr in Parse.Ref(() => Parser)
+            from r in Parse.Token(Token.RightExpressionDelimiter)
+            select expr;
+
         public static readonly Parser<Expression, Token> Atomic =
-            Literal.Parser
-            .Or<Expression, Token>(Identifier.Parser)
-            .Or(from l in Parse.Token(Token.LeftExpressionDelimiter)
-                from expr in Parse.Ref(() => Parser)
-                from r in Parse.Token(Token.RightExpressionDelimiter)
-                select expr);
+            Literal.Parser.OfType<Expression, Token>()
+            .Or(Identifier.Parser)
+            .Or(ParenthesizedExpression);
 
         public static readonly Parser<Expression, Token> Parser = BinaryExpression.Assignment;
     }

@@ -25,22 +25,40 @@
                 Console.WriteLine(string.Join('\n', lexemes));
                 Console.WriteLine();
 
-                var parserResult =
-                    (from r in Statement.Parser
-                    from _ in Parse.Token(Token.EoF)
-                    select r)(lexemes);
+                var parser = Expression.Parser;
+
+                //var aparser = Parse.RightAssociative(
+                //    NumberLiteral.Parser.OfType<Expression, Token>(),
+                //    from expr in NumberLiteral.Parser
+                //    from op in Parse.Token(Token.Add)
+                //    select (op, expr),
+                //    (a, x) => new BinaryExpression(x.expr, a, x.op));
+
+                //var parser =
+                //    aparser.Or(
+                //    from _ in Parse.Token(Token.LeftExpressionDelimiter)
+                //    from expr in aparser
+                //    from __ in Parse.Token(Token.RightExpressionDelimiter)
+                //    select expr);
+
+                var eofParser = parser;
+                    //(from r in parser
+                    // from _ in Parse.Token(Token.EoF)
+                    // select r);
+
+                var parserResult = eofParser(lexemes);
 
                 Console.WriteLine(parserResult);
                 Console.WriteLine();
 
-                Binder binder = new Binder();
+                //Binder binder = new Binder();
 
-                var bound = binder.BindStatement(parserResult.Result);
+                //var bound = binder.BindStatement(parserResult.Result);
 
-                Console.WriteLine(bound);
-                Console.WriteLine();
+                //Console.WriteLine(bound);
+                //Console.WriteLine();
 
-                foreach (var diagnostic in binder.Diagnostics) Console.WriteLine(diagnostic.ToStringFancy(text));
+                //foreach (var diagnostic in binder.Diagnostics) Console.WriteLine(diagnostic.ToStringFancy(text));
             }
         }
     }

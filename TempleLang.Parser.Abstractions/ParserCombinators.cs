@@ -58,6 +58,9 @@
                 return ParserResult.Success(selector(result.Result!), result.RemainingLexemeString);
             };
 
+        public static Parser<U, TToken> Select<T, U, TToken>(this Parser<T, TToken> parser, Func<T, U> selector) =>
+            parser.Transform(selector);
+
         public static Parser<U, TToken> As<T, U, TToken>(this Parser<T, TToken> parser, U value) =>
             parser.Transform(_ => value);
 
@@ -71,7 +74,7 @@
                 List<T> elements = new List<T>();
                 LexemeString<TToken> remainder = input;
 
-                for (int i = 1; i <= most; i++)
+                for (int i = 0; i <= most; i++)
                 {
                     var result = parser(remainder);
 
@@ -93,8 +96,56 @@
                 return ParserResult.Success(elements, remainder);
             };
 
-        public static Parser<List<T>, TToken> Maybe<T, TToken>(this Parser<T, TToken> parser) => parser.Many(least: 0, most: 1);
-
         public static Parser<T, TToken> OfType<T, TToken>(this Parser<T, TToken> parser) => parser;
+
+        public static Parser<List<T>, TToken> SeparatedBy<T, U, TToken>(this Parser<T, TToken> parser, Parser<U, TToken> separator, int least = 0, int most = int.MaxValue) =>
+            input =>
+            {
+                List<T> elements = new List<T>();
+                LexemeString<TToken> remainder = input;
+
+                for (int i = 0; i <= most; i++)
+                {
+                    var result = parser(remainder);
+
+                    if (!result.IsSuccessful)
+                    {
+                        if (i < least)
+                        {
+                            return ParserResult.Failure<List<T>, TToken>("Too few elements. Expected at least " + least, remainder);
+                        }
+
+                        return ParserResult.Success(elements, remainder);
+                    }
+
+                    elements.Add(result.Result);
+
+                    var sep = separator(result.RemainingLexemeString);
+
+                    if (!sep.IsSuccessful)
+                    {
+                        if (i < least)
+                        {
+                            return ParserResult.Failure<List<T>, TToken>("Too few elements. Expected at least " + least, remainder);
+                        }
+
+                        return ParserResult.Success(elements, remainder);
+                    }
+
+                    remainder = sep.RemainingLexemeString;
+                }
+
+                return ParserResult.Success(elements, remainder);
+            };
+
+        public static Parser<T, TToken> Maybe<T, TToken>(this Parser<T, TToken> parser, T noneValue = default) =>
+            input =>
+            {
+                var result = parser(input);
+
+                if (result.IsSuccessful) return result;
+
+                return ParserResult.Success(noneValue, input);
+            };
     }
 }

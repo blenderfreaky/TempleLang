@@ -4,56 +4,23 @@
 
     public struct Operation
     {
-        public IEnumerable<IStatement> Statements { get; }
+        public IEnumerable<IAsm> Statements { get; }
     }
 
-    public interface IStatement
+    public interface IAsm
     {
     }
 
-    public struct ScopeStatement : IStatement
-    {
-        public CodeBlock Scope { get; }
-        public IEnumerable<IStatement> Instructions { get; }
-    }
-
-    public struct ReturnStatement : IStatement
-    {
-        public IReadableMemory Value { get; }
-    }
-
-    public struct BinaryStatement : IStatement
+    public struct BinaryStatement : IAsm
     {
         public IWriteableMemory LeftOperand { get; }
         public IReadableMemory RightOperand { get; }
 
-        public Architecture Architecture { get; }
-
-        public string Command { get; }
+        public OpCode OpCode { get; }
     }
 
-    public struct UnaryStatement : IStatement
+    public enum OpCode
     {
-        public IWriteableMemory Operand { get; }
-
-        public Architecture Operation { get; }
-
-        public string Command { get; }
-    }
-
-    public enum Architecture
-    {
-        x64,
-    }
-
-    public struct Constant : IReadableMemory
-    {
-        public byte[] Value { get; }
-
-        public int Size => Value.Length;
-
-        public string DebugName { get; }
-
-        public ValueType Type => ValueType.Constant;
+        MOV
     }
 }

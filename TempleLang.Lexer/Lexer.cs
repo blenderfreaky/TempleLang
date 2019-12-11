@@ -208,6 +208,12 @@
 
                 case ';':
                     return MakeLexeme(Token.StatementDelimiter);
+
+                case ':':
+                    return MakeLexeme(Token.TypeSetter);
+
+                case ',':
+                    return MakeLexeme(Token.Comma);
             }
 
             // Identifier or keyword
@@ -250,7 +256,8 @@
 
                     if (!char.IsDigit(character))
                     {
-                        throw UnexpectedCharException.Create(character, Token.FloatLiteral, "Digit");
+                        return MakeLexeme(Token.Accessor);
+                        //throw UnexpectedCharException.Create(character, Token.FloatLiteral, "Digit");
                     }
                 }
 
@@ -266,6 +273,8 @@
 
             throw UnexpectedCharException.Create(character, Token.EoF, "EoF");
         }
+
+        private Token SwitchOnNextCharacter(object modulo, (char, Token ModuloCompoundAssign) p) => throw new NotImplementedException();
 
         private void LexNumber(ref bool reachedDot)
         {

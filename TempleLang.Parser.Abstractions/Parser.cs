@@ -72,23 +72,44 @@
             return result;
         }
 
-        //public static Parser<T, TToken> LeftRecursive<T, U, TToken>(
-        //    Parser<T, TToken> nonRecursiveSubstitutions,
-        //    Parser<T, TToken> recursionlessRemainder,
-        //    Func<T, U, U> aggregator)
-        //{
-        //    var tail =
-        //        Recursive<U, TToken>(self =>
-        //            (from remainder in recursionlessRemainder
-        //             from rest in self
-        //             select aggregator(remainder, rest))
-        //            .Or(recursionlessRemainder));
+        public static Parser<U, TToken> LeftAssociative<T, U, TToken>(
+            Parser<U, TToken> internalParser,
+            Parser<T, TToken> tailParser,
+            Func<U, T, U> accumulator) =>
+            from head in internalParser
+            from tail in tailParser.Many()
+            select AggregateLeftToRight(head, tail, accumulator);
 
-        //    return
-        //        (from substitution in nonRecursiveSubstitutions
-        //        from rest in tail
-        //        select aggregator(substitution, rest))
-        //        .Or(nonRecursiveSubstitutions);
-        //}
+        public static Parser<U, TToken> RightAssociative<T, U, TToken>(
+            Parser<U, TToken> internalParser,
+            Parser<T, TToken> headParser,
+            Func<U, T, U> accumulator) =>
+            from head in headParser.Many()
+            from tail in internalParser
+            select AggregateRightToLeft(head, tail, accumulator);
+
+        private static U AggregateLeftToRight<T, U>(U head, List<T> tail, Func<U, T, U> accumulator)
+        {
+            U accumulate = head;
+
+            for (int i = 0; i < tail.Count; i++)
+            {
+                accumulate = accumulator(accumulate, tail[i]);
+            }
+
+            return accumulate;
+        }
+
+        private static U AggregateRightToLeft<T, U>(List<T> head, U tail, Func<U, T, U> accumulator)
+        {
+            U accumulate = tail;
+
+            for (int i = head.Count - 1; i >= 0; i--)
+            {
+                accumulate = accumulator(accumulate, head[i]);
+            }
+
+            return accumulate;
+        }
     }
 }

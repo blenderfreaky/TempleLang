@@ -5,6 +5,9 @@
         StatementDelimiter,
         Declarator,
         TypeSetter,
+        Accessor,
+        Dereference,
+        Reference,
 
         Return,
 
@@ -19,6 +22,8 @@
         RightCodeDelimiter,
         LeftEnumerationDelimiter,
         RightEnumerationDelimiter,
+
+        Comma,
 
         Add,
         Subtract,
