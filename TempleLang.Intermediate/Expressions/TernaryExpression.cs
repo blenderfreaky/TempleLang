@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Compiler;
-using TempleLang.Diagnostic;
-
-namespace TempleLang.Intermediate.Expressions
+﻿namespace TempleLang.Intermediate.Expressions
 {
+    using TempleLang.Compiler;
+    using TempleLang.Diagnostic;
+
     public struct TernaryExpression : IExpression
     {
         public IExpression Condition { get; }

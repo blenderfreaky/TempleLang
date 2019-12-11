@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Intermediate.Expressions;
-
-namespace TempleLang.Intermediate.Statements
+﻿namespace TempleLang.Intermediate.Statements
 {
+    using TempleLang.Intermediate.Expressions;
+
     public struct ReturnStatement
     {
         public IExpression Expression { get; }

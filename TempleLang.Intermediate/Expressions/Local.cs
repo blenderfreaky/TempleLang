@@ -1,9 +1,9 @@
-﻿using TempleLang.Compiler;
-using TempleLang.Diagnostic;
-using TempleLang.Intermediate.Expressions;
-
-namespace TempleLang.Binder
+﻿namespace TempleLang.Binder
 {
+    using TempleLang.Compiler;
+    using TempleLang.Diagnostic;
+    using TempleLang.Intermediate.Expressions;
+
     public struct Local : IValue
     {
         public string Name { get; }
@@ -19,5 +19,7 @@ namespace TempleLang.Binder
             ReturnType = returnType;
             Location = location;
         }
+
+        public override string ToString() => $"{Name} : {ReturnType}";
     }
 }

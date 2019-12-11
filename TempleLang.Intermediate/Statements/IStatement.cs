@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Diagnostic;
-
-namespace TempleLang.Intermediate.Statements
+﻿namespace TempleLang.Intermediate.Statements
 {
+    using TempleLang.Diagnostic;
+
     public interface IStatement : IPositioned
     {
     }

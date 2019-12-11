@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Diagnostic;
-using TempleLang.Intermediate.Expressions;
-
-namespace TempleLang.Intermediate.Statements
+﻿namespace TempleLang.Intermediate.Statements
 {
+    using TempleLang.Diagnostic;
+    using TempleLang.Intermediate.Expressions;
+
     public struct ExpressionStatement : IStatement
     {
         public IExpression Expression { get; }
@@ -17,5 +14,7 @@ namespace TempleLang.Intermediate.Statements
             Expression = expression;
             Location = location;
         }
+
+        public override string ToString() => $"{Expression}";
     }
 }

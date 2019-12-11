@@ -1,7 +1,7 @@
-﻿using TempleLang.Diagnostic;
-
-namespace TempleLang.Parser
+﻿namespace TempleLang.Parser
 {
+    using TempleLang.Diagnostic;
+
     public abstract class Syntax : IPositioned
     {
         public FileLocation Location { get; protected set; }

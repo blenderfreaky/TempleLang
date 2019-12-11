@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TempleLang.Diagnostic;
-using TempleLang.Lexer;
-using TempleLang.Parser.Abstractions;
-
-namespace TempleLang.Parser
+﻿namespace TempleLang.Parser
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using TempleLang.Diagnostic;
+    using TempleLang.Lexer;
+    using TempleLang.Parser.Abstractions;
+
     public class BlockStatement : Statement
     {
         public List<Statement> Statements { get; }

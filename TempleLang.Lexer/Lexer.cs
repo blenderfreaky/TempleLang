@@ -295,10 +295,7 @@
             }
         }
 
-        private int PeekChar()
-        {
-            return TextReader.Peek();
-        }
+        private int PeekChar() => TextReader.Peek();
 
         private int AdvanceChar()
         {

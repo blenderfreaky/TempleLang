@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Compiler;
-using TempleLang.Diagnostic;
-using TempleLang.Lexer;
-
-namespace TempleLang.Intermediate.Expressions
+﻿namespace TempleLang.Intermediate.Expressions
 {
+    using TempleLang.Compiler;
+    using TempleLang.Diagnostic;
+
     public struct BinaryExpression : IExpression
     {
         public IExpression Lhs { get; }

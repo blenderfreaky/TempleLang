@@ -1,7 +1,5 @@
 ﻿namespace TempleLang.Compiler
 {
-    using System;
-
     public struct PropertyInfo : IMemberInfo
     {
         public MemberType MemberType => MemberType.Property;

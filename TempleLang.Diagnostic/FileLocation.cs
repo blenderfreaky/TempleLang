@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TempleLang.Lexer.Abstractions;
-
-namespace TempleLang.Diagnostic
+﻿namespace TempleLang.Diagnostic
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using TempleLang.Lexer.Abstractions;
 
     public readonly struct FileLocation : IPositioned
     {

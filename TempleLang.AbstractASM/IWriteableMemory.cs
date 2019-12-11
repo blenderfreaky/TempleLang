@@ -1,8 +1,5 @@
 ﻿namespace TempleLang.AbstractASM
 {
-    using System.Collections;
-    using System.Collections.Generic;
-
     public interface IReadableMemory
     {
         int Size { get; }

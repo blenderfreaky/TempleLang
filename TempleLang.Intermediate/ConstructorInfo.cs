@@ -1,7 +1,6 @@
 ﻿namespace TempleLang.Compiler
 {
     using Intermediate.Statements;
-    using System;
 
     public struct ConstructorInfo : IMemberInfo
     {

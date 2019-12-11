@@ -1,8 +1,8 @@
-﻿using TempleLang.Diagnostic;
-using TempleLang.Intermediate.Expressions;
-
-namespace TempleLang.Intermediate.Statements
+﻿namespace TempleLang.Intermediate.Statements
 {
+    using TempleLang.Diagnostic;
+    using TempleLang.Intermediate.Expressions;
+
     public struct LocalDeclarationStatement : IStatement
     {
         public IValue Local { get; }
@@ -17,5 +17,7 @@ namespace TempleLang.Intermediate.Statements
             AssignedValue = assignedValue;
             Location = location;
         }
+
+        public override string ToString() => $"let {Local} = {AssignedValue?.ToString() ?? "unassigned"}";
     }
 }

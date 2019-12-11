@@ -1,6 +1,5 @@
 ﻿namespace TempleLang.AbstractASM
 {
-    using System.Collections;
     using System.Collections.Generic;
 
     public struct CodeBlock : IStackScope

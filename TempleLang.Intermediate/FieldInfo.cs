@@ -1,7 +1,5 @@
 ﻿namespace TempleLang.Compiler
 {
-    using System;
-
     public struct FieldInfo : IMemberInfo
     {
         public MemberType MemberType => MemberType.Field;

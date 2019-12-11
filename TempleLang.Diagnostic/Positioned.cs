@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TempleLang.Diagnostic
+﻿namespace TempleLang.Diagnostic
 {
     public struct Positioned<T> : IPositioned
     {

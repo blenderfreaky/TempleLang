@@ -1,9 +1,7 @@
-﻿using System;
-using TempleLang.Compiler;
-using TempleLang.Diagnostic;
-
-namespace TempleLang.Intermediate.Expressions
+﻿namespace TempleLang.Intermediate.Expressions
 {
+    using System;
+
     public interface IValue : IExpression
     {
         ValueFlags Flags { get; }

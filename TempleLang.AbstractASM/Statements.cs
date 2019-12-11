@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TempleLang.AbstractASM
+﻿namespace TempleLang.AbstractASM
 {
+    using System.Collections.Generic;
+
     public struct Operation
     {
         public IEnumerable<IStatement> Statements { get; }

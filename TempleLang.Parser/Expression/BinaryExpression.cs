@@ -1,7 +1,5 @@
 ﻿namespace TempleLang.Parser
 {
-    using Diagnostic;
-    using System;
     using System.Linq;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;

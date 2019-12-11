@@ -1,6 +1,5 @@
 ﻿namespace TempleLang.Compiler
 {
-    using System;
     using TempleLang.Intermediate.Statements;
 
     public struct MethodInfo : IMemberInfo

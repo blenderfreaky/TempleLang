@@ -14,8 +14,8 @@
         {
             while (true)
             {
-                //using var stringReader = new StringReader("abc[1] + 2.3 ^ .2 - (-3)");
-                using var stringReader = new StringReader(Console.ReadLine());
+                var text = Console.ReadLine();
+                using var stringReader = new StringReader(text);
 
                 var lexemes = new Lexer(
                     stringReader,
@@ -23,9 +23,7 @@
                     .LexUntil(Token.EoF);
 
                 Console.WriteLine(string.Join('\n', lexemes));
-
-                //var add = Token.IntegerLiteral.Match<Lexeme, Token, SourceFile>().SeparatedBy(Token.Add.Match<Lexeme, Token, SourceFile>());
-                //ParserResult<List<Lexeme<Token, SourceFile>>, Lexeme<Token, SourceFile>, Token, SourceFile> parserResult = add.Parse(lexemes);
+                Console.WriteLine();
 
                 var parserResult =
                     (from r in Statement.Parser
@@ -33,14 +31,16 @@
                     select r)(lexemes);
 
                 Console.WriteLine(parserResult);
+                Console.WriteLine();
 
                 Binder binder = new Binder();
 
                 var bound = binder.BindStatement(parserResult.Result);
 
                 Console.WriteLine(bound);
+                Console.WriteLine();
 
-                foreach (var diagnostic in binder.Diagnostics) Console.WriteLine(diagnostic);
+                foreach (var diagnostic in binder.Diagnostics) Console.WriteLine(diagnostic.ToStringFancy(text));
             }
         }
     }

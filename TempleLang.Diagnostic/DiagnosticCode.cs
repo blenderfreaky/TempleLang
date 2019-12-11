@@ -5,6 +5,8 @@
         InvalidOperator,
         InvalidConditionalType,
         UnknownValue,
-        InvalidNumeric
+        InvalidNumeric,
+        MissingType,
+        InvalidType
     }
 }
