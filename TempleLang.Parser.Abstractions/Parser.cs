@@ -72,44 +72,41 @@
             return result;
         }
 
-        public static Parser<U, TToken> LeftAssociative<T, U, TToken>(
-            Parser<U, TToken> internalParser,
-            Parser<T, TToken> tailParser,
-            Func<U, T, U> accumulator) =>
-            from head in internalParser
-            from tail in tailParser.Many()
-            select AggregateLeftToRight(head, tail, accumulator);
+        public static Parser<T, TToken> BinaryOperatorRightToLeft<T, U, TToken>(Parser<T, TToken> parser, Parser<U, TToken> @operator, Func<T, U, T, T> factory) =>
+            Recursive<T, TToken>(self =>
+                (from lhs in parser
+                 from op in @operator
+                 from rhs in self
+                 select factory(lhs, op, rhs))
+                .Or(parser));
 
-        public static Parser<U, TToken> RightAssociative<T, U, TToken>(
-            Parser<U, TToken> internalParser,
-            Parser<T, TToken> headParser,
-            Func<U, T, U> accumulator) =>
-            from head in headParser.Many()
-            from tail in internalParser
-            select AggregateRightToLeft(head, tail, accumulator);
+        public static Parser<T, TToken> BinaryOperatorLeftToRight<T, U, TToken>(Parser<T, TToken> parser, Parser<U, TToken> @operator, Func<T, U, T, T> factory) =>
+            BinaryOperatorLeftToRight(parser, parser, @operator, factory);
 
-        private static U AggregateLeftToRight<T, U>(U head, List<T> tail, Func<U, T, U> accumulator)
-        {
-            U accumulate = head;
-
-            for (int i = 0; i < tail.Count; i++)
+        public static Parser<T, TToken> BinaryOperatorLeftToRight<T, U, V, TToken>(Parser<T, TToken> lhsParser, Parser<V, TToken> rhsParser, Parser<U, TToken> @operator, Func<T, U, V, T> factory) =>
+            input =>
             {
-                accumulate = accumulator(accumulate, tail[i]);
-            }
+                var result = lhsParser(input);
 
-            return accumulate;
-        }
+                if (!result.IsSuccessful) return result;
 
-        private static U AggregateRightToLeft<T, U>(List<T> head, U tail, Func<U, T, U> accumulator)
-        {
-            U accumulate = tail;
+                T accumulator = result.Result;
+                var remainder = result.RemainingLexemeString;
 
-            for (int i = head.Count - 1; i >= 0; i--)
-            {
-                accumulate = accumulator(accumulate, head[i]);
-            }
+                while (true)
+                {
+                    var op = @operator(remainder);
 
-            return accumulate;
-        }
+                    if (!op.IsSuccessful) return ParserResult.Success(accumulator, remainder);
+
+                    var res = rhsParser(op.RemainingLexemeString);
+
+                    if (!op.IsSuccessful) return ParserResult.Success(accumulator, remainder);
+
+                    remainder = res.RemainingLexemeString;
+
+                    accumulator = factory(accumulator, op.Result, res.Result);
+                }
+            };
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace TempleLang.Intermediate.Expressions
 {
-    using TempleLang.Compiler;
+    using TempleLang.Intermediate;
     using TempleLang.Diagnostic;
 
     public struct BinaryExpression : IExpression

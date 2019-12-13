@@ -7,6 +7,12 @@
         UnknownValue,
         InvalidNumeric,
         MissingType,
-        InvalidType
+        InvalidType,
+        TypeInferenceFailed,
+        InvalidTypeSpecifier,
+        UnknownType,
+        InvalidParamCount,
+        InvalidParamType,
+        EmptyProcedure
     }
 }

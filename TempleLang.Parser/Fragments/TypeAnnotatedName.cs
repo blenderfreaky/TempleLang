@@ -22,6 +22,9 @@
             TypeAnnotation = typeAnnotation;
         }
 
+        public override string ToString() => Name + TypeAnnotationString;
+        public string TypeAnnotationString => TypeAnnotation == null ? "" : " : " + TypeAnnotation;
+
         public static readonly Parser<TypeAnnotatedName, Token> Parser =
             (from name in Identifier.Parser
              from _ in Parse.Token(Token.TypeSetter)

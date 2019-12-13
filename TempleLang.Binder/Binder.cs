@@ -1,32 +1,63 @@
 ﻿namespace TempleLang.Binder
 {
+    using Intermediate;
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using TempleLang.Diagnostic;
     using TempleLang.Intermediate.Expressions;
+    using IE = TempleLang.Intermediate.Expressions;
+    using IS = TempleLang.Intermediate.Statements;
+    using S = TempleLang.Parser;
 
-    public partial class Binder
+    public abstract partial class Binder : IDisposable
     {
         public Binder? Parent { get; }
 
         public bool HasErrors { get; private set; }
         public ConcurrentBag<DiagnosticInfo> Diagnostics { get; }
 
-        public Dictionary<string, IValue> Symbols { get; }
-
-        public Binder(Binder? parent = null)
+        protected Binder(Binder? parent = null)
         {
             Parent = parent;
             HasErrors = false;
             Diagnostics = new ConcurrentBag<DiagnosticInfo>();
-            Symbols = new Dictionary<string, IValue>();
         }
 
-        private void Error(DiagnosticCode invalidType, FileLocation location)
+        protected void Error(DiagnosticCode invalidType, FileLocation location)
         {
             Diagnostics.Add(new DiagnosticInfo(invalidType, location));
             HasErrors = true;
         }
 
+        public abstract ITypeInfo FindType(S.Expression expression);
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (Parent != null)
+                    {
+                        Parent.HasErrors |= HasErrors;
+
+                        foreach (var diagnostic in Diagnostics) Parent.Diagnostics.Add(diagnostic);
+                    }
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+        }
+        #endregion
     }
 }

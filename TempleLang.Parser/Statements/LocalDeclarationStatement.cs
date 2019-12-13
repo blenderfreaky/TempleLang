@@ -6,16 +6,16 @@
 
     public class LocalDeclarationStatement : Statement
     {
-        public string Name { get; }
+        public TypeAnnotatedName Name { get; }
         public Expression? Assignment { get; }
 
-        public LocalDeclarationStatement(Positioned<string> name) : base(name)
+        public LocalDeclarationStatement(TypeAnnotatedName name) : base(name)
         {
             Name = name;
             Assignment = null;
         }
 
-        public LocalDeclarationStatement(Positioned<string> name, Expression assignment) : base(name, assignment)
+        public LocalDeclarationStatement(TypeAnnotatedName name, Expression assignment) : base(name, assignment)
         {
             Name = name;
             Assignment = assignment;
@@ -25,14 +25,14 @@
 
         public static new readonly Parser<LocalDeclarationStatement, Token> Parser =
             (from _ in Parse.Token(Token.Declarator)
-             from name in Parse.Token(Token.Identifier)
+             from name in TypeAnnotatedName.Parser
              from __ in Parse.Token(Token.Assign)
              from assignment in Expression.Parser
              from ___ in Parse.Token(Token.StatementDelimiter)
-             select new LocalDeclarationStatement(name.PositionedText, assignment))
+             select new LocalDeclarationStatement(name, assignment))
             .Or(from _ in Parse.Token(Token.Declarator)
-                from name in Parse.Token(Token.Identifier)
+                from name in TypeAnnotatedName.Parser
                 from __ in Parse.Token(Token.StatementDelimiter)
-                select new LocalDeclarationStatement(name.PositionedText));
+                select new LocalDeclarationStatement(name));
     }
 }

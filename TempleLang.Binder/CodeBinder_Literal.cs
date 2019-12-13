@@ -8,9 +8,8 @@
     using IE = TempleLang.Intermediate.Expressions;
     using S = TempleLang.Parser;
 
-    public partial class Binder
+    public partial class CodeBinder : Binder
     {
-
         public IE.IValue BindLiteral(S.Literal syntaxLiteral) => syntaxLiteral switch
         {
             S.BoolLiteral expr => BindLiteral(expr),

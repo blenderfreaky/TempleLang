@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using TempleLang.Intermediate.Declarations;
-using TempleLang.Intermediate.Expressions;
-using TempleLang.Intermediate.Statements;
+﻿using System;
 
-namespace TempleLang.AbstractASM
+namespace TempleLang.Compiler.FASM
 {
     public class ProcedureCompiler
     {
@@ -61,39 +57,5 @@ namespace TempleLang.AbstractASM
         DivideInt,
         DivideUInt,
         DivideFloat,
-    }
-
-    public interface IAssemblerInstruction
-    {
-        string Serialize(Architecture architecture);
-    }
-
-    public readonly struct AssemblerInstruction : IAssemblerInstruction
-    {
-        public readonly string Name;
-
-        public readonly IAssemblerParameter[] Parameters;
-
-        public AssemblerInstruction(string name, IAssemblerParameter[] parameters)
-        {
-            Name = name;
-            Parameters = parameters;
-        }
-
-        public string Serialize(Architecture architecture)
-        {
-            if (architecture != Architecture.FASMx64) throw new System.NotImplementedException();
-            return Name + " " + string.Join(", ",  Parameters.Select(x => x.Serialize(architecture)));
-        }
-    }
-
-    public interface IAssemblerParameter
-    {
-        string Serialize(Architecture architecture);
-    }
-
-    public readonly struct RegisterParameter : IAssemblerParameter
-    {
-        public readonly string Text;
     }
 }

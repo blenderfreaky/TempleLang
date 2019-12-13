@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Compiler
+﻿namespace TempleLang.Intermediate
 {
     public struct PropertyInfo : IMemberInfo
     {

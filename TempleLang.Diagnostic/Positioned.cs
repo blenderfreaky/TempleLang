@@ -11,6 +11,8 @@
             Location = location;
         }
 
+        public override string ToString() => $"{Location}: {Value}";
+
         public static implicit operator T(Positioned<T> positioned) => positioned.Value;
     }
 }

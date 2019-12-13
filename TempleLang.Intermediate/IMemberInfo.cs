@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Compiler
+﻿namespace TempleLang.Intermediate
 {
     using System;
 

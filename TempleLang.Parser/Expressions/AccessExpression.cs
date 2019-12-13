@@ -17,12 +17,13 @@
             Accessor = accessor;
         }
 
-        public static new readonly Parser<Expression, Token> Parser = Atomic;
-            //Parse.LeftRecursive(
-            //    Atomic,
-            //    from elem in Identifier.Parser
-            //    from op in Parse.Token(Token.Accessor)
-            //    select (elem, op),
-            //    (a, x) => new AccessExpression(a, x.elem, x.op));
+        public override string ToString() => $"({Accessee} {AccessOperator.Value} {Accessor})";
+
+        public static new readonly Parser<Expression, Token> Parser =
+            Parse.BinaryOperatorLeftToRight(
+                Atomic,
+                Identifier.Parser,
+                Parse.Token(Token.Accessor),
+                (lhs, op, rhs) => new AccessExpression(lhs, rhs, op));
     }
 }

@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TempleLang.AbstractASM\TempleLang.AbstractASM.csproj" />
     <ProjectReference Include="..\TempleLang.Diagnostic\TempleLang.Diagnostic.csproj" />
     <ProjectReference Include="..\TempleLang.Lexer\TempleLang.Lexer.csproj" />
   </ItemGroup>

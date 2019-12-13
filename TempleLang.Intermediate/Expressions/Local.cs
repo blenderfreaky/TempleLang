@@ -1,8 +1,9 @@
-﻿namespace TempleLang.Binder
+﻿namespace TempleLang.Intermediate.Expressions
 {
-    using TempleLang.Compiler;
+    using TempleLang.Intermediate;
     using TempleLang.Diagnostic;
     using TempleLang.Intermediate.Expressions;
+    using Primitives;
 
     public struct Local : IValue
     {
@@ -21,5 +22,7 @@
         }
 
         public override string ToString() => $"{Name} : {ReturnType}";
+
+        public static readonly Local Unknown = new Local("?", ValueFlags.None, PrimitiveType.Unknown, FileLocation.Null);
     }
 }

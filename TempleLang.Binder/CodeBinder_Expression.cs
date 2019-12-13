@@ -1,6 +1,9 @@
 ﻿namespace TempleLang.Binder
 {
+    using Intermediate;
+    using Intermediate.Primitives;
     using System;
+    using System.Linq;
     using TempleLang.Diagnostic;
     using TempleLang.Intermediate.Expressions;
     using TempleLang.Lexer;
@@ -8,7 +11,7 @@
     using IE = TempleLang.Intermediate.Expressions;
     using S = TempleLang.Parser;
 
-    public partial class Binder
+    public partial class CodeBinder : Binder
     {
         public IExpression BindExpression(Expression syntaxExpression) => syntaxExpression switch
         {
@@ -16,6 +19,8 @@
             S.PostfixExpression expr => BindExpression(expr),
             S.BinaryExpression expr => BindExpression(expr),
             S.TernaryExpression expr => BindExpression(expr),
+            S.AccessExpression expr => BindExpression(expr),
+            S.CallExpression expr => BindExpression(expr),
             S.Identifier expr => BindExpression(expr),
             S.Literal expr => BindLiteral(expr),
             _ => throw new ArgumentException(nameof(syntaxExpression)),
@@ -24,6 +29,7 @@
         public IE.UnaryExpression BindExpression(S.PrefixExpression expr)
         {
             var val = BindExpression(expr.Value);
+
             UnaryOperatorType op = expr.Operator.Value switch
             {
                 Token.Increment => UnaryOperatorType.PreIncrement,
@@ -47,6 +53,7 @@
         public IE.UnaryExpression BindExpression(S.PostfixExpression expr)
         {
             var val = BindExpression(expr.Value);
+
             UnaryOperatorType op = expr.Operator.Value switch
             {
                 Token.Increment => UnaryOperatorType.PostIncrement,
@@ -70,7 +77,7 @@
             var lhs = BindExpression(expr.Lhs);
             var rhs = BindExpression(expr.Rhs);
 
-            if (lhs != null && rhs != null && lhs.ReturnType != rhs.ReturnType)
+            if ((lhs == null && rhs == null) || lhs?.ReturnType != rhs?.ReturnType)
             {
                 Error(DiagnosticCode.InvalidType, expr.Location);
             }
@@ -120,7 +127,7 @@
                 Error(DiagnosticCode.InvalidOperator, expr.Location);
             }
 
-            var returnType = lhs?.ReturnType;
+            var returnType = lhs?.ReturnType ?? rhs?.ReturnType;
 
             return new IE.BinaryExpression(lhs!, rhs!, op, returnType!, expr.Location);
         }
@@ -147,22 +154,50 @@
             return new IE.TernaryExpression(condition, trueVal, falseVal, returnType, expr.Location);
         }
 
-        public IE.IValue BindExpression(S.Identifier expr)
+        public IE.AccessExpression BindExpression(S.AccessExpression expr)
         {
-            if (Symbols.TryGetValue(expr.Name, out var value))
-            {
-                return value;
-            }
+            var val = BindExpression(expr.Accessee);
 
-            if (Parent != null)
+            AccessOperationType op = expr.AccessOperator.Value switch
             {
-                return Parent.BindExpression(expr);
-            }
+                Token.Accessor => AccessOperationType.Regular,
+
+                _ => AccessOperationType.ERROR,
+            };
 
             //TODO
-            Error(DiagnosticCode.UnknownValue, expr.Location);
-
-            return default!;
+            return new IE.AccessExpression(val, op, expr.Accessor.PositionedText, ValueFlags.Readable, PrimitiveType.Bool, expr.Location);
         }
+
+        public IE.CallExpression BindExpression(S.CallExpression expr)
+        {
+            var callee = BindExpression(expr.Callee);
+            var parameters = expr.Parameters.Select(BindExpression).ToList();
+
+            var calledType = callee.ReturnType;
+
+            if (calledType is ICallable callable)
+            {
+                if (callable.Parameters.Count != parameters.Count)
+                {
+                    Error(DiagnosticCode.InvalidParamCount, expr.Location);
+                    return new IE.CallExpression(null!, null!, PrimitiveType.Unknown, expr.Location);
+                }
+
+                for (int i = 0; i < parameters.Count; i++)
+                {
+                    if (callable.Parameters[i].ReturnType == parameters[i].ReturnType) continue;
+
+                    Error(DiagnosticCode.InvalidParamType, expr.Location);
+                    return new IE.CallExpression(null!, null!, PrimitiveType.Unknown, expr.Location);
+                }
+
+                return new IE.CallExpression(callee, parameters, callable.ReturnType, expr.Location);
+            }
+
+            return new IE.CallExpression(null!, null!, PrimitiveType.Unknown, expr.Location);
+        }
+
+        public IE.IValue BindExpression(S.Identifier expr) => FindValue(expr)!;
     }
 }

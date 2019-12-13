@@ -70,37 +70,9 @@
                 Token.BitshiftRightCompoundAssign));
 
         public static Parser<Expression, Token> CreateParserLeftToRight(Parser<Expression, Token> parser, Parser<Lexeme<Token>, Token> @operator) =>
-            input =>
-            {
-                var result = parser(input);
-
-                if (!result.IsSuccessful) return result;
-
-                Expression accumulator = result.Result;
-                var remainder = result.RemainingLexemeString;
-
-                while (true)
-                {
-                    var op = @operator(remainder);
-
-                    if (!op.IsSuccessful) return ParserResult.Success(accumulator, remainder);
-
-                    var res = parser(op.RemainingLexemeString);
-
-                    if (!op.IsSuccessful) return ParserResult.Success(accumulator, remainder);
-
-                    remainder = res.RemainingLexemeString;
-
-                    accumulator = new BinaryExpression(accumulator, res.Result, op.Result);
-                }
-            };
+            Parse.BinaryOperatorLeftToRight(parser, @operator, (lhs, op, rhs) => new BinaryExpression(lhs, rhs, op));
 
         public static Parser<Expression, Token> CreateParserRightToLeft(Parser<Expression, Token> parser, Parser<Lexeme<Token>, Token> @operator) =>
-            Parse.Recursive<Expression, Token>(self =>
-                (from lhs in parser
-                 from op in @operator
-                 from rhs in self
-                 select new BinaryExpression(lhs, rhs, op))
-                .Or(parser));
+            Parse.BinaryOperatorRightToLeft(parser, @operator, (lhs, op, rhs) => new BinaryExpression(lhs, rhs, op));
     }
 }

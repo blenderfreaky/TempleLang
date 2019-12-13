@@ -24,6 +24,8 @@
             Parameters = parameters;
         }
 
+        public override string ToString() => $"let {Name}({string.Join(", ", Parameters)}){ReturnTypeAnnotation}{EntryPoint}";
+
         public static new readonly Parser<ProcedureDeclaration, Token> Parser =
             from start in Parse.Token(Token.Declarator)
             from name in Identifier.Parser

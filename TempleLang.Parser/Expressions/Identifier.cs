@@ -8,6 +8,8 @@
     {
         public string Name { get; }
 
+        public Positioned<string> PositionedText => Location.WithValue(Name);
+
         public Identifier(Positioned<string> name) : base(name)
         {
             Name = name.Value;
