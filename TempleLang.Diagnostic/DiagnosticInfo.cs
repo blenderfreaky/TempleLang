@@ -32,7 +32,7 @@
                 {
                     break;
                 }
-                if (Location.Value.FirstCharIndex >= pos)
+                if (Location.Value.FirstCharIndex >= pos && Location.Value.FirstCharIndex < pos + text[i].Length)
                 {
                     int start = Math.Max(0, Location.Value.FirstCharIndex - pos);
                     int end = Math.Min(Location.Value.LastCharIndex - pos, text[i].Length);
