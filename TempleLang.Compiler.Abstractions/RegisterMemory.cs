@@ -1,16 +1,16 @@
 ﻿namespace TempleLang.Compiler.Abstractions
 {
-    public struct RegisterMemory : IWriteableMemory
+    public struct RegisterMemory : IMemory
     {
-        public int RegisterIndex { get; }
+        public string RegisterName { get; }
         public int Size { get; }
 
         public string DebugName { get; }
         public ValueType Type { get; }
 
-        public RegisterMemory(int registerIndex, int size, string debugName, ValueType type)
+        public RegisterMemory(string registerName, int size, string debugName, ValueType type)
         {
-            RegisterIndex = registerIndex;
+            RegisterName = registerName;
             Size = size;
             DebugName = debugName;
             Type = type;

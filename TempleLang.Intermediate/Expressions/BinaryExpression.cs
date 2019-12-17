@@ -43,19 +43,6 @@
 
         Assign,
 
-        AddCompoundAssign,
-        SubtractCompoundAssign,
-        MultiplyCompoundAssign,
-        DivideCompoundAssign,
-        RemainderCompoundAssign,
-        OrCompoundAssign,
-        BitwiseOrCompoundAssign,
-        AndCompoundAssign,
-        BitwiseAndCompoundAssign,
-        BitwiseXorCompoundAssign,
-        BitshiftLeftCompoundAssign,
-        BitshiftRightCompoundAssign,
-
         ComparisonGreaterThan,
         ComparisonGreaterThanOrEqual,
         ComparisonLessThan,

@@ -99,18 +99,18 @@
 
                 Token.Assign => BinaryOperatorType.Assign,
 
-                Token.AddCompoundAssign => BinaryOperatorType.AddCompoundAssign,
-                Token.SubtractCompoundAssign => BinaryOperatorType.SubtractCompoundAssign,
-                Token.MultiplyCompoundAssign => BinaryOperatorType.MultiplyCompoundAssign,
-                Token.DivideCompoundAssign => BinaryOperatorType.DivideCompoundAssign,
-                Token.RemainderCompoundAssign => BinaryOperatorType.RemainderCompoundAssign,
-                Token.OrCompoundAssign => BinaryOperatorType.OrCompoundAssign,
-                Token.BitwiseOrCompoundAssign => BinaryOperatorType.BitwiseOrCompoundAssign,
-                Token.AndCompoundAssign => BinaryOperatorType.AndCompoundAssign,
-                Token.BitwiseAndCompoundAssign => BinaryOperatorType.BitwiseAndCompoundAssign,
-                Token.BitwiseXorCompoundAssign => BinaryOperatorType.BitwiseXorCompoundAssign,
-                Token.BitshiftLeftCompoundAssign => BinaryOperatorType.BitshiftLeftCompoundAssign,
-                Token.BitshiftRightCompoundAssign => BinaryOperatorType.BitshiftRightCompoundAssign,
+                Token.AddCompoundAssign => BinaryOperatorType.Add,
+                Token.SubtractCompoundAssign => BinaryOperatorType.Subtract,
+                Token.MultiplyCompoundAssign => BinaryOperatorType.Multiply,
+                Token.DivideCompoundAssign => BinaryOperatorType.Divide,
+                Token.RemainderCompoundAssign => BinaryOperatorType.Remainder,
+                Token.LogicalOrCompoundAssign => BinaryOperatorType.LogicalOr,
+                Token.BitwiseOrCompoundAssign => BinaryOperatorType.BitwiseOr,
+                Token.LogicalAndCompoundAssign => BinaryOperatorType.LogicalAnd,
+                Token.BitwiseAndCompoundAssign => BinaryOperatorType.BitwiseAnd,
+                Token.BitwiseXorCompoundAssign => BinaryOperatorType.BitwiseXor,
+                Token.BitshiftLeftCompoundAssign => BinaryOperatorType.BitshiftLeft,
+                Token.BitshiftRightCompoundAssign => BinaryOperatorType.BitshiftRight,
 
                 Token.ComparisonGreaterThan => BinaryOperatorType.ComparisonGreaterThan,
                 Token.ComparisonGreaterThanOrEqual => BinaryOperatorType.ComparisonGreaterThanOrEqual,
@@ -129,7 +129,26 @@
 
             var returnType = lhs?.ReturnType ?? rhs?.ReturnType;
 
-            return new IE.BinaryExpression(lhs!, rhs!, op, returnType!, expr.Location);
+            var computationExpression = new IE.BinaryExpression(lhs!, rhs!, op, returnType!, expr.Location);
+
+            switch (expr.Operator.Token)
+            {
+                case Token.AddCompoundAssign:
+                case Token.SubtractCompoundAssign:
+                case Token.MultiplyCompoundAssign:
+                case Token.DivideCompoundAssign:
+                case Token.RemainderCompoundAssign:
+                case Token.LogicalOrCompoundAssign:
+                case Token.BitwiseOrCompoundAssign:
+                case Token.LogicalAndCompoundAssign:
+                case Token.BitwiseAndCompoundAssign:
+                case Token.BitwiseXorCompoundAssign:
+                case Token.BitshiftLeftCompoundAssign:
+                case Token.BitshiftRightCompoundAssign:
+                    return new IE.BinaryExpression(lhs!, computationExpression, BinaryOperatorType.Assign, returnType!, expr.Location);
+                default:
+                    return computationExpression;
+            }
         }
 
         public IE.TernaryExpression BindExpression(S.TernaryExpression expr)

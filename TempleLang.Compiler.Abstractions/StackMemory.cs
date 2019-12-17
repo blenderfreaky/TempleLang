@@ -1,6 +1,6 @@
 ﻿namespace TempleLang.Compiler.Abstractions
 {
-    public struct StackMemory : IWriteableMemory
+    public struct StackMemory : IMemory
     {
         public int StackOffset { get; }
         public int Size { get; }

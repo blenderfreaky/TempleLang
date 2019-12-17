@@ -1,6 +1,6 @@
 ﻿namespace TempleLang.Compiler.Abstractions
 {
-    public struct TheoreticalMemory : IWriteableMemory
+    public struct TheoreticalMemory : IMemory
     {
         public int RegisterPriority { get; }
         public int StackOffset { get; }

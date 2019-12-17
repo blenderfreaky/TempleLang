@@ -117,7 +117,7 @@
                     {
                         andType = SwitchOnNextCharacter(
                             Token.LogicalAnd,
-                            ('=', Token.AndCompoundAssign));
+                            ('=', Token.LogicalAndCompoundAssign));
                     }
                     return MakeLexeme(andType);
 
@@ -130,7 +130,7 @@
                     {
                         orType = SwitchOnNextCharacter(
                             Token.LogicalOr,
-                            ('=', Token.OrCompoundAssign));
+                            ('=', Token.LogicalOrCompoundAssign));
                     }
                     return MakeLexeme(orType);
 

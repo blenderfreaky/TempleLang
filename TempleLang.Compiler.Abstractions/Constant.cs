@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public struct Constant : IReadableMemory
+    public struct Constant : IMemory
     {
         public byte[] Value { get; }
 
