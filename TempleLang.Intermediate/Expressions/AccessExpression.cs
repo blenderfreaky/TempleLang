@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Intermediate;
-using TempleLang.Diagnostic;
+﻿using TempleLang.Diagnostic;
 
 namespace TempleLang.Intermediate.Expressions
 {
@@ -31,6 +27,26 @@ namespace TempleLang.Intermediate.Expressions
         }
 
         public override string ToString() => $"({Accessee} {AccessOperator} {Accessor})";
+
+        public override bool Equals(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public static bool operator ==(AccessExpression left, AccessExpression right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AccessExpression left, AccessExpression right)
+        {
+            return !(left == right);
+        }
     }
 
     public enum AccessOperationType

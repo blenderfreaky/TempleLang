@@ -16,5 +16,25 @@
             Name = name;
             ContainingType = containingType;
         }
+
+        public override bool Equals(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public static bool operator ==(FieldInfo left, FieldInfo right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(FieldInfo left, FieldInfo right)
+        {
+            return !(left == right);
+        }
     }
 }

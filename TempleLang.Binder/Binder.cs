@@ -3,11 +3,7 @@
     using Intermediate;
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using TempleLang.Diagnostic;
-    using TempleLang.Intermediate.Expressions;
-    using IE = TempleLang.Intermediate.Expressions;
-    using IS = TempleLang.Intermediate.Statements;
     using S = TempleLang.Parser;
 
     public abstract partial class Binder : IDisposable

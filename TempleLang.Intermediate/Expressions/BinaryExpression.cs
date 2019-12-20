@@ -24,6 +24,26 @@
         }
 
         public override string ToString() => $"({Lhs} {Operator} {Rhs}) : {ReturnType}";
+
+        public override bool Equals(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public static bool operator ==(BinaryExpression left, BinaryExpression right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(BinaryExpression left, BinaryExpression right)
+        {
+            return !(left == right);
+        }
     }
 
     public enum BinaryOperatorType

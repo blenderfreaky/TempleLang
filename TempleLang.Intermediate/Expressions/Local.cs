@@ -2,7 +2,6 @@
 {
     using TempleLang.Intermediate;
     using TempleLang.Diagnostic;
-    using TempleLang.Intermediate.Expressions;
     using Primitives;
 
     public struct Local : IValue
@@ -24,5 +23,25 @@
         public override string ToString() => $"{Name} : {ReturnType}";
 
         public static readonly Local Unknown = new Local("?", ValueFlags.None, PrimitiveType.Unknown, FileLocation.Null);
+
+        public override bool Equals(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public static bool operator ==(Local left, Local right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Local left, Local right)
+        {
+            return !(left == right);
+        }
     }
 }

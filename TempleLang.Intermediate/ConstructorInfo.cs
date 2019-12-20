@@ -21,5 +21,25 @@
             ContainingType = containingType;
             EntryPoint = entryPoint;
         }
+
+        public override bool Equals(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public static bool operator ==(ConstructorInfo left, ConstructorInfo right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ConstructorInfo left, ConstructorInfo right)
+        {
+            return !(left == right);
+        }
     }
 }

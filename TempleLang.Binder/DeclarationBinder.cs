@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using TempleLang.Intermediate;
 using TempleLang.Diagnostic;
-using TempleLang.Intermediate.Expressions;
-using TempleLang.Intermediate.Statements;
 using TempleLang.Parser;
-using ID = TempleLang.Intermediate.Declarations;
 using S = TempleLang.Parser;
 using TempleLang.Intermediate.Declarations;
 using TempleLang.Intermediate.Primitives;

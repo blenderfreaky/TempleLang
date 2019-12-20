@@ -46,5 +46,25 @@
 
             return buffer.ToString();
         }
+
+        public override bool Equals(object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool operator ==(DiagnosticInfo left, DiagnosticInfo right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(DiagnosticInfo left, DiagnosticInfo right)
+        {
+            return !(left == right);
+        }
     }
 }

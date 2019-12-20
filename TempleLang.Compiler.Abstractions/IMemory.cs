@@ -4,10 +4,10 @@
     {
         int Size { get; }
         string DebugName { get; }
-        ValueType Type { get; }
+        MemoryValueType Type { get; }
     }
 
-    public enum ValueType
+    public enum MemoryValueType
     {
         Local,
         ReturnValue,

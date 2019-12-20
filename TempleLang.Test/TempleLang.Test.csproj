@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TempleLang.Binder\TempleLang.Binder.csproj" />
+    <ProjectReference Include="..\TempleLang.Compiler.NASM\TempleLang.Compiler.NASM.csproj" />
     <ProjectReference Include="..\TempleLang.Lexer.Abstractions\TempleLang.Lexer.Abstractions.csproj" />
     <ProjectReference Include="..\TempleLang.Lexer\TempleLang.Lexer.csproj" />
     <ProjectReference Include="..\TempleLang.Parser\TempleLang.Parser.csproj" />

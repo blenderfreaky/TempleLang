@@ -31,5 +31,25 @@
                 Environment.NewLine,
                 Statements.Select(x => string.Concat(x.ToString().Split('\n').Select(x => "    " + x + Environment.NewLine)))),
             "}");
+
+        public override bool Equals(object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool operator ==(BlockStatement left, BlockStatement right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(BlockStatement left, BlockStatement right)
+        {
+            return !(left == right);
+        }
     }
 }

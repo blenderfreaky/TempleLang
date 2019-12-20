@@ -29,9 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Diagnostic.Manag
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Binder", "TempleLang.Binder\TempleLang.Binder.csproj", "{54EE0EFB-CEE6-4893-8195-60276D3977D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempleLang.Compiler.Abstractions", "TempleLang.Compiler.Abstractions\TempleLang.Compiler.Abstractions.csproj", "{A4EF406D-A73C-4EC8-97FF-4B5D0331B40A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Compiler.Abstractions", "TempleLang.Compiler.Abstractions\TempleLang.Compiler.Abstractions.csproj", "{A4EF406D-A73C-4EC8-97FF-4B5D0331B40A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempleLang.Compiler.NASM", "TempleLang.Compiler.NASM\TempleLang.Compiler.NASM.csproj", "{F6186DB4-9793-413C-9111-A1F26DD2B9F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Compiler.NASM", "TempleLang.Compiler.NASM\TempleLang.Compiler.NASM.csproj", "{F6186DB4-9793-413C-9111-A1F26DD2B9F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

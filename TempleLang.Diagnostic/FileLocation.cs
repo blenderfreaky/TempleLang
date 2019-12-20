@@ -63,5 +63,25 @@
 
             return new FileLocation(firstCharIndex, lastCharIndex, file);
         }
+
+        public override bool Equals(object obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool operator ==(FileLocation left, FileLocation right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(FileLocation left, FileLocation right)
+        {
+            return !(left == right);
+        }
     }
 }

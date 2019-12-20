@@ -21,5 +21,25 @@
         }
 
         public override string ToString() => $"Const {Value} : {ReturnType}";
+
+        public override bool Equals(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public static bool operator ==(Constant<T> left, Constant<T> right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Constant<T> left, Constant<T> right)
+        {
+            return !(left == right);
+        }
     }
 }

@@ -23,5 +23,25 @@
         }
 
         public override string ToString() => $"({Condition} ? {TrueValue} : {FalseValue}) : {ReturnType}";
+
+        public override bool Equals(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public static bool operator ==(TernaryExpression left, TernaryExpression right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(TernaryExpression left, TernaryExpression right)
+        {
+            return !(left == right);
+        }
     }
 }

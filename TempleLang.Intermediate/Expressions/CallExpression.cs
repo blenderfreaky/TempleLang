@@ -1,7 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using TempleLang.Diagnostic;
 
 namespace TempleLang.Intermediate.Expressions
@@ -22,6 +19,26 @@ namespace TempleLang.Intermediate.Expressions
             Parameters = parameters;
             ReturnType = returnType;
             Location = location;
+        }
+
+        public override bool Equals(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public static bool operator ==(CallExpression left, CallExpression right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(CallExpression left, CallExpression right)
+        {
+            return !(left == right);
         }
     }
 }

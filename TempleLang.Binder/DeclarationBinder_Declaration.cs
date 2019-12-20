@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ID = TempleLang.Intermediate.Declarations;
 using S = TempleLang.Parser;
 using TempleLang.Intermediate.Declarations;
 using System.Linq;

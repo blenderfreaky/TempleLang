@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using TempleLang.Intermediate;
 using TempleLang.Diagnostic;
 using TempleLang.Intermediate.Expressions;
 using IE = TempleLang.Intermediate.Expressions;
 using S = TempleLang.Parser;
 using TempleLang.Intermediate.Primitives;
-using TempleLang.Intermediate.Statements;
 
 namespace TempleLang.Binder
 {

@@ -1,9 +1,11 @@
 ﻿namespace TempleLang.Test
 {
+    using Intermediate.Declarations;
     using Intermediate.Primitives;
     using System;
     using System.IO;
     using TempleLang.Binder;
+    using TempleLang.Compiler.NASM;
     using TempleLang.Lexer;
     using TempleLang.Lexer.Abstractions;
     using TempleLang.Parser;
@@ -48,6 +50,16 @@
                 Console.WriteLine();
 
                 foreach (var diagnostic in binder.Diagnostics) Console.WriteLine(diagnostic.ToStringFancy(text));
+
+                Console.WriteLine();
+
+                var boundProc = bound as Procedure;
+
+                var compiler = new ProcedureCompiler(boundProc);
+
+                var instructions = compiler.Compile(boundProc.EntryPoint);
+
+                foreach (var instruction in instructions) Console.WriteLine(instruction.ToNASM());
             }
         }
     }
