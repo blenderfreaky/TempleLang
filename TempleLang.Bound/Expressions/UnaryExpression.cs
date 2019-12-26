@@ -1,6 +1,6 @@
-﻿namespace TempleLang.Intermediate.Expressions
+﻿namespace TempleLang.Bound.Expressions
 {
-    using TempleLang.Intermediate;
+    using TempleLang.Bound;
     using TempleLang.Diagnostic;
 
     public struct UnaryExpression : IExpression

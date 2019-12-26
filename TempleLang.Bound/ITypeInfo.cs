@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Intermediate
+﻿namespace TempleLang.Bound
 {
     public interface ITypeInfo
     {

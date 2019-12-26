@@ -1,6 +1,6 @@
-﻿namespace TempleLang.Intermediate
+﻿namespace TempleLang.Bound
 {
-    using Intermediate.Statements;
+    using Bound.Statements;
 
     public struct ConstructorInfo : IMemberInfo
     {

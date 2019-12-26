@@ -2,11 +2,11 @@
 {
     using System;
     using S = TempleLang.Parser;
-    using TempleLang.Intermediate.Declarations;
+    using TempleLang.Bound.Declarations;
     using System.Linq;
-    using TempleLang.Intermediate;
-    using TempleLang.Intermediate.Expressions;
-    using TempleLang.Intermediate.Primitives;
+    using TempleLang.Bound;
+    using TempleLang.Bound.Expressions;
+    using TempleLang.Bound.Primitives;
     using TempleLang.Diagnostic;
 
     public partial class DeclarationBinder

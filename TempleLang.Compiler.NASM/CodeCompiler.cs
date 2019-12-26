@@ -1,14 +1,9 @@
-﻿namespace TempleLang.Compiler.NASM
+﻿namespace TempleLang.Intermediate.NASM
 {
-    using Abstractions;
-    using Intermediate.Expressions;
-    using Intermediate.Primitives;
-    using Intermediate.Statements;
+    using Bound.Expressions;
+    using Bound.Primitives;
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
-    using TempleLang.Intermediate.Declarations;
 
     public class CodeCompiler
     {
@@ -29,7 +24,6 @@
         {
             switch (instruction)
             {
-                case 
             }
         }
 

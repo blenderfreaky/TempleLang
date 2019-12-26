@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TempleLang.Compiler.Abstractions
+﻿namespace TempleLang.Intermediate
 {
+    using System.Collections.Generic;
+
     public struct Conditional : IInstruction
     {
         public IReadableValue Condition { get; }

@@ -1,8 +1,8 @@
-﻿namespace TempleLang.Compiler.Abstractions
+﻿namespace TempleLang.Intermediate
 {
-    using Intermediate.Primitives;
     using System.Collections.Generic;
-    using TempleLang.Intermediate.Expressions;
+    using TempleLang.Bound.Expressions;
+    using TempleLang.Bound.Primitives;
 
     public struct BinaryComputationAssignment : IAssignment
     {

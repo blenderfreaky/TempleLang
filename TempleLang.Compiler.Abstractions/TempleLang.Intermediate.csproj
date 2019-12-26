@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TempleLang.Intermediate\TempleLang.Intermediate.csproj" />
+    <ProjectReference Include="..\TempleLang.Bound\TempleLang.Bound.csproj" />
+    <ProjectReference Include="..\TempleLang.Parser\TempleLang.Parser.csproj" />
   </ItemGroup>
 
 </Project>

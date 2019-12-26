@@ -1,10 +1,10 @@
-﻿namespace TempleLang.Intermediate.Declarations
+﻿namespace TempleLang.Bound.Declarations
 {
-    using Intermediate.Statements;
+    using Bound.Statements;
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Diagnostic;
-    using TempleLang.Intermediate.Expressions;
+    using TempleLang.Bound.Expressions;
 
     public sealed class Procedure : IDeclaration, ICallable
     {

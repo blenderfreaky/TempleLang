@@ -1,11 +1,11 @@
 ﻿namespace TempleLang.Test
 {
-    using Intermediate.Declarations;
-    using Intermediate.Primitives;
+    using Bound.Declarations;
+    using Bound.Primitives;
     using System;
     using System.IO;
     using TempleLang.Binder;
-    using TempleLang.Compiler.NASM;
+    using TempleLang.Intermediate.NASM;
     using TempleLang.Lexer;
     using TempleLang.Lexer.Abstractions;
     using TempleLang.Parser;

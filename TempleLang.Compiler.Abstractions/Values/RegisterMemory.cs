@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Compiler.Abstractions
+﻿namespace TempleLang.Intermediate
 {
     using System.Collections.Generic;
 

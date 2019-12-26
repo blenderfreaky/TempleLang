@@ -1,10 +1,10 @@
-﻿namespace TempleLang.Intermediate.Statements
+﻿namespace TempleLang.Bound.Statements
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Diagnostic;
-    using TempleLang.Intermediate.Expressions;
+    using TempleLang.Bound.Expressions;
 
     public struct BlockStatement : IStatement
     {

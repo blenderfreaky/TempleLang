@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Compiler.NASM
+﻿namespace TempleLang.Intermediate.NASM
 {
     public interface IParameter
     {

@@ -1,6 +1,6 @@
-﻿namespace TempleLang.Intermediate
+﻿namespace TempleLang.Bound
 {
-    using TempleLang.Intermediate.Statements;
+    using TempleLang.Bound.Statements;
 
     public struct MethodInfo : IMemberInfo
     {

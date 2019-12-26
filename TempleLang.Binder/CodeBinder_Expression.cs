@@ -1,14 +1,14 @@
 ﻿namespace TempleLang.Binder
 {
-    using Intermediate;
-    using Intermediate.Primitives;
+    using Bound;
+    using Bound.Primitives;
     using System;
     using System.Linq;
     using TempleLang.Diagnostic;
-    using TempleLang.Intermediate.Expressions;
+    using TempleLang.Bound.Expressions;
     using TempleLang.Lexer;
     using TempleLang.Parser;
-    using IE = TempleLang.Intermediate.Expressions;
+    using IE = TempleLang.Bound.Expressions;
     using S = TempleLang.Parser;
 
     public partial class CodeBinder : Binder

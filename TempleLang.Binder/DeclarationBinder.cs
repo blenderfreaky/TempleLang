@@ -1,12 +1,12 @@
 ﻿namespace TempleLang.Binder
 {
     using System.Collections.Generic;
-    using TempleLang.Intermediate;
+    using TempleLang.Bound;
     using TempleLang.Diagnostic;
     using TempleLang.Parser;
     using S = TempleLang.Parser;
-    using TempleLang.Intermediate.Declarations;
-    using TempleLang.Intermediate.Primitives;
+    using TempleLang.Bound.Declarations;
+    using TempleLang.Bound.Primitives;
 
     public partial class DeclarationBinder : Binder
     {

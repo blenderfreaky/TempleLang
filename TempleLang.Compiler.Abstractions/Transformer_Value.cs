@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Intermediate.Expressions;
-using TempleLang.Intermediate.Primitives;
-
-namespace TempleLang.Compiler.Abstractions
+﻿namespace TempleLang.Intermediate
 {
+    using System;
+    using System.Collections.Generic;
+    using TempleLang.Bound.Expressions;
+    using TempleLang.Bound.Primitives;
+
     public partial class Transformer
     {
         public IEnumerable<IInstruction> TransformValue(IValue value, IAssignableValue target) =>

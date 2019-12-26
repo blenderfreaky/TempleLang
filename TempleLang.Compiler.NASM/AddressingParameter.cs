@@ -1,9 +1,8 @@
-﻿namespace TempleLang.Compiler.NASM
+﻿namespace TempleLang.Intermediate.NASM
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TempleLang.Compiler.Abstractions;
 
     public struct AddressingParameter : IParameter
     {

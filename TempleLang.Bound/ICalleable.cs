@@ -1,7 +1,7 @@
-﻿namespace TempleLang.Intermediate
+﻿namespace TempleLang.Bound
 {
     using System.Collections.Generic;
-    using TempleLang.Intermediate.Expressions;
+    using TempleLang.Bound.Expressions;
 
     public interface ICallable : ITypeInfo
     {

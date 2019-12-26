@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Intermediate.Declarations
+﻿namespace TempleLang.Bound.Declarations
 {
     using TempleLang.Diagnostic;
 

@@ -2,10 +2,10 @@
 {
     using System;
     using TempleLang.Diagnostic;
-    using TempleLang.Intermediate.Expressions;
-    using TempleLang.Intermediate.Primitives;
+    using TempleLang.Bound.Expressions;
+    using TempleLang.Bound.Primitives;
     using TempleLang.Parser;
-    using IE = TempleLang.Intermediate.Expressions;
+    using IE = TempleLang.Bound.Expressions;
     using S = TempleLang.Parser;
 
     public partial class CodeBinder : Binder

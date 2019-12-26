@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Lexer;
-using TempleLang.Parser.Abstractions;
-
-namespace TempleLang.Parser
+﻿namespace TempleLang.Parser
 {
+    using TempleLang.Lexer;
+    using TempleLang.Parser.Abstractions;
+
     public class IfStatement : Statement
     {
         public Expression Condition { get; }

@@ -1,8 +1,8 @@
-﻿namespace TempleLang.Intermediate.Primitives
+﻿namespace TempleLang.Bound.Primitives
 {
     using System.Collections.Generic;
     using System.Linq;
-    using TempleLang.Intermediate;
+    using TempleLang.Bound;
 
     public sealed class PrimitiveType : ITypeInfo
     {

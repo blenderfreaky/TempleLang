@@ -1,7 +1,7 @@
-﻿namespace TempleLang.Intermediate.Statements
+﻿namespace TempleLang.Bound.Statements
 {
     using TempleLang.Diagnostic;
-    using TempleLang.Intermediate.Expressions;
+    using TempleLang.Bound.Expressions;
 
     public struct ReturnStatement : IStatement
     {

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TempleLang.Compiler.Abstractions.Values
+﻿namespace TempleLang.Intermediate
 {
+    using System.Collections.Generic;
+
     public struct NameValue : IReadableValue, IAssignableValue
     {
         public string Name { get; }

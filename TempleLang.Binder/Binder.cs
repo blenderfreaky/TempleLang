@@ -1,6 +1,6 @@
 ﻿namespace TempleLang.Binder
 {
-    using Intermediate;
+    using Bound;
     using System;
     using System.Collections.Concurrent;
     using TempleLang.Diagnostic;

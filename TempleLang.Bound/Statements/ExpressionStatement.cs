@@ -1,8 +1,8 @@
-﻿namespace TempleLang.Intermediate.Statements
+﻿namespace TempleLang.Bound.Statements
 {
     using System.Collections.Generic;
     using TempleLang.Diagnostic;
-    using TempleLang.Intermediate.Expressions;
+    using TempleLang.Bound.Expressions;
 
     public struct ExpressionStatement : IStatement
     {

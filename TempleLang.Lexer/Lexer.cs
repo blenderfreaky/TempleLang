@@ -275,8 +275,6 @@
             throw UnexpectedCharException.Create(character, Token.EoF, "EoF");
         }
 
-        private Token SwitchOnNextCharacter(object modulo, (char, Token ModuloCompoundAssign) p) => throw new NotImplementedException();
-
         private void LexNumber(ref bool reachedDot)
         {
             while (true)

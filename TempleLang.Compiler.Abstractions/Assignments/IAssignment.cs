@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Compiler.Abstractions
+﻿namespace TempleLang.Intermediate
 {
     public interface IAssignment : IInstruction
     {

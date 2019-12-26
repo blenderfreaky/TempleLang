@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Compiler.NASM
+﻿namespace TempleLang.Intermediate.NASM
 {
     using System;
     using System.Collections.Generic;

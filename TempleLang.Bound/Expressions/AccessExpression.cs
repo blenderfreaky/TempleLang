@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Intermediate.Expressions
+﻿namespace TempleLang.Bound.Expressions
 {
     using TempleLang.Diagnostic;
 

@@ -3,12 +3,12 @@
     using System;
     using System.Linq;
     using TempleLang.Diagnostic;
-    using TempleLang.Intermediate.Expressions;
-    using TempleLang.Intermediate.Primitives;
-    using TempleLang.Intermediate.Statements;
+    using TempleLang.Bound.Expressions;
+    using TempleLang.Bound.Primitives;
+    using TempleLang.Bound.Statements;
     using TempleLang.Parser;
-    using IE = TempleLang.Intermediate.Expressions;
-    using IS = TempleLang.Intermediate.Statements;
+    using IE = TempleLang.Bound.Expressions;
+    using IS = TempleLang.Bound.Statements;
     using S = TempleLang.Parser;
 
     public partial class CodeBinder : Binder

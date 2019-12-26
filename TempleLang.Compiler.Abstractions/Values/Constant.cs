@@ -1,7 +1,7 @@
-﻿namespace TempleLang.Compiler.Abstractions
+﻿namespace TempleLang.Intermediate
 {
     using System.Collections.Generic;
-    using TempleLang.Intermediate.Primitives;
+    using TempleLang.Bound.Primitives;
 
     public struct Constant : IImmutableValue
     {

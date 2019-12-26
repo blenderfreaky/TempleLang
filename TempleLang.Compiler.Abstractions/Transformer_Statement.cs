@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TempleLang.Compiler.Abstractions.Values;
-using TempleLang.Intermediate.Statements;
-
-namespace TempleLang.Compiler.Abstractions
+﻿namespace TempleLang.Intermediate
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using TempleLang.Bound.Statements;
+
     public partial class Transformer
     {
         public IEnumerable<IInstruction> TransformStatment(IStatement statement) =>

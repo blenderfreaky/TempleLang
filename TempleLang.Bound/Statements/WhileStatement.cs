@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Diagnostic;
-using TempleLang.Intermediate.Expressions;
-
-namespace TempleLang.Intermediate.Statements
+﻿namespace TempleLang.Bound.Statements
 {
+    using System.Collections.Generic;
+    using TempleLang.Diagnostic;
+    using TempleLang.Bound.Expressions;
+
     public struct WhileStatement : IStatement
     {
         public IExpression Condition { get; }

@@ -1,7 +1,5 @@
-﻿namespace TempleLang.Compiler.Abstractions
+﻿namespace TempleLang.Intermediate
 {
-    using TempleLang.Intermediate.Primitives;
-
     public interface IReadableValue
     {
     }
