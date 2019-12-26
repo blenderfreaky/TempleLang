@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TempleLang.Intermediate\TempleLang.Intermediate.csproj" />
+  </ItemGroup>
+
 </Project>

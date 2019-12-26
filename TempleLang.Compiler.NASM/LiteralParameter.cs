@@ -18,14 +18,8 @@
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(LiteralParameter left, LiteralParameter right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(LiteralParameter left, LiteralParameter right) => left.Equals(right);
 
-        public static bool operator !=(LiteralParameter left, LiteralParameter right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(LiteralParameter left, LiteralParameter right) => !(left == right);
     }
 }

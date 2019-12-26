@@ -19,14 +19,8 @@
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(ReturnStatement left, ReturnStatement right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(ReturnStatement left, ReturnStatement right) => left.Equals(right);
 
-        public static bool operator !=(ReturnStatement left, ReturnStatement right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(ReturnStatement left, ReturnStatement right) => !(left == right);
     }
 }

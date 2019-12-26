@@ -25,14 +25,8 @@
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(Positioned<T> left, Positioned<T> right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(Positioned<T> left, Positioned<T> right) => left.Equals(right);
 
-        public static bool operator !=(Positioned<T> left, Positioned<T> right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(Positioned<T> left, Positioned<T> right) => !(left == right);
     }
 }

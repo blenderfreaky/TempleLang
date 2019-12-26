@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using TempleLang.Lexer;
-using TempleLang.Parser.Abstractions;
-
-namespace TempleLang.Parser
+﻿namespace TempleLang.Parser
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using TempleLang.Lexer;
+    using TempleLang.Parser.Abstractions;
+
     public class CallExpression : Expression
     {
         public Expression Callee { get; }

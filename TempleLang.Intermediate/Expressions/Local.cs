@@ -3,6 +3,7 @@
     using TempleLang.Intermediate;
     using TempleLang.Diagnostic;
     using Primitives;
+    using System.Collections.Generic;
 
     public struct Local : IValue
     {
@@ -21,27 +22,22 @@
         }
 
         public override string ToString() => $"{Name} : {ReturnType}";
-
-        public static readonly Local Unknown = new Local("?", ValueFlags.None, PrimitiveType.Unknown, FileLocation.Null);
-
-        public override bool Equals(object obj)
-        {
-            throw new System.NotImplementedException();
-        }
+        public override bool Equals(object? obj) => obj is Local local && Name == local.Name && Flags == local.Flags && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, local.ReturnType) && EqualityComparer<FileLocation>.Default.Equals(Location, local.Location);
 
         public override int GetHashCode()
         {
-            throw new System.NotImplementedException();
+            var hashCode = -687767545;
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = (hashCode * -1521134295) + Flags.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<ITypeInfo>.Default.GetHashCode(ReturnType);
+            hashCode = (hashCode * -1521134295) + Location.GetHashCode();
+            return hashCode;
         }
 
-        public static bool operator ==(Local left, Local right)
-        {
-            return left.Equals(right);
-        }
+        public static readonly Local Unknown = new Local("?", ValueFlags.None, PrimitiveType.Unknown, FileLocation.Null);
 
-        public static bool operator !=(Local left, Local right)
-        {
-            return !(left == right);
-        }
+        public static bool operator ==(Local left, Local right) => left.Equals(right);
+
+        public static bool operator !=(Local left, Local right) => !(left == right);
     }
 }

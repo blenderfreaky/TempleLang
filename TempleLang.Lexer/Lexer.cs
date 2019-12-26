@@ -19,6 +19,7 @@
             ["else"] = Token.Else,
             ["for"] = Token.For,
             ["while"] = Token.While,
+            ["do"] = Token.Do,
             ["let"] = Token.Declarator,
         };
 

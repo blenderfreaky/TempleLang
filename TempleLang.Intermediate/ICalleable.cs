@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using TempleLang.Intermediate.Expressions;
-
-namespace TempleLang.Intermediate
+﻿namespace TempleLang.Intermediate
 {
+    using System.Collections.Generic;
+    using TempleLang.Intermediate.Expressions;
+
     public interface ICallable : ITypeInfo
     {
         ITypeInfo ReturnType { get; }

@@ -34,14 +34,8 @@
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(TernaryExpression left, TernaryExpression right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(TernaryExpression left, TernaryExpression right) => left.Equals(right);
 
-        public static bool operator !=(TernaryExpression left, TernaryExpression right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(TernaryExpression left, TernaryExpression right) => !(left == right);
     }
 }

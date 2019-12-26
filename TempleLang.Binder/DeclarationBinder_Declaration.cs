@@ -1,14 +1,14 @@
-﻿using System;
-using S = TempleLang.Parser;
-using TempleLang.Intermediate.Declarations;
-using System.Linq;
-using TempleLang.Intermediate;
-using TempleLang.Intermediate.Expressions;
-using TempleLang.Intermediate.Primitives;
-using TempleLang.Diagnostic;
-
-namespace TempleLang.Binder
+﻿namespace TempleLang.Binder
 {
+    using System;
+    using S = TempleLang.Parser;
+    using TempleLang.Intermediate.Declarations;
+    using System.Linq;
+    using TempleLang.Intermediate;
+    using TempleLang.Intermediate.Expressions;
+    using TempleLang.Intermediate.Primitives;
+    using TempleLang.Diagnostic;
+
     public partial class DeclarationBinder
     {
         public IDeclaration BindDeclaration(S.Declaration syntaxDeclaration) => syntaxDeclaration switch

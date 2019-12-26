@@ -55,7 +55,7 @@
 
                 var boundProc = bound as Procedure;
 
-                var compiler = new ProcedureCompiler(boundProc);
+                var compiler = new CodeCompiler(boundProc);
 
                 var instructions = compiler.Compile(boundProc.EntryPoint);
 

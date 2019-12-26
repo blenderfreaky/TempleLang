@@ -4,7 +4,7 @@
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
 
-    public abstract class Statement : Syntax
+    public abstract class Statement : SyntaxNode
     {
         protected Statement(IPositioned location) : base(location) { }
 
@@ -15,6 +15,8 @@
         public static readonly Parser<Statement, Token> Parser =
             LocalDeclarationStatement.Parser.OfType<Statement, Token>()
             .Or(ExpressionStatement.Parser)
-            .Or(BlockStatement.Parser);
+            .Or(BlockStatement.Parser)
+            .Or(IfStatement.Parser)
+            .Or(WhileStatement.Parser);
     }
 }

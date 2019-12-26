@@ -18,6 +18,8 @@
             S.ExpressionStatement stmt => BindStatement(stmt),
             S.LocalDeclarationStatement stmt => BindStatement(stmt),
             S.BlockStatement stmt => BindStatement(stmt),
+            S.IfStatement stmt => BindStatement(stmt),
+            S.WhileStatement stmt => BindStatement(stmt),
             _ => throw new ArgumentException(nameof(syntaxStatement)),
         };
 
@@ -60,10 +62,23 @@
         {
             using CodeBinder binder = new CodeBinder(this);
 
-            var statements = stmt.Statements.Select(binder.BindStatement).Where(x => x != null).Select(x => x!).ToList();
-            var result = new IS.BlockStatement(binder.Locals.Values, statements, stmt.Location);
+            var statements = stmt.Statements.Select(binder.BindStatement).ToList();
 
-            return result;
+            return new IS.BlockStatement(binder.Locals.Values, statements!, stmt.Location);
         }
+
+        public IS.IfStatement? BindStatement(S.IfStatement stmt) =>
+            new IS.IfStatement(
+                BindExpression(stmt.Condition),
+                BindStatement(stmt.TrueStatement)!,
+                stmt.FalseStatement == null ? null : BindStatement(stmt.FalseStatement),
+                stmt.Location);
+
+        public IS.WhileStatement? BindStatement(S.WhileStatement stmt) =>
+            new IS.WhileStatement(
+                BindExpression(stmt.Condition),
+                BindStatement(stmt.Statement)!,
+                stmt.IsDoLoop,
+                stmt.Location);
     }
 }

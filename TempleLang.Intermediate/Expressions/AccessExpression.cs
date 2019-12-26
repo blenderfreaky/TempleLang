@@ -1,7 +1,7 @@
-﻿using TempleLang.Diagnostic;
-
-namespace TempleLang.Intermediate.Expressions
+﻿namespace TempleLang.Intermediate.Expressions
 {
+    using TempleLang.Diagnostic;
+
     public struct AccessExpression : IValue
     {
         public IExpression Accessee { get; }
@@ -38,15 +38,9 @@ namespace TempleLang.Intermediate.Expressions
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(AccessExpression left, AccessExpression right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(AccessExpression left, AccessExpression right) => left.Equals(right);
 
-        public static bool operator !=(AccessExpression left, AccessExpression right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(AccessExpression left, AccessExpression right) => !(left == right);
     }
 
     public enum AccessOperationType

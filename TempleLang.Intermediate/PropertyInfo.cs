@@ -33,14 +33,8 @@
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(PropertyInfo left, PropertyInfo right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(PropertyInfo left, PropertyInfo right) => left.Equals(right);
 
-        public static bool operator !=(PropertyInfo left, PropertyInfo right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(PropertyInfo left, PropertyInfo right) => !(left == right);
     }
 }

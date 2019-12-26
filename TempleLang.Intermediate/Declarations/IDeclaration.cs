@@ -1,7 +1,7 @@
-﻿using TempleLang.Diagnostic;
-
-namespace TempleLang.Intermediate.Declarations
+﻿namespace TempleLang.Intermediate.Declarations
 {
+    using TempleLang.Diagnostic;
+
     public interface IDeclaration : IPositioned
     {
     }

@@ -20,28 +20,14 @@
             {
                 RegisterMemory register => register.RegisterName,
                 StackMemory stack => $"[rsi + {stack.StackOffset}]",
-                Constant constant => constant.ValueString,
                 _ => throw new InvalidOperationException(),
             });
 
-        public override bool Equals(object obj)
-        {
-            throw new NotImplementedException();
-        }
+        public override bool Equals(object? obj) => obj is AddressingParameter parameter && EqualityComparer<IMemory>.Default.Equals(Memory, parameter.Memory);
+        public override int GetHashCode() => -140318722 + EqualityComparer<IMemory>.Default.GetHashCode(Memory);
 
-        public override int GetHashCode()
-        {
-            throw new NotImplementedException();
-        }
+        public static bool operator ==(AddressingParameter left, AddressingParameter right) => left.Equals(right);
 
-        public static bool operator ==(AddressingParameter left, AddressingParameter right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(AddressingParameter left, AddressingParameter right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(AddressingParameter left, AddressingParameter right) => !(left == right);
     }
 }

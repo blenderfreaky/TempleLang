@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using TempleLang.Diagnostic;
-
-namespace TempleLang.Intermediate.Expressions
+﻿namespace TempleLang.Intermediate.Expressions
 {
+    using System.Collections.Generic;
+    using TempleLang.Diagnostic;
+
     public struct CallExpression : IExpression
     {
         public IExpression Callee { get; }
@@ -31,14 +31,8 @@ namespace TempleLang.Intermediate.Expressions
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(CallExpression left, CallExpression right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(CallExpression left, CallExpression right) => left.Equals(right);
 
-        public static bool operator !=(CallExpression left, CallExpression right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(CallExpression left, CallExpression right) => !(left == right);
     }
 }

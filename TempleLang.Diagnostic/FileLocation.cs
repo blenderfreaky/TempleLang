@@ -64,24 +64,20 @@
             return new FileLocation(firstCharIndex, lastCharIndex, file);
         }
 
-        public override bool Equals(object obj)
-        {
-            throw new NotImplementedException();
-        }
+        public override bool Equals(object? obj) => obj is FileLocation location && FirstCharIndex == location.FirstCharIndex && LastCharIndex == location.LastCharIndex && EqualityComparer<ISourceFile>.Default.Equals(File, location.File) && EqualityComparer<FileLocation>.Default.Equals(Location, location.Location);
 
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
+            var hashCode = 649508415;
+            hashCode = (hashCode * -1521134295) + FirstCharIndex.GetHashCode();
+            hashCode = (hashCode * -1521134295) + LastCharIndex.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<ISourceFile>.Default.GetHashCode(File);
+            hashCode = (hashCode * -1521134295) + Location.GetHashCode();
+            return hashCode;
         }
 
-        public static bool operator ==(FileLocation left, FileLocation right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(FileLocation left, FileLocation right) => left.Equals(right);
 
-        public static bool operator !=(FileLocation left, FileLocation right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(FileLocation left, FileLocation right) => !(left == right);
     }
 }

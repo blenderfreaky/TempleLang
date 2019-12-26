@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using TempleLang.Intermediate;
-using TempleLang.Diagnostic;
-using TempleLang.Parser;
-using S = TempleLang.Parser;
-using TempleLang.Intermediate.Declarations;
-using TempleLang.Intermediate.Primitives;
-
-namespace TempleLang.Binder
+﻿namespace TempleLang.Binder
 {
+    using System.Collections.Generic;
+    using TempleLang.Intermediate;
+    using TempleLang.Diagnostic;
+    using TempleLang.Parser;
+    using S = TempleLang.Parser;
+    using TempleLang.Intermediate.Declarations;
+    using TempleLang.Intermediate.Primitives;
+
     public partial class DeclarationBinder : Binder
     {
         public Dictionary<string, ITypeInfo> Types { get; }

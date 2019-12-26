@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using TempleLang.Intermediate;
-using TempleLang.Diagnostic;
-using TempleLang.Intermediate.Expressions;
-using IE = TempleLang.Intermediate.Expressions;
-using S = TempleLang.Parser;
-using TempleLang.Intermediate.Primitives;
-
-namespace TempleLang.Binder
+﻿namespace TempleLang.Binder
 {
+    using System.Collections.Generic;
+    using TempleLang.Intermediate;
+    using TempleLang.Diagnostic;
+    using TempleLang.Intermediate.Expressions;
+    using IE = TempleLang.Intermediate.Expressions;
+    using S = TempleLang.Parser;
+    using TempleLang.Intermediate.Primitives;
+
     public partial class CodeBinder : Binder
     {
         public Dictionary<string, Local> Locals { get; }

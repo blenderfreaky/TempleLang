@@ -14,6 +14,7 @@
         If,
         Else,
         While,
+        Do,
         For,
 
         LeftExpressionDelimiter,

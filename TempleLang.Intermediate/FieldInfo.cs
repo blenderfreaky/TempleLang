@@ -27,14 +27,8 @@
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(FieldInfo left, FieldInfo right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(FieldInfo left, FieldInfo right) => left.Equals(right);
 
-        public static bool operator !=(FieldInfo left, FieldInfo right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(FieldInfo left, FieldInfo right) => !(left == right);
     }
 }

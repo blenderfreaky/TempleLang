@@ -2,7 +2,7 @@
 {
     using TempleLang.Diagnostic;
 
-    public abstract class Fragment : Syntax
+    public abstract class Fragment : SyntaxNode
     {
         protected Fragment(IPositioned location) : base(location) { }
 

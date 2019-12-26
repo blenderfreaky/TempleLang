@@ -4,7 +4,7 @@
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
 
-    public abstract class Expression : Syntax
+    public abstract class Expression : SyntaxNode
     {
         protected Expression(IPositioned location) : base(location) { }
 

@@ -32,14 +32,8 @@
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(ConstructorInfo left, ConstructorInfo right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(ConstructorInfo left, ConstructorInfo right) => left.Equals(right);
 
-        public static bool operator !=(ConstructorInfo left, ConstructorInfo right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(ConstructorInfo left, ConstructorInfo right) => !(left == right);
     }
 }

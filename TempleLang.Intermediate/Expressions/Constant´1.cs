@@ -32,14 +32,8 @@
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(Constant<T> left, Constant<T> right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(Constant<T> left, Constant<T> right) => left.Equals(right);
 
-        public static bool operator !=(Constant<T> left, Constant<T> right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(Constant<T> left, Constant<T> right) => !(left == right);
     }
 }

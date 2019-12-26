@@ -35,15 +35,9 @@
             throw new System.NotImplementedException();
         }
 
-        public static bool operator ==(BinaryExpression left, BinaryExpression right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(BinaryExpression left, BinaryExpression right) => left.Equals(right);
 
-        public static bool operator !=(BinaryExpression left, BinaryExpression right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(BinaryExpression left, BinaryExpression right) => !(left == right);
     }
 
     public enum BinaryOperatorType

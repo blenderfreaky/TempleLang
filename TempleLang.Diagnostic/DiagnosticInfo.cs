@@ -57,14 +57,8 @@
             throw new NotImplementedException();
         }
 
-        public static bool operator ==(DiagnosticInfo left, DiagnosticInfo right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(DiagnosticInfo left, DiagnosticInfo right) => left.Equals(right);
 
-        public static bool operator !=(DiagnosticInfo left, DiagnosticInfo right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(DiagnosticInfo left, DiagnosticInfo right) => !(left == right);
     }
 }
