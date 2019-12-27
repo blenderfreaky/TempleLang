@@ -19,7 +19,7 @@
             Dictionary<Variable, IMemory> assignedLocations)
         {
             Instructions = instructions;
-            ConstantTable = constantTable.ToDictionary(x => x, x => new DataLocation(x.DebugName, x.Type.Size));
+            ConstantTable = constantTable.ToDictionary(x => x, x => new DataLocation(x.DebugName.Replace(' ', '_'), x.Type.Size));
             AssignedLocations = assignedLocations;
         }
 

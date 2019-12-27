@@ -40,7 +40,7 @@
             AssignedLocations = new Dictionary<Variable, IMemory>();
             FreeGeneralPurposeRegisters = new Stack<Register>(
                 Register.All
-                .Where(x => (x.Flags & RegisterFlags.GeneralPurpose) != 0));
+                .Where(x => x.Size == RegisterSize.Bytes8 && (x.Flags & RegisterFlags.GeneralPurpose) != 0));
 
             Active = new List<LiveInterval>();
 

@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Bound", "TempleL
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5_CodeGenerator", "5_CodeGenerator", "{89BB7A73-4E2C-4DB2-AD2E-08900628CC1D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6_Compiler", "6_Compiler", "{62F0A80D-47E6-43A1-ADC2-2A4BAB8FF6DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

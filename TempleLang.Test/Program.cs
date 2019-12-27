@@ -33,7 +33,7 @@
 
                 var eofParser =
                     (from r in parser
-                     from _ in Parse.Token(Token.EoF)
+                     from _ in Parse.Token(Token.EoF) // Match EoF to ensure the entire input is matched
                      select r);
 
                 var parserResult = eofParser(lexemes);
