@@ -48,6 +48,8 @@
             int characterInt;
             char character;
 
+            Start:
+            
             do
             {
                 characterInt = AdvanceChar();
@@ -60,6 +62,22 @@
                 character = (char)characterInt;
             }
             while (char.IsWhiteSpace(character));
+
+            if (character == '/' && PeekChar() == '/')
+            {
+                characterInt = AdvanceChar();
+
+                while (characterInt != -1 && characterInt != '\n') characterInt = AdvanceChar();
+
+                if (characterInt == -1)
+                {
+                    return MakeLexeme(Token.EoF);
+                }
+
+                character = (char)characterInt;
+
+                goto Start;
+            }
 
             TokenBuffer.Append(character);
 

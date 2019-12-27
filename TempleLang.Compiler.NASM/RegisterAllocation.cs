@@ -4,7 +4,7 @@
     using System.Linq;
     using TempleLang.Intermediate;
 
-    public class RegisterAllocation
+    public sealed class RegisterAllocation
     {
         private class LiveInterval
         {
@@ -18,6 +18,8 @@
                 FirstIndex = firstIndex;
                 LastIndex = lastIndex;
             }
+
+            public override string ToString() => $"{Variable}: {FirstIndex} - {LastIndex}";
         }
 
         public List<IInstruction> Instructions { get; }
@@ -112,11 +114,15 @@
 
         private void ExpireOld(LiveInterval interval)
         {
-            foreach (var other in LiveIntervals)
+            for (int i = 0; i < Active.Count; i++)
             {
-                if (other.LastIndex >= interval.FirstIndex) return;
+                var other = Active[i];
 
-                Active.Remove(other);
+                if (other.LastIndex >= interval.FirstIndex) continue;
+
+                Active.RemoveAt(i);
+                i--;
+
                 var memory = AssignedLocations[other.Variable];
                 if (memory is Register register) FreeGeneralPurposeRegisters.Push(register);
             }

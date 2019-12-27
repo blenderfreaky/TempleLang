@@ -37,7 +37,7 @@
         SPL, BPL, SIL, DIL
     }
 
-    public readonly struct Register : IMemory
+    public readonly struct Register : IMemory, IEquatable<Register>
     {
         public readonly RegisterName RegisterName;
         public readonly RegisterKind Kind;
@@ -136,7 +136,8 @@
 
         public override string ToString() => Name;
 
-        public override bool Equals(object? obj) => obj is Register register && RegisterName == register.RegisterName && Kind == register.Kind && Flags == register.Flags && Size == register.Size && Containing == register.Containing && Name == register.Name;
+        public override bool Equals(object? obj) => obj is Register register && Equals(register);
+        public bool Equals(Register register) => RegisterName == register.RegisterName;
 
         public override int GetHashCode()
         {

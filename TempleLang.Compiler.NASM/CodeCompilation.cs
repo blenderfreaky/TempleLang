@@ -7,23 +7,23 @@
     using System.Linq;
     using TempleLang.Intermediate;
 
-    public class CodeCompiler
+    public class CodeCompilation
     {
         public List<IInstruction> Instructions { get; }
         public Dictionary<Constant, DataLocation> ConstantTable { get; }
         public Dictionary<Variable, IMemory> AssignedLocations { get; }
 
-        public CodeCompiler(
+        public CodeCompilation(
             List<IInstruction> instructions,
             List<Constant> constantTable,
             Dictionary<Variable, IMemory> assignedLocations)
         {
             Instructions = instructions;
-            ConstantTable = constantTable.ToDictionary(x => x, x => new DataLocation(x.DebugName.Replace(' ', '_'), x.Type.Size));
+            ConstantTable = constantTable.Distinct().ToDictionary(x => x, x => new DataLocation(x.DebugName.Replace(' ', '_'), x.Type.Size));
             AssignedLocations = assignedLocations;
         }
 
-        public CodeCompiler(
+        public CodeCompilation(
             List<IInstruction> instructions,
             Dictionary<Constant, DataLocation> constantTable,
             Dictionary<Variable, IMemory> assignedLocations)
@@ -46,7 +46,7 @@
             }
         }
 
-        public IEnumerable<NasmInstruction> CompileInstructions() => Instructions.SelectMany(CompileInstruction);
+        public IEnumerable<NasmInstruction> CompileInstructions() => Instructions.SelectMany(CompileInstruction);//.BasicOptimization();
 
         private IEnumerable<NasmInstruction> CompileInstruction(IInstruction instruction)
         {
@@ -119,7 +119,11 @@
             var rhsMemory = GetMemory(inst.Rhs) ?? throw new ArgumentException(nameof(inst));
             var targetMemory = GetMemory(inst.Target);
 
-            if (targetMemory == null) yield break;
+            if (targetMemory == null)
+            {
+                if (inst.Operator == BinaryOperatorType.Assign) targetMemory = lhsMemory;
+                else yield break;
+            }
 
             if (lhsMemory != targetMemory) yield return Move(targetMemory, new MemoryParameter(lhsMemory));
 

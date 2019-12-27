@@ -25,7 +25,10 @@
                 _ => throw new InvalidOperationException(),
             });
 
+        public override string ToString() => ToNASM();
+
         public override bool Equals(object? obj) => obj is MemoryParameter parameter && EqualityComparer<IMemory>.Default.Equals(Memory, parameter.Memory);
+
         public override int GetHashCode() => -140318722 + EqualityComparer<IMemory>.Default.GetHashCode(Memory);
 
         public static bool operator ==(MemoryParameter left, MemoryParameter right) => left.Equals(right);

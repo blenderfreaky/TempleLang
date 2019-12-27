@@ -12,6 +12,8 @@
             {
                 BlockStatement stmt => TransformStatementCore(stmt),
                 ExpressionStatement stmt => TransformStatementCore(stmt),
+                IfStatement stmt => TransformStatementCore(stmt),
+                WhileStatement stmt => TransformStatementCore(stmt),
                 _ => throw new ArgumentException(nameof(statement)),
             };
 
@@ -25,12 +27,12 @@
 
         private IEnumerable<IInstruction> TransformStatementCore(IfStatement stmt)
         {
-            var conditionResult = RequestLocal();
+            IReadableValue conditionResult;
 
-            foreach (var instruction in TransformExpression(stmt.Condition, conditionResult)) yield return instruction;
+            foreach (var instruction in GetValue(stmt.Condition, out conditionResult)) yield return instruction;
 
-            var trueLabel = new LabelInstruction();
-            var exitLabel = new LabelInstruction();
+            var trueLabel = RequestLabel();
+            var exitLabel = RequestLabel();
 
             yield return new ConditionalJump(trueLabel, conditionResult);
 
@@ -49,13 +51,13 @@
 
         private IEnumerable<IInstruction> TransformStatementCore(WhileStatement stmt)
         {
-            var conditionResult = RequestLocal();
-            var conditionInstructions = TransformExpression(stmt.Condition, conditionResult);
+            IReadableValue conditionResult;
+            var conditionInstructions = GetValue(stmt.Condition, out conditionResult);
             var statementInstructions = TransformStatement(stmt.Statement);
 
             if (stmt.IsDoLoop)
             {
-                var entryLabel = new LabelInstruction();
+                var entryLabel = RequestLabel();
 
                 yield return entryLabel;
 
@@ -66,8 +68,8 @@
             }
             else
             {
-                var entryLabel = new LabelInstruction();
-                var exitLabel = new LabelInstruction();
+                var entryLabel = RequestLabel();
+                var exitLabel = RequestLabel();
 
                 yield return entryLabel;
                 foreach (var instruction in conditionInstructions) yield return instruction;

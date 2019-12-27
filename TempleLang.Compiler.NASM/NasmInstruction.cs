@@ -35,6 +35,9 @@
             (Name ?? string.Empty).PadRight(6),
             Parameters == null ? string.Empty : string.Join(", ", Parameters.Select(x => x.ToNASM()))
             );
+
+        public override string ToString() => ToNASM();
+
         public override bool Equals(object? obj) => obj is NasmInstruction instruction
             && Label == instruction.Label
             && Name == instruction.Name

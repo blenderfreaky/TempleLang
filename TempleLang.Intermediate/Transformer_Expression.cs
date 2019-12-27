@@ -1,6 +1,7 @@
 ﻿namespace TempleLang.Intermediate
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using TempleLang.Bound.Expressions;
     using TempleLang.Bound.Primitives;
@@ -19,9 +20,9 @@
 
         private IEnumerable<IInstruction> TransformExpressionCore(UnaryExpression expr, IAssignableValue target)
         {
-            var operandResult = RequestLocal();
+            IReadableValue operandResult;
 
-            foreach (var instruction in TransformExpression(expr.Operand, operandResult)) yield return instruction;
+            foreach (var instruction in GetValue(expr.Operand, out operandResult)) yield return instruction;
 
             if (!(expr.Operand.ReturnType is PrimitiveType type)) throw new InvalidOperationException("Internal Failure: Binder failed binding high-level operators to methods");
 
@@ -30,11 +31,10 @@
 
         private IEnumerable<IInstruction> TransformExpressionCore(BinaryExpression expr, IAssignableValue target)
         {
-            var lhsResult = RequestLocal();
-            var rhsResult = RequestLocal();
+            IReadableValue lhsResult, rhsResult;
 
-            foreach (var instruction in TransformExpression(expr.Lhs, lhsResult)) yield return instruction;
-            foreach (var instruction in TransformExpression(expr.Rhs, rhsResult)) yield return instruction;
+            foreach (var instruction in GetValue(expr.Lhs, out lhsResult)) yield return instruction;
+            foreach (var instruction in GetValue(expr.Rhs, out rhsResult)) yield return instruction;
 
             if (!(expr.Lhs.ReturnType is PrimitiveType type)) throw new InvalidOperationException("Internal Failure: Binder failed binding high-level operators to methods");
 
@@ -43,12 +43,12 @@
 
         private IEnumerable<IInstruction> TransformExpressionCore(TernaryExpression expr, IAssignableValue target)
         {
-            var conditionResult = RequestLocal();
+            IReadableValue conditionResult;
 
-            foreach (var instruction in TransformExpression(expr, conditionResult)) yield return instruction;
+            foreach (var instruction in GetValue(expr.Condition, out conditionResult)) yield return instruction;
 
-            var trueLabel = new LabelInstruction();
-            var exitLabel = new LabelInstruction();
+            var trueLabel = RequestLabel();
+            var exitLabel = RequestLabel();
 
             yield return new ConditionalJump(trueLabel, conditionResult);
 
@@ -59,6 +59,11 @@
             foreach (var instruction in TransformExpression(expr.TrueValue, target)) yield return instruction;
 
             yield return exitLabel;
+        }
+
+        private IEnumerable<IInstruction> TransformExpressionCore(CallExpression expr, IAssignableValue target)
+        {
+            yield break;
         }
     }
 }

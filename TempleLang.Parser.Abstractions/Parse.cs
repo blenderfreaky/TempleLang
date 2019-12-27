@@ -3,9 +3,6 @@
     using Lexer;
     using System;
     using System.Collections.Generic;
-    using TempleLang.Lexer.Abstractions;
-
-    public delegate IParserResult<T, TToken> Parser<out T, TToken>(LexemeString<TToken> lexemeString);
 
     public static class Parse
     {

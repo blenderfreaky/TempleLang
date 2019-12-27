@@ -1,88 +1,31 @@
 ﻿namespace TempleLang.Test
 {
     using TempleLang.Lexer;
-    using TempleLang.Bound.Primitives;
-    using TempleLang.CodeGenerator.NASM;
-    using TempleLang.Intermediate;
     using System;
     using System.IO;
-    using System.Linq;
-    using TempleLang.Binder;
-    using TempleLang.Lexer.Abstractions;
-    using TempleLang.Parser;
-    using TempleLang.Parser.Abstractions;
+    using Compiler;
 
     public static class Program
     {
         public static void Main(string[] args)
         {
-            while (true)
-            {
-                var text = Console.ReadLine();
-                using var stringReader = new StringReader(text);
+            var text = File.ReadAllText("../../../../Test.tl");
 
-                var lexemes = new Lexer(
-                    stringReader,
-                    new SourceFile("Console", null))
-                    .LexUntil(Token.EoF);
+            var compiled = TempleLang.CompileStatement(text, new SourceFile("Console", null), out var parserError, out var diagnostics);
 
-                Console.WriteLine(string.Join('\n', lexemes));
-                Console.WriteLine();
+            if (parserError != null) Console.WriteLine(parserError.ToString());
 
-                var parser = Statement.Parser;
+            foreach (var diagnostic in diagnostics) Console.WriteLine(diagnostic.ToStringFancy(text.Split('\n')));
 
-                var eofParser =
-                    (from r in parser
-                     from _ in Parse.Token(Token.EoF) // Match EoF to ensure the entire input is matched
-                     select r);
+            if (compiled == null) return;
 
-                var parserResult = eofParser(lexemes);
+            Console.WriteLine("section .data");
 
-                Console.WriteLine(parserResult);
-                Console.WriteLine();
+            foreach (var constant in compiled.CompileConstantTable()) Console.WriteLine(constant.ToNASM());
 
-                if (!parserResult.IsSuccessful) continue;
+            Console.WriteLine("section .text");
 
-                using DeclarationBinder binder = new DeclarationBinder(PrimitiveType.Types);
-                using CodeBinder codeBinder = new CodeBinder(binder);
-
-                var bound = codeBinder.BindStatement(parserResult.Result);
-
-                Console.WriteLine(bound);
-                Console.WriteLine();
-
-                foreach (var diagnostic in binder.Diagnostics) Console.WriteLine(diagnostic.ToStringFancy(text));
-
-                Console.WriteLine();
-
-                var transformer = new Transformer();
-
-                var instructions = transformer.TransformStatement(bound).ToList();
-
-                foreach (var constant in transformer.ConstantTable) Console.WriteLine("Const " + constant.DebugName + " = " + constant);
-
-                Console.WriteLine();
-
-                foreach (var instruction in instructions) Console.WriteLine(instruction);
-
-                Console.WriteLine();
-
-                var allocation = RegisterAllocation.Generate(instructions);
-
-                foreach (var assignment in allocation.AssignedLocations) Console.WriteLine(assignment.Key + " -> " + assignment.Value);
-
-                Console.WriteLine();
-
-                var compiler = new CodeCompiler(instructions, transformer.ConstantTable, allocation.AssignedLocations);
-
-                Console.WriteLine("section .data");
-
-                foreach (var constant in compiler.CompileConstantTable()) Console.WriteLine(constant.ToNASM());
-
-                Console.WriteLine("section .text");
-
-                foreach (var constant in compiler.CompileInstructions()) Console.WriteLine(constant.ToNASM());
-            }
+            foreach (var constant in compiled.CompileInstructions()) Console.WriteLine(constant.ToNASM());
         }
     }
 }
