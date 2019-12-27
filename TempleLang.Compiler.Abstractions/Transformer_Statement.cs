@@ -7,7 +7,7 @@
 
     public partial class Transformer
     {
-        public IEnumerable<IInstruction> TransformStatment(IStatement statement) =>
+        public IEnumerable<IInstruction> TransformStatement(IStatement statement) =>
             statement switch
             {
                 BlockStatement stmt => TransformStatementCore(stmt),
@@ -15,37 +15,70 @@
                 _ => throw new ArgumentException(nameof(statement)),
             };
 
-        public IEnumerable<IInstruction> TransformStatementCore(BlockStatement stmt) =>
-            stmt.Statements.SelectMany(TransformStatment);
+        private IEnumerable<IInstruction> TransformStatementCore(BlockStatement stmt) =>
+            stmt.Statements.SelectMany(TransformStatement);
 
-        public IEnumerable<IInstruction> TransformStatementCore(ExpressionStatement stmt)
+        private IEnumerable<IInstruction> TransformStatementCore(ExpressionStatement stmt)
         {
             return TransformExpression(stmt.Expression, new DiscardValue());
         }
 
-        public IEnumerable<IInstruction> TransformStatementCore(IfStatement stmt)
+        private IEnumerable<IInstruction> TransformStatementCore(IfStatement stmt)
         {
             var conditionResult = RequestLocal();
 
             foreach (var instruction in TransformExpression(stmt.Condition, conditionResult)) yield return instruction;
 
-            yield return new Conditional(
-                   conditionResult,
-                   TransformStatment(stmt.TrueStatement).ToList(),
-                   stmt.FalseStatement == null
-                       ? (IReadOnlyList<IInstruction>)Array.Empty<IInstruction>()
-                       : TransformStatment(stmt.FalseStatement).ToList());
+            var trueLabel = new LabelInstruction();
+            var exitLabel = new LabelInstruction();
+
+            yield return new ConditionalJump(trueLabel, conditionResult);
+
+            if (stmt.FalseStatement != null)
+            {
+                foreach (var instruction in TransformStatement(stmt.FalseStatement)) yield return instruction;
+            }
+
+            yield return new UnconditionalJump(exitLabel);
+
+            yield return trueLabel;
+            foreach (var instruction in TransformStatement(stmt.TrueStatement)) yield return instruction;
+
+            yield return exitLabel;
         }
 
-        public IEnumerable<IInstruction> TransformStatementCore(WhileStatement stmt)
+        private IEnumerable<IInstruction> TransformStatementCore(WhileStatement stmt)
         {
             var conditionResult = RequestLocal();
+            var conditionInstructions = TransformExpression(stmt.Condition, conditionResult);
+            var statementInstructions = TransformStatement(stmt.Statement);
 
-            yield return new ConditionalLoop(
-                   conditionResult,
-                   TransformExpression(stmt.Condition, conditionResult),
-                   TransformStatment(stmt.Statement),
-                   stmt.IsDoLoop);
+            if (stmt.IsDoLoop)
+            {
+                var entryLabel = new LabelInstruction();
+
+                yield return entryLabel;
+
+                foreach (var instruction in statementInstructions) yield return instruction;
+                foreach (var instruction in conditionInstructions) yield return instruction;
+
+                yield return new ConditionalJump(entryLabel, conditionResult);
+            }
+            else
+            {
+                var entryLabel = new LabelInstruction();
+                var exitLabel = new LabelInstruction();
+
+                yield return entryLabel;
+                foreach (var instruction in conditionInstructions) yield return instruction;
+
+                yield return new ConditionalJump(exitLabel, conditionResult, true);
+
+                foreach (var instruction in statementInstructions) yield return instruction;
+                yield return new UnconditionalJump(entryLabel);
+
+                yield return exitLabel;
+            }
         }
     }
 }

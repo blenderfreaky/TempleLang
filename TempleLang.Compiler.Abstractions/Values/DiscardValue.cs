@@ -2,5 +2,6 @@
 {
     public struct DiscardValue : IAssignableValue
     {
+        public override string ToString() => "_";
     }
 }

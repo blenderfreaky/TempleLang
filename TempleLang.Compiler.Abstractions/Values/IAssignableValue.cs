@@ -1,6 +1,6 @@
 ﻿namespace TempleLang.Intermediate
 {
-    public interface IAssignableValue
+    public interface IAssignableValue : IReadableValue
     {
     }
 }

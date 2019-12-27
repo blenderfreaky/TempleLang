@@ -21,6 +21,8 @@
             ["while"] = Token.While,
             ["do"] = Token.Do,
             ["let"] = Token.Declarator,
+            ["ref"] = Token.Reference,
+            ["deref"] = Token.Dereference,
         };
 
         public Lexer(TextReader textReader, SourceFile sourceFile)

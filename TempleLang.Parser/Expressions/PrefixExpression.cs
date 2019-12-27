@@ -22,7 +22,8 @@
             CreateParser(PostfixExpression.Parser, Parse.Token(
                 Token.Increment, Token.Decrement,
                 Token.LogicalNot, Token.BitwiseNot,
-                Token.Add, Token.Subtract));
+                Token.Add, Token.Subtract,
+                Token.Dereference, Token.Reference));
 
         public static Parser<Expression, Token> CreateParser(Parser<Expression, Token> parser, Parser<Lexeme<Token>, Token> @operator) =>
             (from op in @operator

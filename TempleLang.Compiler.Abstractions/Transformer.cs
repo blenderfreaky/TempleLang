@@ -1,21 +1,31 @@
 ﻿namespace TempleLang.Intermediate
 {
+    using Bound.Primitives;
     using System;
     using System.Collections.Generic;
     using TempleLang.Bound.Expressions;
 
     public partial class Transformer
     {
-        private List<Constant> ConstantTable { get; }
+        public List<Constant> ConstantTable { get; }
 
         public Transformer()
         {
             ConstantTable = new List<Constant>();
         }
-        private NameValue RequestLocal() =>
-            new NameValue(Guid.NewGuid().ToString().Replace("-", "_"), true);
 
-        private NameValue RequestUserLocal(Local local) =>
-            new NameValue(local.Name, false);
+        private string RequestName() => Guid.NewGuid().ToString().Replace("-", "_");
+
+        private Variable RequestLocal() =>
+            new Variable(RequestName(), true);
+
+        private LabelInstruction RequestLabel() =>
+            new LabelInstruction(RequestName());
+
+        private Variable RequestUserLocal(Local local) =>
+            new Variable(local.Name, false);
+
+        private IInstruction DirectAssignment(IAssignableValue target, IReadableValue source, PrimitiveType type) =>
+            new BinaryComputationAssignment(target, target, source, BinaryOperatorType.Assign, type);
     }
 }

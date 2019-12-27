@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using TempleLang.Bound.Expressions;
     using TempleLang.Bound.Primitives;
 
@@ -18,7 +17,7 @@
                 _ => throw new ArgumentException(nameof(expression)),
             };
 
-        public IEnumerable<IInstruction> TransformExpressionCore(UnaryExpression expr, IAssignableValue target)
+        private IEnumerable<IInstruction> TransformExpressionCore(UnaryExpression expr, IAssignableValue target)
         {
             var operandResult = RequestLocal();
 
@@ -29,7 +28,7 @@
             yield return new UnaryComputationAssignment(target, operandResult, expr.Operator, type);
         }
 
-        public IEnumerable<IInstruction> TransformExpressionCore(BinaryExpression expr, IAssignableValue target)
+        private IEnumerable<IInstruction> TransformExpressionCore(BinaryExpression expr, IAssignableValue target)
         {
             var lhsResult = RequestLocal();
             var rhsResult = RequestLocal();
@@ -42,16 +41,24 @@
             yield return new BinaryComputationAssignment(target, lhsResult, rhsResult, expr.Operator, type);
         }
 
-        public IEnumerable<IInstruction> TransformExpressionCore(TernaryExpression expr, IAssignableValue target)
+        private IEnumerable<IInstruction> TransformExpressionCore(TernaryExpression expr, IAssignableValue target)
         {
             var conditionResult = RequestLocal();
 
             foreach (var instruction in TransformExpression(expr, conditionResult)) yield return instruction;
 
-            yield return new Conditional(
-                conditionResult,
-                TransformExpression(expr.TrueValue, target).ToList(),
-                TransformExpression(expr.FalseValue, target).ToList());
+            var trueLabel = new LabelInstruction();
+            var exitLabel = new LabelInstruction();
+
+            yield return new ConditionalJump(trueLabel, conditionResult);
+
+            foreach (var instruction in TransformExpression(expr.FalseValue, target)) yield return instruction;
+            yield return new UnconditionalJump(exitLabel);
+
+            yield return trueLabel;
+            foreach (var instruction in TransformExpression(expr.TrueValue, target)) yield return instruction;
+
+            yield return exitLabel;
         }
     }
 }

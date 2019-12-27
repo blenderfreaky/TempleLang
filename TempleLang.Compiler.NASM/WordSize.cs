@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Intermediate.NASM
+﻿namespace TempleLang.CodeGenerator.NASM
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1027:Mark enums with FlagsAttribute", Justification = "Not flags")]
     public enum WordSize

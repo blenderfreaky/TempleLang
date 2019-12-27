@@ -1,12 +1,13 @@
 ﻿namespace TempleLang.Test
 {
-    using Bound.Declarations;
-    using Bound.Primitives;
+    using TempleLang.Lexer;
+    using TempleLang.Bound.Primitives;
+    using TempleLang.CodeGenerator.NASM;
+    using TempleLang.Intermediate;
     using System;
     using System.IO;
+    using System.Linq;
     using TempleLang.Binder;
-    using TempleLang.Intermediate.NASM;
-    using TempleLang.Lexer;
     using TempleLang.Lexer.Abstractions;
     using TempleLang.Parser;
     using TempleLang.Parser.Abstractions;
@@ -28,7 +29,7 @@
                 Console.WriteLine(string.Join('\n', lexemes));
                 Console.WriteLine();
 
-                var parser = Declaration.Parser;
+                var parser = Statement.Parser;
 
                 var eofParser =
                     (from r in parser
@@ -43,8 +44,9 @@
                 if (!parserResult.IsSuccessful) continue;
 
                 using DeclarationBinder binder = new DeclarationBinder(PrimitiveType.Types);
+                using CodeBinder codeBinder = new CodeBinder(binder);
 
-                var bound = binder.BindDeclaration(parserResult.Result);
+                var bound = codeBinder.BindStatement(parserResult.Result);
 
                 Console.WriteLine(bound);
                 Console.WriteLine();
@@ -53,13 +55,33 @@
 
                 Console.WriteLine();
 
-                var boundProc = bound as Procedure;
+                var transformer = new Transformer();
 
-                var compiler = new CodeCompiler(boundProc);
+                var instructions = transformer.TransformStatement(bound).ToList();
 
-                var instructions = compiler.Compile(boundProc.EntryPoint);
+                foreach (var constant in transformer.ConstantTable) Console.WriteLine("Const " + constant.DebugName + " = " + constant);
 
-                foreach (var instruction in instructions) Console.WriteLine(instruction.ToNASM());
+                Console.WriteLine();
+
+                foreach (var instruction in instructions) Console.WriteLine(instruction);
+
+                Console.WriteLine();
+
+                var allocation = RegisterAllocation.Generate(instructions);
+
+                foreach (var assignment in allocation.AssignedLocations) Console.WriteLine(assignment.Key + " -> " + assignment.Value);
+
+                Console.WriteLine();
+
+                var compiler = new CodeCompiler(instructions, transformer.ConstantTable, allocation.AssignedLocations);
+
+                Console.WriteLine("section .data");
+
+                foreach (var constant in compiler.CompileConstantTable()) Console.WriteLine(constant.ToNASM());
+
+                Console.WriteLine("section .text");
+
+                foreach (var constant in compiler.CompileInstructions()) Console.WriteLine(constant.ToNASM());
             }
         }
     }

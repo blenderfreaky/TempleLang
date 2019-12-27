@@ -22,15 +22,17 @@
             OperandType = operandType;
         }
 
+        public override string ToString() => $"{Target} = {Operator} {Operand}";
+
         public override bool Equals(object? obj) => obj is UnaryComputationAssignment assignment && EqualityComparer<IAssignableValue>.Default.Equals(Target, assignment.Target) && EqualityComparer<IReadableValue>.Default.Equals(Operand, assignment.Operand) && Operator == assignment.Operator && EqualityComparer<PrimitiveType>.Default.Equals(OperandType, assignment.OperandType);
 
         public override int GetHashCode()
         {
             var hashCode = 915881417;
-            hashCode = hashCode * -1521134295 + EqualityComparer<IAssignableValue>.Default.GetHashCode(Target);
-            hashCode = hashCode * -1521134295 + EqualityComparer<IReadableValue>.Default.GetHashCode(Operand);
-            hashCode = hashCode * -1521134295 + Operator.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<PrimitiveType>.Default.GetHashCode(OperandType);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<IAssignableValue>.Default.GetHashCode(Target);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<IReadableValue>.Default.GetHashCode(Operand);
+            hashCode = (hashCode * -1521134295) + Operator.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<PrimitiveType>.Default.GetHashCode(OperandType);
             return hashCode;
         }
 

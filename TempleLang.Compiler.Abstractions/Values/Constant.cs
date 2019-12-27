@@ -32,6 +32,8 @@
             DebugName = debugName;
         }
 
+        public override string ToString() => $"{ValueString}";
+
         private static string ByteArrayToString(byte[] ba)
         {
             var hex = new System.Text.StringBuilder(ba.Length * 2);

@@ -48,5 +48,7 @@
 
         ERROR,
         Negation,
+        Dereference,
+        Reference,
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Intermediate.NASM
+﻿namespace TempleLang.CodeGenerator.NASM
 {
     public struct LiteralParameter : IParameter
     {

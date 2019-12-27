@@ -24,16 +24,18 @@
             OperandType = operandType;
         }
 
+        public override string ToString() => $"{Target} = {Lhs} {Operator} {Rhs}";
+
         public override bool Equals(object? obj) => obj is BinaryComputationAssignment assignment && EqualityComparer<IAssignableValue>.Default.Equals(Target, assignment.Target) && EqualityComparer<IReadableValue>.Default.Equals(Lhs, assignment.Lhs) && EqualityComparer<IReadableValue>.Default.Equals(Rhs, assignment.Rhs) && Operator == assignment.Operator && EqualityComparer<PrimitiveType>.Default.Equals(OperandType, assignment.OperandType);
 
         public override int GetHashCode()
         {
             var hashCode = 782088245;
-            hashCode = hashCode * -1521134295 + EqualityComparer<IAssignableValue>.Default.GetHashCode(Target);
-            hashCode = hashCode * -1521134295 + EqualityComparer<IReadableValue>.Default.GetHashCode(Lhs);
-            hashCode = hashCode * -1521134295 + EqualityComparer<IReadableValue>.Default.GetHashCode(Rhs);
-            hashCode = hashCode * -1521134295 + Operator.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<PrimitiveType>.Default.GetHashCode(OperandType);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<IAssignableValue>.Default.GetHashCode(Target);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<IReadableValue>.Default.GetHashCode(Lhs);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<IReadableValue>.Default.GetHashCode(Rhs);
+            hashCode = (hashCode * -1521134295) + Operator.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<PrimitiveType>.Default.GetHashCode(OperandType);
             return hashCode;
         }
 

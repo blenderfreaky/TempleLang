@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Binder", "Temple
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Intermediate", "TempleLang.Compiler.Abstractions\TempleLang.Intermediate.csproj", "{A4EF406D-A73C-4EC8-97FF-4B5D0331B40A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Compiler.NASM", "TempleLang.Compiler.NASM\TempleLang.Compiler.NASM.csproj", "{F6186DB4-9793-413C-9111-A1F26DD2B9F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.CodeGenerator.NASM", "TempleLang.Compiler.NASM\TempleLang.CodeGenerator.NASM.csproj", "{F6186DB4-9793-413C-9111-A1F26DD2B9F6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3_Binder", "3_Binder", "{3FE1CC6E-4C20-41EC-A77F-9DC94EC5DC33}"
 EndProject

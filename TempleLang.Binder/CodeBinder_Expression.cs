@@ -37,6 +37,8 @@
                 Token.Subtract => UnaryOperatorType.Negation,
                 Token.BitwiseNot => UnaryOperatorType.BitwiseNot,
                 Token.LogicalNot => UnaryOperatorType.LogicalNot,
+                Token.Dereference => UnaryOperatorType.Dereference,
+                Token.Reference => UnaryOperatorType.Reference,
 
                 _ => UnaryOperatorType.ERROR,
             };

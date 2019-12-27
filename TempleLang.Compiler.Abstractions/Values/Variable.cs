@@ -2,21 +2,23 @@
 {
     using System.Collections.Generic;
 
-    public struct NameValue : IReadableValue, IAssignableValue
+    public struct Variable : IReadableValue, IAssignableValue
     {
         public string Name { get; }
         public bool IsCompilerOwned { get; }
 
         public string DisplayName => IsCompilerOwned ? "<>" + Name : Name;
 
-        public NameValue(string name, bool isCompilerOwned)
+        public Variable(string name, bool isCompilerOwned)
         {
             Name = name;
             IsCompilerOwned = isCompilerOwned;
         }
 
+        public override string ToString() => DisplayName;
+
         public override bool Equals(object? obj) =>
-            obj is NameValue value
+            obj is Variable value
             && Name == value.Name
             && IsCompilerOwned == value.IsCompilerOwned
             && DisplayName == value.DisplayName;
@@ -30,8 +32,8 @@
             return hashCode;
         }
 
-        public static bool operator ==(NameValue left, NameValue right) => left.Equals(right);
+        public static bool operator ==(Variable left, Variable right) => left.Equals(right);
 
-        public static bool operator !=(NameValue left, NameValue right) => !(left == right);
+        public static bool operator !=(Variable left, Variable right) => !(left == right);
     }
 }

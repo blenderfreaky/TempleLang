@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Intermediate.NASM
+﻿namespace TempleLang.CodeGenerator.NASM
 {
     using System;
     using System.Collections.Generic;
@@ -37,7 +37,7 @@
         SPL, BPL, SIL, DIL
     }
 
-    public readonly struct Register
+    public readonly struct Register : IMemory
     {
         public readonly RegisterName RegisterName;
         public readonly RegisterKind Kind;
@@ -46,8 +46,9 @@
         public readonly RegisterName? Containing;
 
         public readonly string Name => RegisterName.ToString();
+        int IMemory.Size => (int)Size;
 
-        private static readonly Dictionary<RegisterName, Register> Registers = new[]
+        private static readonly Dictionary<RegisterName, Register> _registers = new[]
         {
             new Register(RegisterName.RAX, RegisterKind.Accumulator, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
             new Register(RegisterName.EAX, RegisterKind.Accumulator, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.RAX),
@@ -120,9 +121,9 @@
         }
         .ToDictionary(x => x.RegisterName, x => x);
 
-        public static IEnumerable<Register> All => Registers.Values;
+        public static IEnumerable<Register> All => _registers.Values;
 
-        public static Register Get(RegisterName name) => Registers[name];
+        public static Register Get(RegisterName name) => _registers[name];
 
         private Register(RegisterName register, RegisterKind kind, RegisterFlags flags, RegisterSize size, RegisterName? containing = null)
         {
@@ -132,6 +133,8 @@
             Size = size;
             Containing = containing;
         }
+
+        public override string ToString() => Name;
 
         public override bool Equals(object? obj) => obj is Register register && RegisterName == register.RegisterName && Kind == register.Kind && Flags == register.Flags && Size == register.Size && Containing == register.Containing && Name == register.Name;
 

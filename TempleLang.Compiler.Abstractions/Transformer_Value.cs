@@ -15,18 +15,20 @@
                 _ => throw new ArgumentException(nameof(value)),
             };
 
-        public IEnumerable<IInstruction> TransformValueCore(Constant<long> val, IAssignableValue target)
+        private IEnumerable<IInstruction> TransformValueCore(Constant<long> val, IAssignableValue target)
         {
             var constant = new Constant(val.Value.ToString(), PrimitiveType.Long, "const long " + val.Value);
 
             ConstantTable.Add(constant);
 
-            yield return new DirectAssignment(target, constant);
+            yield return DirectAssignment(target, constant, PrimitiveType.Long);
         }
 
-        public IEnumerable<IInstruction> TransformValueCore(Local val, IAssignableValue target)
+        private IEnumerable<IInstruction> TransformValueCore(Local val, IAssignableValue target)
         {
-            yield return new DirectAssignment(target, RequestUserLocal(val));
+            if (!(val.ReturnType is PrimitiveType type)) throw new InvalidOperationException("Internal Failure: Binder failed binding high-level locals to primitives");
+
+            yield return DirectAssignment(target, RequestUserLocal(val), type);
         }
     }
 }
