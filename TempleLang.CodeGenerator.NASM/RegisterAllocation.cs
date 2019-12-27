@@ -83,10 +83,12 @@
                         adaptLiveIntervals(i, inst.Lhs);
                         adaptLiveIntervals(i, inst.Rhs);
                         break;
+
                     case UnaryComputationAssignment inst:
                         adaptLiveIntervals(i, inst.Target);
                         adaptLiveIntervals(i, inst.Operand);
                         break;
+
                     case ConditionalJump inst:
                         adaptLiveIntervals(i, inst.Condition);
                         break;

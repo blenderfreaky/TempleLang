@@ -1,9 +1,9 @@
 ﻿namespace TempleLang.Test
 {
-    using TempleLang.Lexer;
+    using Compiler;
     using System;
     using System.IO;
-    using Compiler;
+    using TempleLang.Lexer;
 
     public static class Program
     {

@@ -55,6 +55,7 @@
             public T? Value { get; set; }
 
             public RefContainer() => Value = null;
+
             public RefContainer(T? value) => Value = value;
         }
 

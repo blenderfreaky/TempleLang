@@ -2,7 +2,6 @@
 {
     using Bound.Primitives;
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using TempleLang.Bound.Expressions;
 

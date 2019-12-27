@@ -7,11 +7,17 @@
 
     public abstract class Statement : SyntaxNode
     {
-        protected Statement(IPositioned location) : base(location) { }
+        protected Statement(IPositioned location) : base(location)
+        {
+        }
 
-        protected Statement(IPositioned first, IPositioned second) : base(first, second) { }
+        protected Statement(IPositioned first, IPositioned second) : base(first, second)
+        {
+        }
 
-        protected Statement(params IPositioned[] locations) : base(locations) { }
+        protected Statement(params IPositioned[] locations) : base(locations)
+        {
+        }
 
         public static readonly Parser<Statement, Token> Parser =
             ExpressionStatement.Parser.OfType<Statement, Token>()

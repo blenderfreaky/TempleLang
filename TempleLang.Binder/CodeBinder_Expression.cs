@@ -4,10 +4,11 @@
     using Bound.Primitives;
     using System;
     using System.Linq;
-    using TempleLang.Diagnostic;
     using TempleLang.Bound.Expressions;
+    using TempleLang.Diagnostic;
     using TempleLang.Lexer;
     using TempleLang.Parser;
+
     using IE = TempleLang.Bound.Expressions;
     using S = TempleLang.Parser;
 
@@ -149,6 +150,7 @@
                 case Token.BitshiftLeftCompoundAssign:
                 case Token.BitshiftRightCompoundAssign:
                     return new IE.BinaryExpression(lhs!, computationExpression, BinaryOperatorType.Assign, returnType!, expr.Location);
+
                 default:
                     return computationExpression;
             }

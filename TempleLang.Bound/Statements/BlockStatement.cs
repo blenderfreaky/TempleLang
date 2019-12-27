@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TempleLang.Diagnostic;
     using TempleLang.Bound.Expressions;
+    using TempleLang.Diagnostic;
 
     public struct BlockStatement : IStatement
     {

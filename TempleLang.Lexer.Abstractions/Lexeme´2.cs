@@ -40,6 +40,7 @@
         public Positioned<TToken> PositionedToken => Location.WithValue(Token);
 
         public static implicit operator Positioned<string>(Lexeme<TToken> lexeme) => lexeme.PositionedText;
+
         public static implicit operator Positioned<TToken>(Lexeme<TToken> lexeme) => lexeme.PositionedToken;
 
         /// <inheritdoc/>

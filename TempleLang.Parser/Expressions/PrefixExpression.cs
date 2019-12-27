@@ -27,8 +27,8 @@
 
         public static Parser<Expression, Token> CreateParser(Parser<Expression, Token> parser, Parser<Lexeme<Token>, Token> @operator) =>
             (from op in @operator
-            from val in parser
-            select new PrefixExpression(val, op))
+             from val in parser
+             select new PrefixExpression(val, op))
             .Or(parser);
     }
 }

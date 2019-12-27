@@ -2,11 +2,13 @@
 {
     using System.Collections.Generic;
     using TempleLang.Bound;
-    using TempleLang.Diagnostic;
     using TempleLang.Bound.Expressions;
-    using IE = TempleLang.Bound.Expressions;
-    using S = TempleLang.Parser;
     using TempleLang.Bound.Primitives;
+    using TempleLang.Diagnostic;
+
+    using IE = TempleLang.Bound.Expressions;
+
+    using S = TempleLang.Parser;
 
     public partial class CodeBinder : Binder
     {

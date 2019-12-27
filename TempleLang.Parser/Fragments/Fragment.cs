@@ -4,10 +4,16 @@
 
     public abstract class Fragment : SyntaxNode
     {
-        protected Fragment(IPositioned location) : base(location) { }
+        protected Fragment(IPositioned location) : base(location)
+        {
+        }
 
-        protected Fragment(IPositioned first, IPositioned second) : base(first, second) { }
+        protected Fragment(IPositioned first, IPositioned second) : base(first, second)
+        {
+        }
 
-        protected Fragment(params IPositioned[] locations) : base(locations) { }
+        protected Fragment(params IPositioned[] locations) : base(locations)
+        {
+        }
     }
 }

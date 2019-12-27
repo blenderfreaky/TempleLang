@@ -3,8 +3,8 @@
     using Bound.Statements;
     using System.Collections.Generic;
     using System.Linq;
-    using TempleLang.Diagnostic;
     using TempleLang.Bound.Expressions;
+    using TempleLang.Diagnostic;
 
     public sealed class Procedure : IDeclaration, ICallable
     {

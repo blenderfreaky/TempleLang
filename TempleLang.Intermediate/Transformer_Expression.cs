@@ -1,7 +1,6 @@
 ﻿namespace TempleLang.Intermediate
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using TempleLang.Bound.Expressions;
     using TempleLang.Bound.Primitives;

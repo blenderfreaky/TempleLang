@@ -6,11 +6,17 @@
 
     public abstract class Literal : Expression
     {
-        protected Literal(IPositioned location) : base(location) { }
+        protected Literal(IPositioned location) : base(location)
+        {
+        }
 
-        protected Literal(IPositioned first, IPositioned second) : base(first, second) { }
+        protected Literal(IPositioned first, IPositioned second) : base(first, second)
+        {
+        }
 
-        protected Literal(params IPositioned[] locations) : base(locations) { }
+        protected Literal(params IPositioned[] locations) : base(locations)
+        {
+        }
 
         public static new readonly Parser<Literal, Token> Parser =
             NullLiteral.Parser.OfType<Literal, Token>()

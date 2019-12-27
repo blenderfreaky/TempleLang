@@ -77,7 +77,8 @@
             new Register(RegisterName.RSP, RegisterKind.StackPointer,     RegisterFlags.Preserved, RegisterSize.Bytes8),
             new Register(RegisterName.RBP, RegisterKind.StackBasePointer, RegisterFlags.Preserved, RegisterSize.Bytes8),
 
-#region 64-Bit General Purpose Rn 
+#region 64-Bit General Purpose Rn
+
             new Register(RegisterName.R8,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
             new Register(RegisterName.R9,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
             new Register(RegisterName.R10, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
@@ -86,9 +87,11 @@
             new Register(RegisterName.R13, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
             new Register(RegisterName.R14, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
             new Register(RegisterName.R15, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
-#endregion
+
+#endregion 64-Bit General Purpose Rn
 
 #region 32-Bit General Purpose RnD
+
             new Register(RegisterName.R8D,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R8 ),
             new Register(RegisterName.R9D,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R9 ),
             new Register(RegisterName.R10D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R10),
@@ -97,9 +100,12 @@
             new Register(RegisterName.R13D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R13),
             new Register(RegisterName.R14D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R14),
             new Register(RegisterName.R15D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R15),
-#endregion                                            
+#endregion 32-Bit General Purpose RnD
 
-#region 16-Bit General Purpose RnW/RnB 
+
+
+#region 16-Bit General Purpose RnW/RnB
+
             new Register(RegisterName.R8W,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R8D),
             new Register(RegisterName.R9W,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R9D),
             new Register(RegisterName.R10W, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R10D),
@@ -117,7 +123,8 @@
             new Register(RegisterName.R13B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R13W),
             new Register(RegisterName.R14B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R14W),
             new Register(RegisterName.R15B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R15W),
-#endregion
+
+#endregion 16-Bit General Purpose RnW/RnB
         }
         .ToDictionary(x => x.RegisterName, x => x);
 
@@ -137,6 +144,7 @@
         public override string ToString() => Name;
 
         public override bool Equals(object? obj) => obj is Register register && Equals(register);
+
         public bool Equals(Register register) => RegisterName == register.RegisterName;
 
         public override int GetHashCode()

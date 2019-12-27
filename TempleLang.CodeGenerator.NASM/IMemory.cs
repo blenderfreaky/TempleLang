@@ -3,4 +3,5 @@
     public interface IMemory
     {
         int Size { get; }
-    }}
+    }
+}

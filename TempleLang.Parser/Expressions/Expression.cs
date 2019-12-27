@@ -6,11 +6,17 @@
 
     public abstract class Expression : SyntaxNode
     {
-        protected Expression(IPositioned location) : base(location) { }
+        protected Expression(IPositioned location) : base(location)
+        {
+        }
 
-        protected Expression(IPositioned first, IPositioned second) : base(first, second) { }
+        protected Expression(IPositioned first, IPositioned second) : base(first, second)
+        {
+        }
 
-        protected Expression(params IPositioned[] locations) : base(locations) { }
+        protected Expression(params IPositioned[] locations) : base(locations)
+        {
+        }
 
         public static readonly Parser<Expression, Token> ParenthesizedExpression =
             from l in Parse.Token(Token.LeftExpressionDelimiter)

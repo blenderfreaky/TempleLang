@@ -48,8 +48,8 @@
             int characterInt;
             char character;
 
-            Start:
-            
+        Start:
+
             do
             {
                 characterInt = AdvanceChar();
@@ -359,7 +359,7 @@
         }
 
         private Token SwitchOnNextCharacter(Token fallback, params (char character, Token tokenType)[] options)
-            // TODO: Get around params array heap allocation (C#9 params Span?)
+        // TODO: Get around params array heap allocation (C#9 params Span?)
         {
             int characterInt = PeekChar();
             if (characterInt == -1) return fallback;

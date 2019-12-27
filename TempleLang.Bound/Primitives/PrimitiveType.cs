@@ -25,6 +25,7 @@
         }
 
         public override string ToString() => $"{FullyQualifiedName}";
+
         public bool TryGetMember(string name, out IMemberInfo member) => throw new System.NotImplementedException();
 
         public static readonly Dictionary<string, ITypeInfo> Types = new[]

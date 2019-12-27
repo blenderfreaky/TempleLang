@@ -29,6 +29,7 @@
         public abstract ITypeInfo FindType(S.Expression expression);
 
         #region IDisposable Support
+
         private bool disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
@@ -54,6 +55,7 @@
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
         }
-        #endregion
+
+        #endregion IDisposable Support
     }
 }

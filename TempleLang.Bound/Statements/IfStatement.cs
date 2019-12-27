@@ -1,8 +1,8 @@
 ﻿namespace TempleLang.Bound.Statements
 {
     using System.Collections.Generic;
-    using TempleLang.Diagnostic;
     using TempleLang.Bound.Expressions;
+    using TempleLang.Diagnostic;
 
     public struct IfStatement : IStatement
     {

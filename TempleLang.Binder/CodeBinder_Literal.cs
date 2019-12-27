@@ -1,10 +1,11 @@
 ﻿namespace TempleLang.Binder
 {
     using System;
-    using TempleLang.Diagnostic;
     using TempleLang.Bound.Expressions;
     using TempleLang.Bound.Primitives;
+    using TempleLang.Diagnostic;
     using TempleLang.Parser;
+
     using IE = TempleLang.Bound.Expressions;
     using S = TempleLang.Parser;
 

@@ -6,7 +6,9 @@
 
     public sealed class NullLiteral : Literal
     {
-        private NullLiteral(FileLocation location) : base(location) { }
+        private NullLiteral(FileLocation location) : base(location)
+        {
+        }
 
         public override string ToString() => "null";
 

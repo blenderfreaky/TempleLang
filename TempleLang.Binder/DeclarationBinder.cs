@@ -2,18 +2,19 @@
 {
     using System.Collections.Generic;
     using TempleLang.Bound;
-    using TempleLang.Diagnostic;
-    using TempleLang.Parser;
-    using S = TempleLang.Parser;
     using TempleLang.Bound.Declarations;
     using TempleLang.Bound.Primitives;
+    using TempleLang.Diagnostic;
+    using TempleLang.Parser;
+
+    using S = TempleLang.Parser;
 
     public partial class DeclarationBinder : Binder
     {
         public Dictionary<string, ITypeInfo> Types { get; }
         public Dictionary<string, Procedure> Procedures { get; }
 
-        public DeclarationBinder(Dictionary<string, ITypeInfo> types, Binder? parent  = null) : base(parent)
+        public DeclarationBinder(Dictionary<string, ITypeInfo> types, Binder? parent = null) : base(parent)
         {
             Types = types;
             Procedures = new Dictionary<string, Procedure>();
@@ -31,8 +32,10 @@
             {
                 case S.AccessExpression expr:
                     return FindType(expr);
+
                 case S.Identifier expr:
                     return FindType(expr);
+
                 default:
                     Error(DiagnosticCode.InvalidTypeSpecifier, expression.Location);
                     return PrimitiveType.Unknown;

@@ -1,9 +1,9 @@
 ﻿namespace TempleLang.Bound.Expressions
 {
-    using TempleLang.Bound;
-    using TempleLang.Diagnostic;
     using Primitives;
     using System.Collections.Generic;
+    using TempleLang.Bound;
+    using TempleLang.Diagnostic;
 
     public struct Local : IValue
     {

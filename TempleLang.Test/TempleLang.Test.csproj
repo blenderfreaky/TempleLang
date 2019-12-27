@@ -6,12 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TempleLang.Binder\TempleLang.Binder.csproj" />
-    <ProjectReference Include="..\TempleLang.Compiler.NASM\TempleLang.CodeGenerator.NASM.csproj" />
     <ProjectReference Include="..\TempleLang.Compiler\TempleLang.Compiler.csproj" />
-    <ProjectReference Include="..\TempleLang.Lexer.Abstractions\TempleLang.Lexer.Abstractions.csproj" />
-    <ProjectReference Include="..\TempleLang.Lexer\TempleLang.Lexer.csproj" />
-    <ProjectReference Include="..\TempleLang.Parser\TempleLang.Parser.csproj" />
   </ItemGroup>
 
 </Project>

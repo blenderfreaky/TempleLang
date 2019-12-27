@@ -2,11 +2,12 @@
 {
     using System;
     using System.Linq;
-    using TempleLang.Diagnostic;
     using TempleLang.Bound.Expressions;
     using TempleLang.Bound.Primitives;
     using TempleLang.Bound.Statements;
+    using TempleLang.Diagnostic;
     using TempleLang.Parser;
+
     using IE = TempleLang.Bound.Expressions;
     using IS = TempleLang.Bound.Statements;
     using S = TempleLang.Parser;
