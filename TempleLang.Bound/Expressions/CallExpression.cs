@@ -26,10 +26,10 @@
         public override int GetHashCode()
         {
             var hashCode = 1287236041;
-            hashCode = hashCode * -1521134295 + EqualityComparer<IExpression>.Default.GetHashCode(Callee);
-            hashCode = hashCode * -1521134295 + EqualityComparer<IReadOnlyList<IExpression>>.Default.GetHashCode(Parameters);
-            hashCode = hashCode * -1521134295 + EqualityComparer<ITypeInfo>.Default.GetHashCode(ReturnType);
-            hashCode = hashCode * -1521134295 + Location.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<IExpression>.Default.GetHashCode(Callee);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<IReadOnlyList<IExpression>>.Default.GetHashCode(Parameters);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<ITypeInfo>.Default.GetHashCode(ReturnType);
+            hashCode = (hashCode * -1521134295) + Location.GetHashCode();
             return hashCode;
         }
 

@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Bound.Expressions
 {
+    using System.Collections.Generic;
     using TempleLang.Diagnostic;
 
     public struct AccessExpression : IValue
@@ -28,14 +29,18 @@
 
         public override string ToString() => $"({Accessee} {AccessOperator} {Accessor})";
 
-        public override bool Equals(object obj)
-        {
-            throw new System.NotImplementedException();
-        }
+        public override bool Equals(object? obj) => obj is AccessExpression expression && EqualityComparer<IExpression>.Default.Equals(Accessee, expression.Accessee) && AccessOperator == expression.AccessOperator && EqualityComparer<Positioned<string>>.Default.Equals(Accessor, expression.Accessor) && Flags == expression.Flags && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, expression.ReturnType) && EqualityComparer<FileLocation>.Default.Equals(Location, expression.Location);
 
         public override int GetHashCode()
         {
-            throw new System.NotImplementedException();
+            var hashCode = -1440769109;
+            hashCode = (hashCode * -1521134295) + EqualityComparer<IExpression>.Default.GetHashCode(Accessee);
+            hashCode = (hashCode * -1521134295) + AccessOperator.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Accessor.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Flags.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<ITypeInfo>.Default.GetHashCode(ReturnType);
+            hashCode = (hashCode * -1521134295) + Location.GetHashCode();
+            return hashCode;
         }
 
         public static bool operator ==(AccessExpression left, AccessExpression right) => left.Equals(right);

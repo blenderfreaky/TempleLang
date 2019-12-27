@@ -22,6 +22,7 @@
         }
 
         public override string ToString() => $"{Name} : {ReturnType}";
+
         public override bool Equals(object? obj) => obj is Local local && Name == local.Name && Flags == local.Flags && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, local.ReturnType) && EqualityComparer<FileLocation>.Default.Equals(Location, local.Location);
 
         public override int GetHashCode()

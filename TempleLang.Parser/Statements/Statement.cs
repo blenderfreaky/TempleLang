@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Parser
 {
+    using Statements;
     using TempleLang.Diagnostic;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
@@ -13,10 +14,11 @@
         protected Statement(params IPositioned[] locations) : base(locations) { }
 
         public static readonly Parser<Statement, Token> Parser =
-            LocalDeclarationStatement.Parser.OfType<Statement, Token>()
-            .Or(ExpressionStatement.Parser)
+            ExpressionStatement.Parser.OfType<Statement, Token>()
+            .Or(LocalDeclarationStatement.Parser)
             .Or(BlockStatement.Parser)
             .Or(IfStatement.Parser)
-            .Or(WhileStatement.Parser);
+            .Or(WhileStatement.Parser)
+            .Or(ReturnStatement.Parser);
     }
 }

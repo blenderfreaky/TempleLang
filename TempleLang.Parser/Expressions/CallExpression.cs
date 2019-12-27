@@ -19,11 +19,15 @@
 
         public override string ToString() => $"({Callee}({string.Join(", ", Parameters)}))";
 
-        public static new readonly Parser<CallExpression, Token> Parser =
-            from callee in Parse.Ref(() => Expression.Parser)
+        public static readonly Parser<List<Expression>, Token> ParameterListParser =
             from l in Parse.Token(Token.LeftExpressionDelimiter)
             from parameters in Parse.Ref(() => Expression.Parser).SeparatedBy(Parse.Token(Token.Comma))
             from r in Parse.Token(Token.RightExpressionDelimiter)
+            select parameters;
+
+        public static new readonly Parser<Expression, Token> Parser =
+            from callee in BinaryExpression.Assignment
+            from parameters in ParameterListParser
             select new CallExpression(callee, parameters);
     }
 }

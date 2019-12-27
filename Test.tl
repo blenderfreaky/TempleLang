@@ -23,10 +23,10 @@
     // let z = a + b + c + d + e + f + g  + h + j + k + l + m + n + o + p + q + r + s + t + u;
 
     let a = 1;
+    
+    if (a) { a += a - 1; }
+    else { a -= a * 2; }
 
-    if (a) {
-        a += a - 1;
-    }
-
-    a.b(1);
+    // 
+    // a(1);
 }
