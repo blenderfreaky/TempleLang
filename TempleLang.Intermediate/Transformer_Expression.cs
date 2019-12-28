@@ -13,6 +13,7 @@
                 BinaryExpression expr => TransformExpressionCore(expr, target),
                 UnaryExpression expr => TransformExpressionCore(expr, target),
                 TernaryExpression expr => TransformExpressionCore(expr, target),
+                CallExpression expr => TransformExpressionCore(expr, target),
                 IValue expr => TransformValue(expr, target),
                 _ => throw new ArgumentException(nameof(expression)),
             };
@@ -62,7 +63,7 @@
 
         private IEnumerable<IInstruction> TransformExpressionCore(CallExpression expr, IAssignableValue target)
         {
-            yield break;
+            yield return new CallInstruction(expr.Callee.ToString());
         }
     }
 }

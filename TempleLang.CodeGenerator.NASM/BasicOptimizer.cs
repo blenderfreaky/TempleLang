@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace TempleLang.CodeGenerator.NASM
+﻿namespace TempleLang.CodeGenerator.NASM
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     public static class BasicOptimizer
     {
         public static IEnumerable<NasmInstruction> BasicOptimization(this IEnumerable<NasmInstruction> compiledInstructions)

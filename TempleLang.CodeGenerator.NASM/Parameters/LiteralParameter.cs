@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace TempleLang.CodeGenerator.NASM
+﻿namespace TempleLang.CodeGenerator.NASM
 {
+    using System.Collections.Generic;
+
     public struct LiteralParameter : IParameter
     {
         public string Text { get; }

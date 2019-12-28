@@ -1,5 +1,7 @@
 ﻿namespace TempleLang.Bound
 {
+    using System.Collections.Generic;
+
     public struct PropertyInfo : IMemberInfo
     {
         public MemberType MemberType => MemberType.Property;
@@ -23,14 +25,18 @@
             SetMethod = setMethod;
         }
 
-        public override bool Equals(object obj)
-        {
-            throw new System.NotImplementedException();
-        }
+        public override bool Equals(object? obj) => obj is PropertyInfo info && MemberType == info.MemberType && MemberFlags == info.MemberFlags && Name == info.Name && EqualityComparer<ITypeInfo>.Default.Equals(ContainingType, info.ContainingType) && EqualityComparer<MethodInfo?>.Default.Equals(GetMethod, info.GetMethod) && EqualityComparer<MethodInfo?>.Default.Equals(SetMethod, info.SetMethod);
 
         public override int GetHashCode()
         {
-            throw new System.NotImplementedException();
+            var hashCode = 93506792;
+            hashCode = (hashCode * -1521134295) + MemberType.GetHashCode();
+            hashCode = (hashCode * -1521134295) + MemberFlags.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<ITypeInfo>.Default.GetHashCode(ContainingType);
+            hashCode = (hashCode * -1521134295) + GetMethod.GetHashCode();
+            hashCode = (hashCode * -1521134295) + SetMethod.GetHashCode();
+            return hashCode;
         }
 
         public static bool operator ==(PropertyInfo left, PropertyInfo right) => left.Equals(right);

@@ -12,7 +12,7 @@
         {
             if (!(value.ReturnType is PrimitiveType type)) throw new InvalidOperationException("Internal Failure: Binder failed binding high-level locals to primitives");
 
-            yield return DirectAssignment(target, RequestValue(value), (PrimitiveType)value.ReturnType);
+            yield return DirectAssignment(target, RequestValue(value), type);
         }
     }
 }

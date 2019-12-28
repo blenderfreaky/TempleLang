@@ -11,13 +11,18 @@
 
     public partial class DeclarationBinder
     {
-        public IDeclaration BindDeclaration(S.Declaration syntaxDeclaration) => syntaxDeclaration switch
+        public IDeclaration BindDeclarationHead(S.Declaration syntaxDeclaration) => syntaxDeclaration switch
         {
-            S.ProcedureDeclaration decl => BindDeclaration(decl),
+            S.ProcedureDeclaration decl => BindDeclarationHead(decl),
+            _ => throw new ArgumentException(nameof(syntaxDeclaration)),
+        };
+        public IDeclaration BindDeclarationBody(S.Declaration syntaxDeclaration) => syntaxDeclaration switch
+        {
+            S.ProcedureDeclaration decl => BindDeclarationBody(decl),
             _ => throw new ArgumentException(nameof(syntaxDeclaration)),
         };
 
-        public IDeclaration BindDeclaration(S.ProcedureDeclaration decl)
+        public IDeclaration BindDeclarationHead(S.ProcedureDeclaration decl)
         {
             var returnTypeAnnotation = decl.ReturnTypeAnnotation == null ? null : FindType(decl.ReturnTypeAnnotation);
 
@@ -25,22 +30,50 @@
 
             var parameters = decl.Parameters.Select(BindParameter).ToDictionary(x => x.Name, x => x);
 
-            using CodeBinder binder = new CodeBinder(parameters, this);
-
-            var entry = binder.BindStatement(decl.EntryPoint);
-
-            var boundParams = decl.Parameters.Select(x => binder.Locals[x.Name.Name]).ToList();
-
-            if (entry == null)
+            if (decl.EntryPoint == null)
             {
-                Error(DiagnosticCode.EmptyProcedure, decl.Location);
+                var procedure = new ProcedureImport(decl.Name.PositionedText, returnType, parameters.Select(x => x.Value).ToList(), decl.ImportedName!.Value, decl.Location);
+
+                Procedures[procedure.Name] = procedure;
+
+                return procedure;
+            }
+            else
+            {
+                var procedure = new Procedure(decl.Name.PositionedText, returnType, parameters.Select(x => x.Value).ToList(), null!, decl.Location);
+
+                Procedures[procedure.Name] = procedure;
+
+                return procedure;
+            }
+        }
+
+        public IDeclaration BindDeclarationBody(S.ProcedureDeclaration decl)
+        {
+            var proc = Procedures[decl.Name.Name];
+
+            if (decl.EntryPoint != null)
+            {
+                var boundParameters = decl.Parameters.Select(BindParameter).ToDictionary(x => x.Name, x => x);
+                var binder = new CodeBinder(boundParameters, this);
+
+                var entry = binder.BindStatement(decl.EntryPoint);
+
+                if (entry == null)
+                {
+                    Error(DiagnosticCode.EmptyProcedure, decl.Location);
+                }
+
+                var boundParams = decl.Parameters.Select(x => binder.Locals[x.Name.Name]).ToList();
+
+                var procedure = new Procedure(decl.Name.PositionedText, proc.ReturnType, boundParams, entry!, decl.Location);
+
+                Procedures[procedure.Name] = procedure;
+
+                return procedure;
             }
 
-            var procedure = new Procedure(decl.Name.PositionedText, returnType, boundParams, entry!, decl.Location);
-
-            Procedures[procedure.Name] = procedure;
-
-            return procedure;
+            return (Procedure)proc;
         }
 
         public Local BindParameter(S.TypeAnnotatedName parameter)

@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.CodeGenerator.NASM
 {
+    using Bound.Declarations;
     using Bound.Expressions;
     using Bound.Primitives;
     using System;
@@ -7,43 +8,23 @@
     using System.Linq;
     using TempleLang.Intermediate;
 
-    public class CodeCompilation
+    public class ProcedureCompilation
     {
+        public Procedure Procedure { get; }
         public List<IInstruction> Instructions { get; }
         public Dictionary<Constant, DataLocation> ConstantTable { get; }
         public Dictionary<Variable, IMemory> AssignedLocations { get; }
 
-        public CodeCompilation(
-            List<IInstruction> instructions,
-            List<Constant> constantTable,
-            Dictionary<Variable, IMemory> assignedLocations)
-        {
-            Instructions = instructions;
-            ConstantTable = constantTable.Distinct().ToDictionary(x => x, x => new DataLocation(x.DebugName.Replace(' ', '_'), x.Type.Size));
-            AssignedLocations = assignedLocations;
-        }
-
-        public CodeCompilation(
+        public ProcedureCompilation(
+            Procedure procedure,
             List<IInstruction> instructions,
             Dictionary<Constant, DataLocation> constantTable,
             Dictionary<Variable, IMemory> assignedLocations)
         {
+            Procedure = procedure;
             Instructions = instructions;
             ConstantTable = constantTable;
             AssignedLocations = assignedLocations;
-        }
-
-        public IEnumerable<NasmInstruction> CompileConstantTable()
-        {
-            foreach (var constant in ConstantTable)
-            {
-                var isString = constant.Key.Type == PrimitiveType.String;
-
-                yield return new NasmInstruction(
-                    label: constant.Value.LabelName,
-                    name: isString ? "db" : "equ",
-                    new LiteralParameter(isString ? $"__utf16__({constant.Key.ValueText})" : constant.Key.ValueString));
-            }
         }
 
         public IEnumerable<NasmInstruction> CompileInstructions() => Instructions.SelectMany(CompileInstruction);//.BasicOptimization();
@@ -57,6 +38,8 @@
                 ConditionalJump inst => CompileCore(inst),
                 UnconditionalJump inst => CompileCore(inst),
                 LabelInstruction inst => CompileCore(inst),
+                CallInstruction inst => CompileCore(inst),
+                ReturnInstruction inst => CompileCore(inst),
                 _ => throw new ArgumentException(nameof(instruction))
             };
         }
@@ -157,6 +140,21 @@
         private IEnumerable<NasmInstruction> CompileCore(LabelInstruction inst)
         {
             yield return new NasmInstruction(inst.Name);
+        }
+
+        private IEnumerable<NasmInstruction> CompileCore(CallInstruction inst)
+        {
+            yield return new NasmInstruction(inst.Name);
+        }
+
+        private IEnumerable<NasmInstruction> CompileCore(ReturnInstruction inst)
+        {
+            if (inst.ReturnValue != null)
+            {
+                yield return Move(Register.Get(RegisterName.RAX), new MemoryParameter(GetMemory(inst.ReturnValue) ?? throw new ArgumentException(nameof(inst))));
+            }
+
+            yield return new NasmInstruction(name: "ret");
         }
     }
 }

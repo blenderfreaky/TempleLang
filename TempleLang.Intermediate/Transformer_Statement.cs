@@ -14,6 +14,7 @@
                 ExpressionStatement stmt => TransformStatementCore(stmt),
                 IfStatement stmt => TransformStatementCore(stmt),
                 WhileStatement stmt => TransformStatementCore(stmt),
+                ReturnStatement stmt => TransformStatementCore(stmt),
                 _ => throw new ArgumentException(nameof(statement)),
             };
 
@@ -51,8 +52,7 @@
 
         private IEnumerable<IInstruction> TransformStatementCore(WhileStatement stmt)
         {
-            IReadableValue conditionResult;
-            var conditionInstructions = GetValue(stmt.Condition, out conditionResult);
+            var conditionInstructions = GetValue(stmt.Condition, out IReadableValue conditionResult);
             var statementInstructions = TransformStatement(stmt.Statement);
 
             if (stmt.IsDoLoop)
@@ -81,6 +81,18 @@
 
                 yield return exitLabel;
             }
+        }
+
+        private IEnumerable<IInstruction> TransformStatementCore(ReturnStatement stmt)
+        {
+            IReadableValue? returnLocation = null;
+
+            if (stmt.Expression != null)
+            {
+                foreach (var instruction in GetValue(stmt.Expression, out returnLocation)) yield return instruction;
+            }
+
+            yield return new ReturnInstruction(stmt.Expression == null ? null : returnLocation);
         }
     }
 }

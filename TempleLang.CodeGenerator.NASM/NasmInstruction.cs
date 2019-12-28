@@ -3,6 +3,11 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    public interface INasmInstruction
+    {
+        string ToNASM();
+    }
+
     public struct NasmInstruction
     {
         public string? Label { get; }

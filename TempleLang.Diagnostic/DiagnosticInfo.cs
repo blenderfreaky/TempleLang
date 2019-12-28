@@ -1,6 +1,7 @@
 ﻿namespace TempleLang.Diagnostic
 {
     using System;
+    using System.Collections.Generic;
     using System.Text;
 
     public struct DiagnosticInfo
@@ -47,14 +48,14 @@
             return buffer.ToString();
         }
 
-        public override bool Equals(object obj)
-        {
-            throw new NotImplementedException();
-        }
+        public override bool Equals(object? obj) => obj is DiagnosticInfo info && EqualityComparer<FileLocation?>.Default.Equals(Location, info.Location) && Code == info.Code;
 
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
+            var hashCode = -888853558;
+            hashCode = (hashCode * -1521134295) + Location.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Code.GetHashCode();
+            return hashCode;
         }
 
         public static bool operator ==(DiagnosticInfo left, DiagnosticInfo right) => left.Equals(right);

@@ -14,12 +14,12 @@
             ConstantTable = new List<Constant>();
         }
 
-        private int Counter;
+        private int _counter;
 
         private string RequestName()
         {
-            Counter++;
-            return "N" + Counter;
+            _counter++;
+            return "N" + _counter;
             //return Guid.NewGuid().ToString().Replace("-", "_");
         }
 

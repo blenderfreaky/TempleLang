@@ -202,23 +202,10 @@
 
             if (calledType is ICallable callable)
             {
-                if (callable.Parameters.Count != parameters.Count)
-                {
-                    Error(DiagnosticCode.InvalidParamCount, expr.Location);
-                    return new IE.CallExpression(null!, null!, PrimitiveType.Unknown, expr.Location);
-                }
-
-                for (int i = 0; i < parameters.Count; i++)
-                {
-                    if (callable.Parameters[i].ReturnType == parameters[i].ReturnType) continue;
-
-                    Error(DiagnosticCode.InvalidParamType, expr.Location);
-                    return new IE.CallExpression(null!, null!, PrimitiveType.Unknown, expr.Location);
-                }
-
-                return new IE.CallExpression(callee, parameters, callable.ReturnType, expr.Location);
+                return callable.BindOverload(callee, parameters, expr.Location, this);
             }
 
+            Error(DiagnosticCode.CallingUncallable, expr.Location);
             return new IE.CallExpression(null!, null!, PrimitiveType.Unknown, expr.Location);
         }
 

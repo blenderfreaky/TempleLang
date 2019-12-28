@@ -3,27 +3,35 @@
     using Bound;
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Linq;
     using TempleLang.Diagnostic;
     using S = TempleLang.Parser;
 
-    public abstract partial class Binder : IDisposable
+    public abstract class Binder : IDisposable, IDiagnosticReceiver
     {
         public Binder? Parent { get; }
 
         public bool HasErrors { get; private set; }
-        public ConcurrentBag<DiagnosticInfo> Diagnostics { get; }
+        private ConcurrentBag<DiagnosticInfo> DiagnosticsBag { get; }
+        public IReadOnlyCollection<DiagnosticInfo> Diagnostics => DiagnosticsBag;
 
         protected Binder(Binder? parent = null)
         {
             Parent = parent;
             HasErrors = false;
-            Diagnostics = new ConcurrentBag<DiagnosticInfo>();
+            DiagnosticsBag = new ConcurrentBag<DiagnosticInfo>();
         }
 
         protected void Error(DiagnosticCode invalidType, FileLocation location)
         {
-            Diagnostics.Add(new DiagnosticInfo(invalidType, location));
-            HasErrors = true;
+            ReceiveDiagnostic(new DiagnosticInfo(invalidType, location), true);
+        }
+
+        public void ReceiveDiagnostic(DiagnosticInfo info, bool error)
+        {
+            DiagnosticsBag.Add(info);
+            HasErrors |= error;
         }
 
         public abstract ITypeInfo FindType(S.Expression expression);
@@ -42,7 +50,7 @@
                     {
                         Parent.HasErrors |= HasErrors;
 
-                        foreach (var diagnostic in Diagnostics) Parent.Diagnostics.Add(diagnostic);
+                        foreach (var diagnostic in Diagnostics) Parent.DiagnosticsBag.Add(diagnostic);
                     }
                 }
 

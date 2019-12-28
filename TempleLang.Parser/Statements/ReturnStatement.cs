@@ -1,4 +1,4 @@
-﻿namespace TempleLang.Parser.Statements
+﻿namespace TempleLang.Parser
 {
     using Diagnostic;
     using TempleLang.Lexer;

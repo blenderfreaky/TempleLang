@@ -47,7 +47,9 @@
             input => parser()(input);
 
         public static Parser<T, TToken> Value<T, TToken>(T value = default) =>
-            input => ParserResult.Success<T, TToken>(value, input);
+            input => ParserResult.Success(value, input);
+
+        public static Parser<object?, TToken> Epsilon<TToken>() => Value<object?, TToken>(null);
 
         private class RefContainer<T>
             where T : class

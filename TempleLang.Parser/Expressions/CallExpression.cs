@@ -26,8 +26,10 @@
             select parameters;
 
         public static new readonly Parser<Expression, Token> Parser =
-            from callee in BinaryExpression.Assignment
-            from parameters in ParameterListParser
-            select new CallExpression(callee, parameters);
+            Parse.BinaryOperatorLeftToRight(
+                BinaryExpression.Assignment,
+                Parse.Epsilon<Token>(),
+                ParameterListParser,
+                (callee, parameters, _) => new CallExpression(callee, parameters));
     }
 }

@@ -102,9 +102,7 @@
             new Register(RegisterName.R15D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R15),
 #endregion 32-Bit General Purpose RnD
 
-
-
-#region 16-Bit General Purpose RnW/RnB
+#region 16-Bit General Purpose RnW
 
             new Register(RegisterName.R8W,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R8D),
             new Register(RegisterName.R9W,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R9D),
@@ -115,6 +113,10 @@
             new Register(RegisterName.R14W, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R14D),
             new Register(RegisterName.R15W, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R15D),
 
+#endregion 16-Bit General Purpose RnW
+
+#region 16-Bit General Purpose RnB
+
             new Register(RegisterName.R8B,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R8W),
             new Register(RegisterName.R9B,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R9W),
             new Register(RegisterName.R10B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R10W),
@@ -124,7 +126,7 @@
             new Register(RegisterName.R14B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R14W),
             new Register(RegisterName.R15B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R15W),
 
-#endregion 16-Bit General Purpose RnW/RnB
+#endregion 16-Bit General Purpose RnB
         }
         .ToDictionary(x => x.RegisterName, x => x);
 

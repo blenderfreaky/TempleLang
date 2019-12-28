@@ -37,6 +37,10 @@
             {
                 return codeBinder.FindValue(expr);
             }
+            else if (Parent is DeclarationBinder declarationBinder)
+            {
+                return declarationBinder.FindType(expr);
+            }
 
             //TODO
             Error(DiagnosticCode.UnknownValue, expr.Location);

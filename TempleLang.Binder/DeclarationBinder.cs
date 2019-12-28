@@ -12,18 +12,18 @@
     public partial class DeclarationBinder : Binder
     {
         public Dictionary<string, ITypeInfo> Types { get; }
-        public Dictionary<string, Procedure> Procedures { get; }
+        public Dictionary<string, ICallable> Procedures { get; }
 
         public DeclarationBinder(Dictionary<string, ITypeInfo> types, Binder? parent = null) : base(parent)
         {
             Types = types;
-            Procedures = new Dictionary<string, Procedure>();
+            Procedures = new Dictionary<string, ICallable>();
         }
 
         public DeclarationBinder(Binder? parent) : base(parent)
         {
             Types = new Dictionary<string, ITypeInfo>();
-            Procedures = new Dictionary<string, Procedure>();
+            Procedures = new Dictionary<string, ICallable>();
         }
 
         public override ITypeInfo FindType(Expression expression)

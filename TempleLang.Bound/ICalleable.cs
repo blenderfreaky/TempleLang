@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Bound
 {
+    using Diagnostic;
     using System.Collections.Generic;
     using TempleLang.Bound.Expressions;
 
@@ -7,6 +8,6 @@
     {
         ITypeInfo ReturnType { get; }
 
-        IReadOnlyList<Local> Parameters { get; }
+        CallExpression BindOverload(IExpression callee, IReadOnlyList<IExpression> parameters, FileLocation location, IDiagnosticReceiver diagnosticReceiver);
     }
 }

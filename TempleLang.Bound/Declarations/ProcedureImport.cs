@@ -8,7 +8,7 @@
     using TempleLang.Diagnostic;
     using IE = TempleLang.Bound.Expressions;
 
-    public sealed class Procedure : IDeclaration, ICallable
+    public sealed class ProcedureImport : IDeclaration, ICallable
     {
         public Positioned<string> Name { get; }
 
@@ -16,7 +16,7 @@
 
         public IReadOnlyList<Local> Parameters { get; }
 
-        public IStatement EntryPoint { get; }
+        public Positioned<string> ImportedName;
 
         public FileLocation Location { get; }
 
@@ -27,16 +27,17 @@
 
         int ITypeInfo.Size => 8;
 
-        public Procedure(Positioned<string> name, ITypeInfo returnType, IReadOnlyList<Local> parameters, IStatement entryPoint, FileLocation location)
+        public ProcedureImport(Positioned<string> name, ITypeInfo returnType, IReadOnlyList<Local> parameters, Positioned<string> importedName, FileLocation location)
         {
             Name = name;
             ReturnType = returnType;
             Parameters = parameters;
-            EntryPoint = entryPoint;
+            ImportedName = importedName;
             Location = location;
         }
 
-        public override string ToString() => $"let {Name.Value}({string.Join(", ", Parameters)}) : {ReturnType?.ToString() ?? "void"} {EntryPoint}";
+        public override string ToString() =>
+            $"let {Name.Value}({string.Join(", ", Parameters)}) : {ReturnType?.ToString() ?? "void"} {"using \"" + ImportedName.Value + "\""}";
 
         public bool TryGetMember(string name, out IMemberInfo? member)
         {

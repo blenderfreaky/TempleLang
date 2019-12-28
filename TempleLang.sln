@@ -35,10 +35,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6_Compiler", "6_Compiler", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Intermediate", "TempleLang.Intermediate\TempleLang.Intermediate.csproj", "{3B0B2ADA-57F0-4463-8EEB-6713D87F322E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempleLang.Compiler", "TempleLang.Compiler\TempleLang.Compiler.csproj", "{1E0945C0-507E-4C9C-8A77-333E2951FA05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Compiler", "TempleLang.Compiler\TempleLang.Compiler.csproj", "{1E0945C0-507E-4C9C-8A77-333E2951FA05}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0CD49334-B982-40FC-9118-B46A90657DAD}"
 	ProjectSection(SolutionItems) = preProject
+		OtherCode.tl = OtherCode.tl
 		Test.tl = Test.tl
 	EndProjectSection
 EndProject

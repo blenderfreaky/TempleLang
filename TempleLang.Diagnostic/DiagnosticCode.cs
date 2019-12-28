@@ -13,6 +13,7 @@
         UnknownType,
         InvalidParamCount,
         InvalidParamType,
-        EmptyProcedure
+        EmptyProcedure,
+        CallingUncallable,
     }
 }

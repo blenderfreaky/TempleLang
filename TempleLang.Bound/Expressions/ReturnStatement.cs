@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using TempleLang.Bound.Statements;
-using TempleLang.Diagnostic;
-
-namespace TempleLang.Bound.Expressions
+﻿namespace TempleLang.Bound.Expressions
 {
+    using System.Collections.Generic;
+    using TempleLang.Bound.Statements;
+    using TempleLang.Diagnostic;
+
     public struct ReturnStatement : IStatement
     {
         public IExpression Expression { get; }

@@ -1,24 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using TempleLang.Binder;
-using TempleLang.Bound.Primitives;
-using TempleLang.Bound.Statements;
-using TempleLang.CodeGenerator.NASM;
-using TempleLang.Diagnostic;
-using TempleLang.Intermediate;
-using TempleLang.Lexer;
-using TempleLang.Lexer.Abstractions;
-using TempleLang.Parser;
-using TempleLang.Parser.Abstractions;
-
-namespace TempleLang.Compiler
+﻿namespace TempleLang.Compiler
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using Bound.Declarations;
+    using global::TempleLang.Binder;
+    using global::TempleLang.Bound.Primitives;
+    using global::TempleLang.Bound.Statements;
+    using global::TempleLang.CodeGenerator.NASM;
+    using global::TempleLang.Diagnostic;
+    using global::TempleLang.Intermediate;
+    using global::TempleLang.Lexer;
+    using global::TempleLang.Lexer.Abstractions;
+    using global::TempleLang.Parser;
+    using global::TempleLang.Parser.Abstractions;
+
     public static class TempleLang
     {
         public static LexemeString<Token> Lex(StringReader source, SourceFile sourceFile) =>
-            new Lexer.Lexer(
+            new Lexer(
                 source,
                 sourceFile)
             .LexUntil(Token.EoF);
@@ -28,7 +30,7 @@ namespace TempleLang.Compiler
             var eofParser =
                 (from r in parser
                      // Match EoF to ensure the entire input is matched
-                 from _ in Parser.Abstractions.Parse.Token(Token.EoF)
+                 //from _ in Parse.Token(Token.EoF)
                  select r);
 
             return eofParser(lexemes);
@@ -50,7 +52,7 @@ namespace TempleLang.Compiler
             return binder.HasErrors ? null : bound;
         }
 
-        public static CodeCompilation? CompileStatement(string text, SourceFile sourceFile, out IParserResult<Statement, Token>? parserError, out IEnumerable<DiagnosticInfo> diagnostics)
+        public static ProcedureCompilation? CompileStatement(string text, SourceFile sourceFile, out IParserResult<Statement, Token>? parserError, out IEnumerable<DiagnosticInfo> diagnostics)
         {
             using var stringReader = new StringReader(text);
 
@@ -83,7 +85,51 @@ namespace TempleLang.Compiler
             Console.WriteLine(string.Join("\n", instructions));
             Console.WriteLine();
 
-            return new CodeCompilation(instructions, transformer.ConstantTable, allocation.AssignedLocations);
+            return new ProcedureCompilation(
+                null,
+                instructions,
+                transformer.ConstantTable.ToDictionary(x => x, x => new DataLocation(x.DebugName.Replace(" ", "_"), x.Type.Size)),
+                allocation.AssignedLocations);
+        }
+
+        public static List<ProcedureCompilation>? CompileDeclaration(string text, SourceFile sourceFile, out IParserResult<List<Declaration>, Token>? parserError, out IEnumerable<DiagnosticInfo> diagnostics, out Dictionary<Constant, DataLocation>? constantTable)
+        {
+            using var stringReader = new StringReader(text);
+
+            var lexemes = Lex(stringReader, sourceFile);
+            var parserResult = ParseEoF(Declaration.Parser.Many(), lexemes);
+
+            if (!parserResult.IsSuccessful)
+            {
+                diagnostics = Array.Empty<DiagnosticInfo>();
+                constantTable = null;
+                parserError = parserResult;
+
+                return null;
+            }
+
+            parserError = null;
+
+            var compiler = new DeclarationCompiler();
+
+            var result = compiler.Compile(parserResult.Result);
+            diagnostics = compiler.DeclarationBinder.Diagnostics;
+            constantTable = compiler.Transformer.ConstantTable.ToDictionary(x => x, x => new DataLocation(x.DebugName.Replace(" ", "_"), x.Type.Size));
+
+            return result;
+        }
+
+        public static IEnumerable<NasmInstruction> CompileConstantTable(this Dictionary<Constant, DataLocation> constantTable)
+        {
+            foreach (var constant in constantTable)
+            {
+                var isString = constant.Key.Type == PrimitiveType.String;
+
+                yield return new NasmInstruction(
+                    label: constant.Value.LabelName,
+                    name: isString ? "db" : "equ",
+                    new LiteralParameter(isString ? $"__utf16__({constant.Key.ValueText})" : constant.Key.ValueString));
+            }
         }
     }
 }

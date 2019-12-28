@@ -51,7 +51,11 @@
 
         public Dictionary<Variable, IMemory> AssignedLocations { get; }
         private Stack<Register> FreeGeneralPurposeRegisters { get; }
-        public int StackSize { get; private set; }
+
+        public int StackOffset { get; private set; } =
+              8 // Return address
+            + 8 // Saved frame pointer
+            ;
 
         private List<LiveInterval> Active { get; }
 
@@ -150,8 +154,8 @@
 
         private StackLocation StackAlloc(int size)
         {
-            var location = new StackLocation(StackSize, size);
-            StackSize += size;
+            var location = new StackLocation(StackOffset, size);
+            StackOffset += size;
             return location;
         }
     }

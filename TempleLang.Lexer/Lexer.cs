@@ -21,8 +21,10 @@
             ["while"] = Token.While,
             ["do"] = Token.Do,
             ["let"] = Token.Declarator,
+            ["return"] = Token.Return,
             ["ref"] = Token.Reference,
             ["deref"] = Token.Dereference,
+            ["using"] = Token.Using,
         };
 
         public Lexer(TextReader textReader, SourceFile sourceFile)
@@ -73,8 +75,6 @@
                 {
                     return MakeLexeme(Token.EoF);
                 }
-
-                character = (char)characterInt;
 
                 goto Start;
             }

@@ -21,6 +21,7 @@
             S.BlockStatement stmt => BindStatement(stmt),
             S.IfStatement stmt => BindStatement(stmt),
             S.WhileStatement stmt => BindStatement(stmt),
+            S.ReturnStatement stmt => BindStatement(stmt),
             _ => throw new ArgumentException(nameof(syntaxStatement)),
         };
 
@@ -80,6 +81,11 @@
                 BindExpression(stmt.Condition),
                 BindStatement(stmt.Statement)!,
                 stmt.IsDoLoop,
+                stmt.Location);
+
+        public IS.ReturnStatement? BindStatement(S.ReturnStatement stmt) =>
+            new IS.ReturnStatement(
+                stmt.Expression == null ?null:BindExpression(stmt.Expression),
                 stmt.Location);
     }
 }
