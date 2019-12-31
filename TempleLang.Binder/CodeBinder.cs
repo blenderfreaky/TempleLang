@@ -1,14 +1,12 @@
 ﻿namespace TempleLang.Binder
 {
+    using Bound;
+    using Bound.Declarations;
     using System.Collections.Generic;
-    using TempleLang.Bound;
     using TempleLang.Bound.Expressions;
-    using TempleLang.Bound.Primitives;
     using TempleLang.Diagnostic;
 
-    using IE = TempleLang.Bound.Expressions;
-
-    using S = TempleLang.Parser;
+    using S = Parser;
 
     public partial class CodeBinder : Binder
     {
@@ -24,9 +22,9 @@
             Locals = symbols;
         }
 
-        public override ITypeInfo FindType(S.Expression expr) => Parent?.FindType(expr) ?? PrimitiveType.Unknown;
+        public override IDeclaration? FindDeclaration(S.Expression expr) => Parent?.FindDeclaration(expr);
 
-        public IE.IValue FindValue(S.Identifier expr)
+        public IValue FindValue(S.Identifier expr)
         {
             if (Locals.TryGetValue(expr.Name, out var value))
             {
@@ -37,10 +35,10 @@
             {
                 return codeBinder.FindValue(expr);
             }
-            else if (Parent is DeclarationBinder declarationBinder)
-            {
-                return declarationBinder.FindType(expr);
-            }
+
+            var type = Parent?.FindDeclaration(expr);
+
+            if (type is ICallable callable) return new CallableValue(callable, ValueFlags.Readable, expr.Location);
 
             //TODO
             Error(DiagnosticCode.UnknownValue, expr.Location);

@@ -1,10 +1,12 @@
 ﻿namespace TempleLang.Bound.Primitives
 {
+    using Declarations;
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Bound;
+    using TempleLang.Diagnostic;
 
-    public sealed class PrimitiveType : ITypeInfo
+    public sealed class PrimitiveType : ITypeInfo, IDeclaration
     {
         public static PrimitiveType Double { get; } = new PrimitiveType("double", "double");
         public static PrimitiveType Long { get; } = new PrimitiveType("long", "long");
@@ -17,6 +19,9 @@
         public string FullyQualifiedName { get; }
 
         public int Size => 8;
+
+        Positioned<string> IDeclaration.Name => FileLocation.Null.WithValue(Name);
+        FileLocation IPositioned.Location => FileLocation.Null;
 
         private PrimitiveType(string name, string fullyQualifiedName)
         {
@@ -32,12 +37,12 @@
             return false;
         }
 
-        public static readonly Dictionary<string, ITypeInfo> Types = new[]
+        public static readonly Dictionary<string, PrimitiveType> Types = new[]
         {
             Double,
             Long,
             Bool,
             String,
-        }.ToDictionary(x => x.Name, x => (ITypeInfo)x);
+        }.ToDictionary(x => x.Name, x => x);
     }
 }

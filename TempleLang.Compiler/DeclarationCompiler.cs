@@ -1,51 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TempleLang.Binder;
-using TempleLang.Bound;
-using TempleLang.Bound.Declarations;
-using TempleLang.Bound.Primitives;
-using TempleLang.CodeGenerator.NASM;
-using TempleLang.Intermediate;
-using TempleLang.Parser;
-
-namespace TempleLang.Compiler
+﻿namespace TempleLang.Compiler
 {
+    using Diagnostic;
+    using System.Collections.Generic;
+    using System.Linq;
+    using TempleLang.Binder;
+    using TempleLang.Bound.Declarations;
+    using TempleLang.CodeGenerator.NASM;
+    using TempleLang.Intermediate;
+    using S = Parser;
+
     public class DeclarationCompiler
     {
-        public DeclarationBinder DeclarationBinder { get; }
-        public Transformer Transformer { get; }
+        private Transformer Transformer { get; }
+        public Dictionary<Constant, DataLocation> ConstantTable { get; }
+        public List<string> Externs { get; }
 
         public DeclarationCompiler()
         {
-            DeclarationBinder = new DeclarationBinder(PrimitiveType.Types);
             Transformer = new Transformer();
+            ConstantTable = new Dictionary<Constant, DataLocation>();
+            Externs = new List<string>();
         }
 
-        public List<ProcedureCompilation> Compile(List<Declaration> declarations)
+        public List<ProcedureCompilation> Compile(S.NamespaceDeclaration declaration, out IEnumerable<DiagnosticInfo> diagnostics)
         {
-            _ = declarations.Select(DeclarationBinder.BindDeclarationHead).ToList();
-            var boundDeclarations = declarations.Select(DeclarationBinder.BindDeclarationBody).ToList();
-            var transformed = boundDeclarations.Select(x => x as Procedure).Where(x => x != null)
-                .ToDictionary(x => x!, x => Transformer.TransformStatement(x!.EntryPoint).ToList());
+            var binder = new NamespaceBinder(declaration);
+            binder.Explore();
+            var bound = binder.Bind();
+            binder.CollectDiagnostics();
+            diagnostics = binder.Diagnostics;
 
-            var constantTable = Transformer.ConstantTable.ToDictionary(x => x, x => new DataLocation(x.DebugName.Replace(" ", "_"), x.Type.Size));
+            var procedures = CompileDeclaration(bound).ToList();
 
-            var procedures = transformed.Select(procedure =>
+            foreach (var constant in Transformer.ConstantTable)
             {
-                var allocation = RegisterAllocation.Generate(procedure.Value);
+                ConstantTable[constant] = new DataLocation(constant.DebugName.Replace(' ', '_'), constant.Type.Size);
+            }
 
-                Console.WriteLine(new string('-', 50));
-                Console.WriteLine(string.Join("\n", allocation.AssignedLocations.Select(x => x.Key + " -> " + x.Value)));
-                Console.WriteLine();
-                Console.WriteLine(string.Join("\n", procedure.Value));
-                Console.WriteLine();
+            return procedures.ToList();
+        }
 
-                return new ProcedureCompilation(procedure.Key, procedure.Value, constantTable, allocation.AssignedLocations);
-            }).ToList();
+        private IEnumerable<ProcedureCompilation> CompileDeclaration(IDeclaration declaration)
+        {
+            switch (declaration)
+            {
+                case NamespaceDeclaration decl:
+                    foreach (var compilation in decl.Declarations.SelectMany(CompileDeclaration)) yield return compilation;
+                    break;
+                case Procedure procedure:
+                    var transformed = Transformer.TransformStatement(procedure.EntryPoint).ToList();
 
-            return procedures;
+                    var allocation = RegisterAllocation.Generate(transformed);
+
+                    yield return new ProcedureCompilation(procedure, transformed, ConstantTable, allocation);
+                    break;
+                case ProcedureImport import:
+                    Externs.Add(import.ImportedName);
+                    break;
+            }
         }
     }
 }

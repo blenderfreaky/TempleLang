@@ -25,6 +25,7 @@
             ["ref"] = Token.Reference,
             ["deref"] = Token.Dereference,
             ["using"] = Token.Using,
+            ["namespace"] = Token.Namespace,
         };
 
         public Lexer(TextReader textReader, SourceFile sourceFile)
@@ -228,7 +229,7 @@
                     return MakeLexeme(Token.RightExpressionDelimiter);
 
                 case ';':
-                    return MakeLexeme(Token.StatementDelimiter);
+                    return MakeLexeme(Token.Semicolon);
 
                 case ':':
                     return MakeLexeme(Token.TypeSetter);

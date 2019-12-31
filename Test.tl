@@ -1,9 +1,18 @@
-let main(a:long)
+namespace Program;
+
+let main(a:long) : long
 {
-    return other(a+1);
+    let str = "abc";
+    print(str, 3);
 }
 
-let other(a:long)
+let print(ptr:long, len:long) : long
 {
-    return a +1;
+    let stdOut = GetStdHandle(-11);
+    let numberOfCharsWritten = 0;
+    return WriteConsoleW(stdOut, ptr, len, ref numberOfCharsWritten, 0);
 }
+
+let GetStdHandle(id : long) : long using "GetStdHandle"
+
+let WriteConsoleW(stdOut : long, message : long, messageLength : long, numberOfCharsWritten : long, zero : long) : long using "WriteConsoleW"

@@ -1,6 +1,7 @@
 ﻿namespace TempleLang.CodeGenerator.NASM
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     public struct NasmRegion
     {
@@ -15,7 +16,7 @@
 
         public string ToNASM() =>
             Name + ":\n"
-            + string.Join("\n", Instructions);
+            + string.Join("\n", Instructions.Select(x => "    " + x));
 
         public override bool Equals(object? obj) => obj is NasmRegion region && Name == region.Name && EqualityComparer<IEnumerable<NasmInstruction>>.Default.Equals(Instructions, region.Instructions);
 

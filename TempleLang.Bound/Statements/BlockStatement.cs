@@ -19,8 +19,6 @@
             Location = location;
         }
 
-        public int StackSize => Locals.Sum(x => x.ReturnType.Size) + Statements.Max(x => x is BlockStatement block ? block.StackSize : 0);
-
         public override string ToString() =>
             Environment.NewLine
             + "{"
@@ -32,7 +30,7 @@
                   Statements.Select(x => string.Concat(x.ToString().Split('\n').Select(x => "    " + x + Environment.NewLine))))
             + "}";
 
-        public override bool Equals(object? obj) => obj is BlockStatement statement && EqualityComparer<IReadOnlyCollection<Local>>.Default.Equals(Locals, statement.Locals) && EqualityComparer<IReadOnlyList<IStatement>>.Default.Equals(Statements, statement.Statements) && EqualityComparer<FileLocation>.Default.Equals(Location, statement.Location) && StackSize == statement.StackSize;
+        public override bool Equals(object? obj) => obj is BlockStatement statement && EqualityComparer<IReadOnlyCollection<Local>>.Default.Equals(Locals, statement.Locals) && EqualityComparer<IReadOnlyList<IStatement>>.Default.Equals(Statements, statement.Statements) && EqualityComparer<FileLocation>.Default.Equals(Location, statement.Location);
 
         public override int GetHashCode()
         {
@@ -40,7 +38,6 @@
             hashCode = (hashCode * -1521134295) + EqualityComparer<IReadOnlyCollection<Local>>.Default.GetHashCode(Locals);
             hashCode = (hashCode * -1521134295) + EqualityComparer<IReadOnlyList<IStatement>>.Default.GetHashCode(Statements);
             hashCode = (hashCode * -1521134295) + Location.GetHashCode();
-            hashCode = (hashCode * -1521134295) + StackSize.GetHashCode();
             return hashCode;
         }
 

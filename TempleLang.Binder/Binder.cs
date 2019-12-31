@@ -1,12 +1,13 @@
 ﻿namespace TempleLang.Binder
 {
     using Bound;
+    using Bound.Declarations;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Linq;
+    using TempleLang.Bound.Primitives;
     using TempleLang.Diagnostic;
-    using S = TempleLang.Parser;
+    using S = Parser;
 
     public abstract class Binder : IDisposable, IDiagnosticReceiver
     {
@@ -34,7 +35,23 @@
             HasErrors |= error;
         }
 
-        public abstract ITypeInfo FindType(S.Expression expression);
+        public abstract IDeclaration? FindDeclaration(S.Expression expression);
+
+        public ITypeInfo FindType(S.Expression? expression)
+        {
+            if (expression == null)
+            {
+                Error(DiagnosticCode.MissingType, FileLocation.Null);
+
+                return PrimitiveType.Unknown;
+            }
+
+            var returnType = FindDeclaration(expression) as ITypeInfo;
+
+            if (returnType == null) Error(DiagnosticCode.InvalidType, expression.Location);
+
+            return returnType ?? PrimitiveType.Unknown;
+        }
 
         #region IDisposable Support
 

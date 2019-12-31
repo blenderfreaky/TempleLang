@@ -21,6 +21,8 @@
             Location = location;
         }
 
+        public override string ToString() => $"({Callee}({string.Join(", ", Parameters)}) : {ReturnType})";
+
         public override bool Equals(object? obj) => obj is CallExpression expression && EqualityComparer<IExpression>.Default.Equals(Callee, expression.Callee) && EqualityComparer<IReadOnlyList<IExpression>>.Default.Equals(Parameters, expression.Parameters) && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, expression.ReturnType) && EqualityComparer<FileLocation>.Default.Equals(Location, expression.Location);
 
         public override int GetHashCode()

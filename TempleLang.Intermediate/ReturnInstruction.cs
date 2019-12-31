@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TempleLang.Intermediate
+﻿namespace TempleLang.Intermediate
 {
+    using System.Collections.Generic;
+
     public struct ReturnInstruction :IInstruction
     {
         public IReadableValue? ReturnValue { get; }

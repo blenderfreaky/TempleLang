@@ -46,6 +46,7 @@
         {
             Constant<long> val => RequestConstant(val),
             Constant<double> val => RequestConstant(val),
+            Constant<string> val => RequestConstant(val),
             Local val => RequestUserLocal(val),
             _ => throw new ArgumentException(nameof(value)),
         };
@@ -57,7 +58,7 @@
         {
             if (!(val.ReturnType is PrimitiveType type)) throw new InvalidOperationException("Internal Failure: Binder failed binding high-level constants to primitives");
 
-            var constant = new Constant(val.Value!.ToString(), type, "const long " + val.Value);
+            var constant = new Constant(val.Value!.ToString(), type, "const " + typeof(T).Name + " " + val.Value);
 
             if (!ConstantTable.Contains(constant)) ConstantTable.Add(constant);
 

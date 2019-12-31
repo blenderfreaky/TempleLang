@@ -6,22 +6,19 @@
     using TempleLang.Diagnostic;
     using TempleLang.Parser;
 
-    using IE = TempleLang.Bound.Expressions;
-    using S = TempleLang.Parser;
-
     public partial class CodeBinder : Binder
     {
-        public IE.IValue BindLiteral(S.Literal syntaxLiteral) => syntaxLiteral switch
+        public IValue BindLiteral(Literal syntaxLiteral) => syntaxLiteral switch
         {
-            S.BoolLiteral expr => BindLiteral(expr),
-            S.NumberLiteral expr => BindLiteral(expr),
-            S.StringLiteral expr => BindLiteral(expr),
+            BoolLiteral expr => BindLiteral(expr),
+            NumberLiteral expr => BindLiteral(expr),
+            StringLiteral expr => BindLiteral(expr),
             _ => throw new ArgumentException(nameof(syntaxLiteral)),
         };
 
-        public IE.IValue BindLiteral(S.BoolLiteral expr) => new Constant<bool>(expr.Value, PrimitiveType.Bool, expr.Location);
+        public IValue BindLiteral(BoolLiteral expr) => new Constant<bool>(expr.Value, PrimitiveType.Bool, expr.Location);
 
-        public IE.IValue BindLiteral(S.NumberLiteral expr)
+        public IValue BindLiteral(NumberLiteral expr)
         {
             if (expr.Value.Contains(".") || (expr.Flags & (NumberFlags.SuffixDouble)) != 0)
             {
@@ -43,6 +40,6 @@
             }
         }
 
-        public IE.IValue BindLiteral(S.StringLiteral expr) => new Constant<string>(expr.Value, PrimitiveType.String, expr.Location);
+        public IValue BindLiteral(StringLiteral expr) => new Constant<string>(expr.Value, PrimitiveType.String, expr.Location);
     }
 }

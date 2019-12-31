@@ -2,7 +2,7 @@
 {
     public enum Token
     {
-        StatementDelimiter,
+        Semicolon,
         Declarator,
         TypeSetter,
         Accessor,
@@ -11,6 +11,7 @@
 
         Return,
         Using,
+        Namespace,
 
         If,
         Else,

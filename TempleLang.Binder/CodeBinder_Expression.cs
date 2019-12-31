@@ -9,25 +9,25 @@
     using TempleLang.Lexer;
     using TempleLang.Parser;
 
-    using IE = TempleLang.Bound.Expressions;
-    using S = TempleLang.Parser;
+    using IE = Bound.Expressions;
+    using S = Parser;
 
     public partial class CodeBinder : Binder
     {
         public IExpression BindExpression(Expression syntaxExpression) => syntaxExpression switch
         {
-            S.PrefixExpression expr => BindExpression(expr),
-            S.PostfixExpression expr => BindExpression(expr),
+            PrefixExpression expr => BindExpression(expr),
+            PostfixExpression expr => BindExpression(expr),
             S.BinaryExpression expr => BindExpression(expr),
             S.TernaryExpression expr => BindExpression(expr),
             S.AccessExpression expr => BindExpression(expr),
             S.CallExpression expr => BindExpression(expr),
-            S.Identifier expr => BindExpression(expr),
-            S.Literal expr => BindLiteral(expr),
+            Identifier expr => BindExpression(expr),
+            Literal expr => BindLiteral(expr),
             _ => throw new ArgumentException(nameof(syntaxExpression)),
         };
 
-        public IE.UnaryExpression BindExpression(S.PrefixExpression expr)
+        public UnaryExpression BindExpression(PrefixExpression expr)
         {
             var val = BindExpression(expr.Value);
 
@@ -51,10 +51,10 @@
 
             var returnType = val.ReturnType;
 
-            return new IE.UnaryExpression(val, op, returnType, expr.Location);
+            return new UnaryExpression(val, op, returnType, expr.Location);
         }
 
-        public IE.UnaryExpression BindExpression(S.PostfixExpression expr)
+        public UnaryExpression BindExpression(PostfixExpression expr)
         {
             var val = BindExpression(expr.Value);
 
@@ -73,7 +73,7 @@
 
             var returnType = val.ReturnType;
 
-            return new IE.UnaryExpression(val, op, returnType, expr.Location);
+            return new UnaryExpression(val, op, returnType, expr.Location);
         }
 
         public IE.BinaryExpression BindExpression(S.BinaryExpression expr)
@@ -209,6 +209,6 @@
             return new IE.CallExpression(null!, null!, PrimitiveType.Unknown, expr.Location);
         }
 
-        public IE.IValue BindExpression(S.Identifier expr) => FindValue(expr)!;
+        public IValue BindExpression(Identifier expr) => FindValue(expr)!;
     }
 }

@@ -37,7 +37,7 @@
 
         public string ToNASM() => string.Concat(
             (Label == null ? string.Empty : (Label + ':')).PadRight(4),
-            (Name ?? string.Empty).PadRight(6),
+            (Name ?? string.Empty).PadRight(8),
             Parameters == null ? string.Empty : string.Join(", ", Parameters.Select(x => x.ToNASM()))
             );
 

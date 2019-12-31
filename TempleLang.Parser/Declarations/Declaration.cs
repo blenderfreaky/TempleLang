@@ -19,6 +19,7 @@
         }
 
         public static readonly Parser<Declaration, Token> Parser =
-            ProcedureDeclaration.Parser;
+            ProcedureDeclaration.Parser.OfType<Declaration, Token>()
+            .Or(NamespaceDeclaration.Parser);
     }
 }

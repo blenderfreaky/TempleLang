@@ -18,7 +18,7 @@
         public static new readonly Parser<ReturnStatement, Token> Parser =
             from ret in Parse.Token(Token.Return)
             from expression in Expression.Parser.Maybe()
-            from _ in Parse.Token(Token.StatementDelimiter)
+            from _ in Parse.Token(Token.Semicolon)
             select new ReturnStatement(expression, expression == null ? ret.Location : FileLocation.Concat(ret.Location, expression));
     }
 }

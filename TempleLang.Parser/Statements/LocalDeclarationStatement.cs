@@ -27,11 +27,11 @@
              from name in TypeAnnotatedName.Parser
              from __ in Parse.Token(Token.Assign)
              from assignment in Expression.Parser
-             from ___ in Parse.Token(Token.StatementDelimiter)
+             from ___ in Parse.Token(Token.Semicolon)
              select new LocalDeclarationStatement(name, assignment))
             .Or(from _ in Parse.Token(Token.Declarator)
                 from name in TypeAnnotatedName.Parser
-                from __ in Parse.Token(Token.StatementDelimiter)
+                from __ in Parse.Token(Token.Semicolon)
                 select new LocalDeclarationStatement(name));
     }
 }

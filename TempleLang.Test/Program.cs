@@ -1,10 +1,8 @@
 ﻿namespace TempleLang.Test
 {
-    using Bound.Declarations;
     using Compiler;
     using System;
     using System.IO;
-    using System.Linq;
     using TempleLang.Lexer;
 
     public static class Program
@@ -13,7 +11,7 @@
         {
             var text = File.ReadAllText("../../../../Test.tl");
 
-            var compiled = TempleLang.CompileDeclaration(text, new SourceFile("Console", null), out var parserError, out var diagnostics, out var constantTable);
+            var compiled = TempleLangHelper.Compile(text, new SourceFile("Console", null), out var parserError, out var diagnostics);
 
             if (parserError != null) Console.WriteLine(parserError.ToString());
 
@@ -23,15 +21,15 @@
 
             Console.WriteLine("section .data");
 
-            foreach (var constant in constantTable.CompileConstantTable()) Console.WriteLine(constant.ToNASM());
+            foreach (var instruction in compiled.WriteConstantTable()) Console.WriteLine(instruction.ToNASM());
 
             Console.WriteLine("section .text");
 
-            foreach (var declaration in compiled)
-            {
-                Console.WriteLine(declaration.Procedure.Name + ":");
-                foreach(var instruction in declaration.CompileInstructions()) Console.WriteLine(instruction.ToNASM());
-            }
+            Console.WriteLine("    global main");
+
+            foreach (var instruction in compiled.WriteExterns()) Console.WriteLine(instruction.ToNASM());
+
+            foreach (var region in compiled.WriteProcedures()) Console.WriteLine(region.ToNASM());
         }
     }
 }

@@ -8,16 +8,16 @@
     using TempleLang.Diagnostic;
     using TempleLang.Parser;
 
-    using IE = TempleLang.Bound.Expressions;
-    using IS = TempleLang.Bound.Statements;
-    using S = TempleLang.Parser;
+    using IE = Bound.Expressions;
+    using IS = Bound.Statements;
+    using S = Parser;
 
     public partial class CodeBinder : Binder
     {
         public IStatement? BindStatement(Statement syntaxStatement) => syntaxStatement switch
         {
             S.ExpressionStatement stmt => BindStatement(stmt),
-            S.LocalDeclarationStatement stmt => BindStatement(stmt),
+            LocalDeclarationStatement stmt => BindStatement(stmt),
             S.BlockStatement stmt => BindStatement(stmt),
             S.IfStatement stmt => BindStatement(stmt),
             S.WhileStatement stmt => BindStatement(stmt),
@@ -27,7 +27,7 @@
 
         public IS.ExpressionStatement? BindStatement(S.ExpressionStatement stmt) => new IS.ExpressionStatement(BindExpression(stmt.Expression), stmt.Location);
 
-        public IS.ExpressionStatement? BindStatement(S.LocalDeclarationStatement stmt)
+        public IS.ExpressionStatement? BindStatement(LocalDeclarationStatement stmt)
         {
             var assignedValue = stmt.Assignment == null ? null : BindExpression(stmt.Assignment);
 

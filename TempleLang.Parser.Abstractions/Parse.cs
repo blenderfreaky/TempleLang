@@ -22,8 +22,14 @@
                 return ParserResult.Success(input[0], input.Advance(1));
             };
 
-        public static Parser<Lexeme<TToken>, TToken> Token<TToken>(params TToken[] tokens) =>
-            input =>
+        public static Parser<Lexeme<TToken>, TToken> Token<TToken>(params TToken[] tokens)
+        {
+            if (tokens is null)
+            {
+                throw new ArgumentNullException(nameof(tokens));
+            }
+
+            return input =>
             {
                 if (input.Length == 0)
                 {
@@ -42,9 +48,17 @@
 
                 return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected [{string.Join(", ", tokens)}]", input);
             };
+        }
 
-        public static Parser<T, TToken> Ref<T, TToken>(Func<Parser<T, TToken>> parser) =>
-            input => parser()(input);
+        public static Parser<T, TToken> Ref<T, TToken>(Func<Parser<T, TToken>> parser)
+        {
+            if (parser is null)
+            {
+                throw new ArgumentNullException(nameof(parser));
+            }
+
+            return input => parser()(input);
+        }
 
         public static Parser<T, TToken> Value<T, TToken>(T value = default) =>
             input => ParserResult.Success(value, input);
@@ -63,6 +77,11 @@
 
         public static Parser<T, TToken> Recursive<T, TToken>(Func<Parser<T, TToken>, Parser<T, TToken>> creator)
         {
+            if (creator is null)
+            {
+                throw new ArgumentNullException(nameof(creator));
+            }
+
             var refContainer = new RefContainer<Parser<T, TToken>>();
 
             var result = creator(Ref(() => refContainer.Value!));
@@ -72,19 +91,74 @@
             return result;
         }
 
-        public static Parser<T, TToken> BinaryOperatorRightToLeft<T, U, TToken>(Parser<T, TToken> parser, Parser<U, TToken> @operator, Func<T, U, T, T> factory) =>
-            Recursive<T, TToken>(self =>
+        public static Parser<T, TToken> BinaryOperatorRightToLeft<T, U, TToken>(Parser<T, TToken> parser, Parser<U, TToken> @operator, Func<T, U, T, T> factory)
+        {
+            if (parser is null)
+            {
+                throw new ArgumentNullException(nameof(parser));
+            }
+
+            if (@operator is null)
+            {
+                throw new ArgumentNullException(nameof(@operator));
+            }
+
+            if (factory is null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+
+            return Recursive<T, TToken>(self =>
                 (from lhs in parser
                  from op in @operator
                  from rhs in self
                  select factory(lhs, op, rhs))
                 .Or(parser));
+        }
 
-        public static Parser<T, TToken> BinaryOperatorLeftToRight<T, U, TToken>(Parser<T, TToken> parser, Parser<U, TToken> @operator, Func<T, U, T, T> factory) =>
-            BinaryOperatorLeftToRight(parser, parser, @operator, factory);
+        public static Parser<T, TToken> BinaryOperatorLeftToRight<T, U, TToken>(Parser<T, TToken> parser, Parser<U, TToken> @operator, Func<T, U, T, T> factory)
+        {
+            if (parser is null)
+            {
+                throw new ArgumentNullException(nameof(parser));
+            }
 
-        public static Parser<T, TToken> BinaryOperatorLeftToRight<T, U, V, TToken>(Parser<T, TToken> lhsParser, Parser<V, TToken> rhsParser, Parser<U, TToken> @operator, Func<T, U, V, T> factory) =>
-            input =>
+            if (@operator is null)
+            {
+                throw new ArgumentNullException(nameof(@operator));
+            }
+
+            if (factory is null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+
+            return BinaryOperatorLeftToRight(parser, parser, @operator, factory);
+        }
+
+        public static Parser<T, TToken> BinaryOperatorLeftToRight<T, U, V, TToken>(Parser<T, TToken> lhsParser, Parser<V, TToken> rhsParser, Parser<U, TToken> @operator, Func<T, U, V, T> factory)
+        {
+            if (lhsParser is null)
+            {
+                throw new ArgumentNullException(nameof(lhsParser));
+            }
+
+            if (rhsParser is null)
+            {
+                throw new ArgumentNullException(nameof(rhsParser));
+            }
+
+            if (@operator is null)
+            {
+                throw new ArgumentNullException(nameof(@operator));
+            }
+
+            if (factory is null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+
+            return input =>
             {
                 var result = lhsParser(input);
 
@@ -108,5 +182,23 @@
                     accumulator = factory(accumulator, op.Result, res.Result);
                 }
             };
+        }
+
+        public static Parser<T, TToken> Lookahead<T, TToken>(Parser<T, TToken> parser)
+        {
+            if (parser is null)
+            {
+                throw new ArgumentNullException(nameof(parser));
+            }
+
+            return input =>
+            {
+                var result = parser(input);
+
+                return result.IsSuccessful
+                ? ParserResult.Success(result.Result, input)
+                : ParserResult.Failure<T,TToken>(result.ErrorMessage!, input);
+            };
+        }
     }
 }

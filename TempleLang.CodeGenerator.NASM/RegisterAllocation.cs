@@ -1,5 +1,7 @@
 ﻿namespace TempleLang.CodeGenerator.NASM
 {
+    using Bound.Expressions;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Intermediate;
@@ -39,7 +41,7 @@
                 .OrderBy(x => x.FirstIndex)
                 .ToList();
 
-            AssignedLocations = new Dictionary<Variable, IMemory>();
+            AssignedLocation = new Dictionary<Variable, IMemory>();
             FreeGeneralPurposeRegisters = new Stack<Register>(
                 Register.All
                 .Where(x => x.Size == RegisterSize.Bytes8 && (x.Flags & RegisterFlags.GeneralPurpose) != 0));
@@ -49,7 +51,7 @@
             AllocateRegisters();
         }
 
-        public Dictionary<Variable, IMemory> AssignedLocations { get; }
+        public Dictionary<Variable, IMemory> AssignedLocation { get; }
         private Stack<Register> FreeGeneralPurposeRegisters { get; }
 
         public int StackOffset { get; private set; } =
@@ -62,9 +64,11 @@
         private Dictionary<Variable, (int First, int Last)> LiveIntervalsByVariable { get; }
         private List<LiveInterval> LiveIntervals { get; }
 
+        public IEnumerable<Variable> GetAllLiveAt(int index) => LiveIntervals.Where(x => x.FirstIndex <= index && x.LastIndex >= index).Select(x => x.Variable);
+
         private void CalculateLiveIntervals()
         {
-            void adaptLiveIntervals(int index, IReadableValue value)
+            void adaptLiveIntervals(int index, IReadableValue? value)
             {
                 if (!(value is Variable var)) return;
 
@@ -96,6 +100,14 @@
                     case ConditionalJump inst:
                         adaptLiveIntervals(i, inst.Condition);
                         break;
+
+                    case ReturnInstruction inst:
+                        adaptLiveIntervals(i, inst.ReturnValue);
+                        break;
+
+                    case CallInstruction inst:
+                        foreach (var param in inst.Parameters) adaptLiveIntervals(i, param);
+                        break;
                 }
             }
         }
@@ -113,7 +125,7 @@
                 {
                     var register = FreeGeneralPurposeRegisters.Pop();
                     Active.Add(interval);
-                    AssignedLocations[interval.Variable] = register;
+                    AssignedLocation[interval.Variable] = register;
                 }
             }
         }
@@ -129,7 +141,7 @@
                 Active.RemoveAt(i);
                 i--;
 
-                var memory = AssignedLocations[other.Variable];
+                var memory = AssignedLocation[other.Variable];
                 if (memory is Register register) FreeGeneralPurposeRegisters.Push(register);
             }
         }
@@ -140,15 +152,15 @@
 
             if (spilled.LastIndex > interval.LastIndex)
             {
-                AssignedLocations[interval.Variable] = AssignedLocations[spilled.Variable];
-                AssignedLocations[spilled.Variable] = StackAlloc(8);
+                AssignedLocation[interval.Variable] = AssignedLocation[spilled.Variable];
+                AssignedLocation[spilled.Variable] = StackAlloc(8);
 
                 Active.Remove(spilled);
                 Active.Add(interval);
             }
             else
             {
-                AssignedLocations[interval.Variable] = StackAlloc(8);
+                AssignedLocation[interval.Variable] = StackAlloc(8);
             }
         }
 
@@ -156,6 +168,12 @@
         {
             var location = new StackLocation(StackOffset, size);
             StackOffset += size;
+            return location;
+        }
+
+        public StackLocation StackAllocAfterSpills(int size)
+        {
+            var location = new StackLocation(StackOffset, size);
             return location;
         }
     }

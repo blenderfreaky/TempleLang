@@ -4,5 +4,6 @@
 
     public interface IDeclaration : IPositioned
     {
+        Positioned<string> Name { get; }
     }
 }

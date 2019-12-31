@@ -2,11 +2,9 @@
 {
     using Bound.Statements;
     using System.Collections.Generic;
-    using System.Linq;
     using TempleLang.Bound.Expressions;
     using TempleLang.Bound.Primitives;
     using TempleLang.Diagnostic;
-    using IE = TempleLang.Bound.Expressions;
 
     public sealed class Procedure : IDeclaration, ICallable
     {
@@ -49,7 +47,7 @@
             if (Parameters.Count != parameters.Count)
             {
                 diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidParamCount, location, true);
-                return new IE.CallExpression(null!, null!, PrimitiveType.Unknown, location);
+                return new CallExpression(null!, null!, PrimitiveType.Unknown, location);
             }
 
             for (int i = 0; i < parameters.Count; i++)
@@ -59,7 +57,7 @@
                 diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidParamType, location, true);
             }
 
-            return new IE.CallExpression(callee, parameters, ReturnType, location);
+            return new CallExpression(callee, parameters, ReturnType, location);
         }
     }
 }

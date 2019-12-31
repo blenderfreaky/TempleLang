@@ -16,7 +16,7 @@
 
         public static new readonly Parser<ExpressionStatement, Token> Parser =
             from expression in Expression.Parser
-            from _ in Parse.Token(Token.StatementDelimiter)
+            from _ in Parse.Token(Token.Semicolon)
             select new ExpressionStatement(expression);
     }
 }

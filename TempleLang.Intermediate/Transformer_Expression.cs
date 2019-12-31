@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using TempleLang.Bound.Expressions;
     using TempleLang.Bound.Primitives;
 
@@ -63,7 +64,18 @@
 
         private IEnumerable<IInstruction> TransformExpressionCore(CallExpression expr, IAssignableValue target)
         {
-            yield return new CallInstruction(expr.Callee.ToString());
+            if (!(expr.Callee is CallableValue callable)) throw new InvalidOperationException();
+
+            var parameterResults = new List<IReadableValue>(expr.Parameters.Count);
+
+            foreach(var parameter in expr.Parameters)
+            {
+                IReadableValue parameterResult;
+                foreach (var instruction in GetValue(parameter, out parameterResult)) yield return instruction;
+                parameterResults.Add(parameterResult);
+            }
+
+            yield return new CallInstruction(callable.Callable.FullyQualifiedName, parameterResults);
         }
     }
 }

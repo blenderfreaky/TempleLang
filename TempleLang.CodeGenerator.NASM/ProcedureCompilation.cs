@@ -6,6 +6,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using TempleLang.CodeGenerator.NASM;
     using TempleLang.Intermediate;
 
     public class ProcedureCompilation
@@ -13,23 +14,36 @@
         public Procedure Procedure { get; }
         public List<IInstruction> Instructions { get; }
         public Dictionary<Constant, DataLocation> ConstantTable { get; }
-        public Dictionary<Variable, IMemory> AssignedLocations { get; }
+        public RegisterAllocation RegisterAllocation { get; }
+        public int OwnedStackSpaceEnd { get; }
 
         public ProcedureCompilation(
             Procedure procedure,
             List<IInstruction> instructions,
             Dictionary<Constant, DataLocation> constantTable,
-            Dictionary<Variable, IMemory> assignedLocations)
+            RegisterAllocation registerAllocation)
         {
             Procedure = procedure;
             Instructions = instructions;
             ConstantTable = constantTable;
-            AssignedLocations = assignedLocations;
+            RegisterAllocation = registerAllocation;
+            OwnedStackSpaceEnd = (RegisterAllocation.StackOffset / 8) % 2 != 0 ? RegisterAllocation.StackOffset + 8 : RegisterAllocation.StackOffset;
         }
 
-        public IEnumerable<NasmInstruction> CompileInstructions() => Instructions.SelectMany(CompileInstruction);//.BasicOptimization();
+        public IEnumerable<NasmInstruction> CompileInstructions()
+        {
+            int stackSize = OwnedStackSpaceEnd + 32;
 
-        private IEnumerable<NasmInstruction> CompileInstruction(IInstruction instruction)
+            yield return new NasmInstruction("sub", new MemoryParameter(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString()));
+
+            foreach (var instruction in Instructions.SelectMany((x, i) => CompileInstruction(i, x))) yield return instruction;
+
+            yield return new NasmInstruction("__exit");
+            yield return new NasmInstruction("add", new MemoryParameter(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString()));
+            yield return new NasmInstruction(name: "ret");
+        }
+
+        private IEnumerable<NasmInstruction> CompileInstruction(int i, IInstruction instruction)
         {
             return instruction switch
             {
@@ -38,7 +52,7 @@
                 ConditionalJump inst => CompileCore(inst),
                 UnconditionalJump inst => CompileCore(inst),
                 LabelInstruction inst => CompileCore(inst),
-                CallInstruction inst => CompileCore(inst),
+                CallInstruction inst => CompileCore(i, inst),
                 ReturnInstruction inst => CompileCore(inst),
                 _ => throw new ArgumentException(nameof(instruction))
             };
@@ -46,11 +60,28 @@
 
         private IMemory? GetMemory(IReadableValue memory) => memory switch
         {
-            Variable mem => AssignedLocations[mem],
+            Variable mem => RegisterAllocation.AssignedLocation[mem],
             Constant mem => ConstantTable[mem],
             DiscardValue mem => null,
             _ => throw new ArgumentException(nameof(memory)),
         };
+
+        private IMemory ParameterLocation(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return Register.Get(RegisterName.RCX);
+                case 1:
+                    return Register.Get(RegisterName.RDX);
+                case 2:
+                    return Register.Get(RegisterName.R8);
+                case 3:
+                    return Register.Get(RegisterName.R9);
+                default:
+                    return new StackLocation(OwnedStackSpaceEnd + index, 8);
+            }
+        }
 
         private NasmInstruction Move(IMemory target, IParameter source) =>
             new NasmInstruction(
@@ -142,9 +173,29 @@
             yield return new NasmInstruction(inst.Name);
         }
 
-        private IEnumerable<NasmInstruction> CompileCore(CallInstruction inst)
+        private IEnumerable<NasmInstruction> CompileCore(int index, CallInstruction inst)
         {
-            yield return new NasmInstruction(inst.Name);
+            var lives = RegisterAllocation
+                .GetAllLiveAt(index)
+                .Select((x,i) => (Variable: x, Temporary: new StackLocation(RegisterAllocation.StackOffset + (i * 8), 8)))
+                .ToList();
+
+            foreach (var live in lives)
+            {
+                yield return Move(live.Temporary, new MemoryParameter(RegisterAllocation.AssignedLocation[live.Variable]));
+            }
+
+            for (int i = 0; i < inst.Parameters.Count; i++)
+            {
+                yield return Move(ParameterLocation(i), new MemoryParameter(GetMemory(inst.Parameters[i]) ?? throw new ArgumentException(nameof(inst))));
+            }
+
+            yield return new NasmInstruction("call", new LiteralParameter(inst.Name));
+
+            foreach (var live in lives)
+            {
+                yield return Move(RegisterAllocation.AssignedLocation[live.Variable], new MemoryParameter(live.Temporary));
+            }
         }
 
         private IEnumerable<NasmInstruction> CompileCore(ReturnInstruction inst)
@@ -154,7 +205,7 @@
                 yield return Move(Register.Get(RegisterName.RAX), new MemoryParameter(GetMemory(inst.ReturnValue) ?? throw new ArgumentException(nameof(inst))));
             }
 
-            yield return new NasmInstruction(name: "ret");
+            yield return new NasmInstruction("jmp", new LiteralParameter("__exit"));
         }
     }
 }

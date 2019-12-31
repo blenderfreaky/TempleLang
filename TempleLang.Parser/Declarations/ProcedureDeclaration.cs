@@ -54,7 +54,13 @@
                   select new ProcedureDeclaration(stmt, name, returnType, parameters, FileLocation.Concat(start, stmt)))
                 .Or(from _ in Parse.Token(Token.Using)
                     from import in Parse.Token(Token.StringLiteral)
-                    select new ProcedureDeclaration(import.PositionedText, name, returnType, parameters, FileLocation.Concat(start, import))))
+                    select new ProcedureDeclaration(
+                        import.Location.WithValue(
+                            import.Text.Substring(1,import.Text.Length-2)),
+                        name,
+                        returnType,
+                        parameters,
+                        FileLocation.Concat(start, import))))
             select result;
     }
 }
