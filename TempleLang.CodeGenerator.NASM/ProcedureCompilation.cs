@@ -6,6 +6,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection.Emit;
     using TempleLang.CodeGenerator.NASM;
     using TempleLang.Intermediate;
 
@@ -14,6 +15,8 @@
         public Procedure Procedure { get; }
         public List<IInstruction> Instructions { get; }
         public Dictionary<Constant, DataLocation> ConstantTable { get; }
+        public DataLocation FalseConstant { get; }
+        public DataLocation TrueConstant{ get; }
         public RegisterAllocation RegisterAllocation { get; }
         public int StackRegisterTemporary { get; }
         public int StackHomeSpace { get; }
@@ -23,11 +26,15 @@
             Procedure procedure,
             List<IInstruction> instructions,
             Dictionary<Constant, DataLocation> constantTable,
+            DataLocation falseConstant,
+            DataLocation trueConstant,
             RegisterAllocation registerAllocation)
         {
             Procedure = procedure;
             Instructions = instructions;
             ConstantTable = constantTable;
+            FalseConstant = falseConstant;
+            TrueConstant = trueConstant;
             RegisterAllocation = registerAllocation;
             StackRegisterTemporary = Align(RegisterAllocation.StackOffset);
 
@@ -148,6 +155,16 @@
             [BinaryOperatorType.Assign] = "mov",
         };
 
+        private readonly Dictionary<BinaryOperatorType, string> _binaryComparisonOperators = new Dictionary<BinaryOperatorType, string>
+        {
+            [BinaryOperatorType.ComparisonGreaterThan] = "jg",
+            [BinaryOperatorType.ComparisonGreaterThanOrEqual] = "jge",
+            [BinaryOperatorType.ComparisonLessThan] = "jl",
+            [BinaryOperatorType.ComparisonLessThanOrEqual] = "jle",
+            [BinaryOperatorType.ComparisonEqual] = "je",
+            [BinaryOperatorType.ComparisonNotEqual] = "jne",
+        };
+
         private IEnumerable<NasmInstruction> CompileCore(BinaryComputationAssignment inst)
         {
             var lhsMemory = GetMemory(inst.Lhs) ?? throw new ArgumentException(nameof(inst));
@@ -162,10 +179,39 @@
 
             if (lhsMemory != targetMemory) yield return Move(targetMemory, new MemoryParameter(lhsMemory));
 
-            yield return new NasmInstruction(
-                _binaryOperators[inst.Operator, inst.OperandType],
-                new MemoryParameter(targetMemory),
-                new MemoryParameter(rhsMemory));
+            if (_binaryComparisonOperators.TryGetValue(inst.Operator, out var jmp))
+            {
+                var trueLabel = "." + Guid.NewGuid().ToString().Replace('-', '_');
+                var exitLabel = "." + Guid.NewGuid().ToString().Replace('-', '_');
+                yield return new NasmInstruction(
+                    "cmp",
+                    new MemoryParameter(targetMemory),
+                    new MemoryParameter(rhsMemory));
+                yield return new NasmInstruction(
+                    jmp,
+                    new LabelParameter(trueLabel));
+
+                yield return Move(
+                    targetMemory,
+                    new MemoryParameter(FalseConstant));
+                yield return new NasmInstruction(
+                    "jmp",
+                    new LabelParameter(exitLabel));
+
+                yield return new NasmInstruction(trueLabel);
+                yield return Move(
+                    targetMemory,
+                    new MemoryParameter(TrueConstant));
+
+                yield return new NasmInstruction(exitLabel);
+            }
+            else
+            {
+                yield return new NasmInstruction(
+                    _binaryOperators[inst.Operator, inst.OperandType],
+                    new MemoryParameter(targetMemory),
+                    new MemoryParameter(rhsMemory));
+            }
         }
 
         private IEnumerable<NasmInstruction> CompileCore(ConditionalJump inst)

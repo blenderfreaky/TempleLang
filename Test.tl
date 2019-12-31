@@ -3,13 +3,13 @@ namespace Program;
 let _start() : long
 {
     let a = 1;
-    if (a - 1)
+    if (a < 2)
     {
-        print("a - 1 != 0", 10);
+        print("a <  2", 6);
     }
     else
     {
-        print("a - 1 == 0", 10);
+        print("a >=> 2", 6);
     }
 }
 
