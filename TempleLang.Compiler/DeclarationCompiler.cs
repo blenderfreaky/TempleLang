@@ -1,6 +1,7 @@
 ﻿namespace TempleLang.Compiler
 {
     using Diagnostic;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Binder;
@@ -34,7 +35,7 @@
 
             foreach (var constant in Transformer.ConstantTable)
             {
-                ConstantTable[constant] = new DataLocation(constant.DebugName.Replace(' ', '_'), constant.Type.Size);
+                ConstantTable[constant] = new DataLocation(constant.Type.FullyQualifiedName + Guid.NewGuid().ToString().Replace('-', '_'), constant.Type.Size);
             }
 
             return procedures.ToList();
@@ -48,7 +49,7 @@
                     foreach (var compilation in decl.Declarations.SelectMany(CompileDeclaration)) yield return compilation;
                     break;
                 case Procedure procedure:
-                    var transformed = Transformer.TransformStatement(procedure.EntryPoint).ToList();
+                    var transformed = Transformer.TransformStatementWithParameters(procedure.EntryPoint, procedure.Parameters).ToList();
 
                     var allocation = RegisterAllocation.Generate(transformed);
 

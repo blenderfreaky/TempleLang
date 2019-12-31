@@ -27,7 +27,7 @@
             new Variable(RequestName(), true);
 
         private LabelInstruction RequestLabel() =>
-            new LabelInstruction(RequestName());
+            new LabelInstruction("." + RequestName());
 
         private IEnumerable<IInstruction> GetValue(IExpression expr, out IReadableValue location)
         {

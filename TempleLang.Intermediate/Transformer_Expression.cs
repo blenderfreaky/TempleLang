@@ -75,7 +75,7 @@
                 parameterResults.Add(parameterResult);
             }
 
-            yield return new CallInstruction(callable.Callable.FullyQualifiedName, parameterResults);
+            yield return new CallInstruction(callable.Callable.FullyQualifiedName, parameterResults, target);
         }
     }
 }

@@ -25,7 +25,7 @@
 
             Console.WriteLine("section .text");
 
-            Console.WriteLine("    global main");
+            Console.WriteLine("    global _start");
 
             foreach (var instruction in compiled.WriteExterns()) Console.WriteLine(instruction.ToNASM());
 

@@ -15,7 +15,9 @@
         public List<IInstruction> Instructions { get; }
         public Dictionary<Constant, DataLocation> ConstantTable { get; }
         public RegisterAllocation RegisterAllocation { get; }
-        public int OwnedStackSpaceEnd { get; }
+        public int StackRegisterTemporary { get; }
+        public int StackHomeSpace { get; }
+        public int StackEnd { get; }
 
         public ProcedureCompilation(
             Procedure procedure,
@@ -27,36 +29,51 @@
             Instructions = instructions;
             ConstantTable = constantTable;
             RegisterAllocation = registerAllocation;
-            OwnedStackSpaceEnd = (RegisterAllocation.StackOffset / 8) % 2 != 0 ? RegisterAllocation.StackOffset + 8 : RegisterAllocation.StackOffset;
+            StackRegisterTemporary = Align(RegisterAllocation.StackOffset);
+
+            int maxCallDeposit = Instructions
+                .Select((x, i) => (x, i))
+                // Get all CallInstructions with their indicies
+                .Where(x => x.x is CallInstruction)
+                // Check how many variables are live at the instruction and get the max
+                .Max(x => RegisterAllocation.GetAllLiveAt(x.i).Count());
+
+            StackHomeSpace = Align(StackRegisterTemporary + maxCallDeposit);
+
+            int maxParameters = Instructions
+                .Where(x => x is CallInstruction)
+                .Max(x => ((CallInstruction)x).Parameters.Count);
+
+            StackEnd = StackHomeSpace + 32 + ((maxParameters - 4) * 8);
         }
+
+        private int Align(int val) => (val / 8) % 2 == 0 ? val : val + 8;
 
         public IEnumerable<NasmInstruction> CompileInstructions()
         {
-            int stackSize = OwnedStackSpaceEnd + 32;
+            int stackSize = StackEnd;
 
             yield return new NasmInstruction("sub", new MemoryParameter(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString()));
 
             foreach (var instruction in Instructions.SelectMany((x, i) => CompileInstruction(i, x))) yield return instruction;
 
-            yield return new NasmInstruction("__exit");
+            yield return new NasmInstruction(".__exit");
             yield return new NasmInstruction("add", new MemoryParameter(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString()));
             yield return new NasmInstruction(name: "ret");
         }
 
-        private IEnumerable<NasmInstruction> CompileInstruction(int i, IInstruction instruction)
+        private IEnumerable<NasmInstruction> CompileInstruction(int i, IInstruction instruction) => instruction switch
         {
-            return instruction switch
-            {
-                UnaryComputationAssignment inst => CompileCore(inst),
-                BinaryComputationAssignment inst => CompileCore(inst),
-                ConditionalJump inst => CompileCore(inst),
-                UnconditionalJump inst => CompileCore(inst),
-                LabelInstruction inst => CompileCore(inst),
-                CallInstruction inst => CompileCore(i, inst),
-                ReturnInstruction inst => CompileCore(inst),
-                _ => throw new ArgumentException(nameof(instruction))
-            };
-        }
+            UnaryComputationAssignment inst => CompileCore(inst),
+            BinaryComputationAssignment inst => CompileCore(inst),
+            ConditionalJump inst => CompileCore(inst),
+            UnconditionalJump inst => CompileCore(inst),
+            LabelInstruction inst => CompileCore(inst),
+            CallInstruction inst => CompileCore(i, inst),
+            ReturnInstruction inst => CompileCore(inst),
+            ParameterQueryAssignment inst => CompileCore(inst),
+            _ => throw new ArgumentException(nameof(instruction))
+        };
 
         private IMemory? GetMemory(IReadableValue memory) => memory switch
         {
@@ -68,19 +85,14 @@
 
         private IMemory ParameterLocation(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return Register.Get(RegisterName.RCX);
-                case 1:
-                    return Register.Get(RegisterName.RDX);
-                case 2:
-                    return Register.Get(RegisterName.R8);
-                case 3:
-                    return Register.Get(RegisterName.R9);
-                default:
-                    return new StackLocation(OwnedStackSpaceEnd + index, 8);
-            }
+                0 => Register.Get(RegisterName.RCX),
+                1 => Register.Get(RegisterName.RDX),
+                2 => Register.Get(RegisterName.R8),
+                3 => Register.Get(RegisterName.R9),
+                _ => new StackLocation(StackEnd - ((index - 4) * 8), 8),
+            };
         }
 
         private NasmInstruction Move(IMemory target, IParameter source) =>
@@ -93,7 +105,6 @@
         {
             [UnaryOperatorType.BitwiseNot, PrimitiveType.Long] = "not",
             [UnaryOperatorType.Negation, PrimitiveType.Long] = "neg",
-            [UnaryOperatorType.Reference] = "lea",
         };
 
         private IEnumerable<NasmInstruction> CompileCore(UnaryComputationAssignment inst)
@@ -112,10 +123,21 @@
                 yield break;
             }
 
+            if (inst.Operator == UnaryOperatorType.Reference)
+            {
+                if (inst.OperandType != PrimitiveType.Long) throw new ArgumentException(nameof(inst));
+
+                yield return new NasmInstruction("lea",
+                    new MemoryParameter(targetMemory),
+                    new DereferenceParameter(new MemoryParameter(operandMemory)));
+                yield break;
+            }
+
+            yield return Move(targetMemory, new MemoryParameter(operandMemory));
+
             yield return new NasmInstruction(
                 _unaryOperators[inst.Operator, inst.OperandType],
-                new MemoryParameter(targetMemory),
-                new MemoryParameter(operandMemory));
+                new MemoryParameter(targetMemory));
         }
 
         private readonly OperatorTable<BinaryOperatorType> _binaryOperators = new OperatorTable<BinaryOperatorType>
@@ -123,7 +145,6 @@
             [BinaryOperatorType.Add, PrimitiveType.Long] = "add",
             [BinaryOperatorType.Subtract, PrimitiveType.Long] = "sub",
             [BinaryOperatorType.Multiply, PrimitiveType.Long] = "imul",
-            //[BinaryOperatorType.Divide, PrimitiveType.Long] = "idiv",
             [BinaryOperatorType.Assign] = "mov",
         };
 
@@ -177,7 +198,7 @@
         {
             var lives = RegisterAllocation
                 .GetAllLiveAt(index)
-                .Select((x,i) => (Variable: x, Temporary: new StackLocation(RegisterAllocation.StackOffset + (i * 8), 8)))
+                .Select((x, i) => (Variable: x, Temporary: new StackLocation(RegisterAllocation.StackOffset + 8 + (i * 8), 8)))
                 .ToList();
 
             foreach (var live in lives)
@@ -192,6 +213,11 @@
 
             yield return new NasmInstruction("call", new LiteralParameter(inst.Name));
 
+            if (inst.Target != null && !(inst.Target is DiscardValue))
+            {
+                yield return Move(GetMemory(inst.Target) ?? throw new ArgumentException(nameof(inst)), new MemoryParameter(Register.Get(RegisterName.RAX)));
+            }
+
             foreach (var live in lives)
             {
                 yield return Move(RegisterAllocation.AssignedLocation[live.Variable], new MemoryParameter(live.Temporary));
@@ -205,7 +231,15 @@
                 yield return Move(Register.Get(RegisterName.RAX), new MemoryParameter(GetMemory(inst.ReturnValue) ?? throw new ArgumentException(nameof(inst))));
             }
 
-            yield return new NasmInstruction("jmp", new LiteralParameter("__exit"));
+            yield return new NasmInstruction("jmp", new LabelParameter(".__exit"));
+        }
+
+        private IEnumerable<NasmInstruction> CompileCore(ParameterQueryAssignment inst)
+        {
+            if (inst.Target != null && !(inst.Target is DiscardValue))
+            {
+                yield return Move(GetMemory(inst.Target) ?? throw new ArgumentException(nameof(inst)), new MemoryParameter(ParameterLocation(inst.ParameterIndex)));
+            }
         }
     }
 }

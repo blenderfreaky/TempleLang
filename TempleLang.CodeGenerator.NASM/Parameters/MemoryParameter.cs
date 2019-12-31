@@ -14,16 +14,16 @@
 
         private static WordSize GetWordSize(int size) => (WordSize)size;
 
+        private string WordSizeText => GetWordSize(Memory.Size).ToString().ToLowerInvariant();
+
         public string ToNASM() =>
-            GetWordSize(Memory.Size).ToString().ToLowerInvariant()
-            + " "
-            + (Memory switch
+            Memory switch
             {
-                Register register => register.RegisterName,
-                StackLocation stack => $"[rsp - {stack.Offset}]",
+                Register register => register.Name,
+                StackLocation stack => $"{WordSizeText} [rsp - {stack.Offset}]",
                 DataLocation data => data.LabelName,
                 _ => throw new InvalidOperationException(),
-            });
+            };
 
         public override string ToString() => ToNASM();
 

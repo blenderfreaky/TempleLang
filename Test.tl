@@ -1,9 +1,16 @@
 namespace Program;
 
-let main(a:long) : long
+let _start() : long
 {
-    let str = "abc";
-    print(str, 3);
+    let a = 1;
+    if (a - 1)
+    {
+        print("a - 1 != 0", 10);
+    }
+    else
+    {
+        print("a - 1 == 0", 10);
+    }
 }
 
 let print(ptr:long, len:long) : long

@@ -1,12 +1,24 @@
 ﻿namespace TempleLang.Intermediate
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using TempleLang.Bound.Expressions;
     using TempleLang.Bound.Statements;
 
     public partial class Transformer
     {
+        public IEnumerable<IInstruction> TransformStatementWithParameters(IStatement statement, IReadOnlyList<Local> parameters)
+        {
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                yield return new ParameterQueryAssignment(i, RequestUserLocal(parameters[i]));
+            }
+
+            foreach (var instruction in TransformStatement(statement)) yield return instruction;
+        }
+
         public IEnumerable<IInstruction> TransformStatement(IStatement statement) =>
             statement switch
             {

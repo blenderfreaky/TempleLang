@@ -105,6 +105,10 @@
                         adaptLiveIntervals(i, inst.ReturnValue);
                         break;
 
+                    case ParameterQueryAssignment inst:
+                        adaptLiveIntervals(i, inst.Target);
+                        break;
+
                     case CallInstruction inst:
                         foreach (var param in inst.Parameters) adaptLiveIntervals(i, param);
                         break;
@@ -168,12 +172,6 @@
         {
             var location = new StackLocation(StackOffset, size);
             StackOffset += size;
-            return location;
-        }
-
-        public StackLocation StackAllocAfterSpills(int size)
-        {
-            var location = new StackLocation(StackOffset, size);
             return location;
         }
     }

@@ -249,7 +249,7 @@
 
                     char nextCharacter = (char)nextCharacterInt;
 
-                    if (!char.IsLetterOrDigit(nextCharacter) && character != '_') break;
+                    if (!char.IsLetterOrDigit(nextCharacter) && nextCharacter != '_') break;
 
                     AdvanceChar();
 
