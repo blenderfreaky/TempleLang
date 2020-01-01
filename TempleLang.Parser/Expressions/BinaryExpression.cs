@@ -20,7 +20,7 @@
         public override string ToString() => $"({Lhs} {Operator.Text} {Rhs})";
 
         public static readonly Parser<Expression, Token> Multiplicative =
-            CreateParserLeftToRight(PrefixExpression.Parser, Parse.Token(Token.Multiply, Token.Divide));
+            CreateParserLeftToRight(PrefixExpression.Parser, Parse.Token(Token.Multiply, Token.Divide, Token.Remainder));
 
         public static readonly Parser<Expression, Token> Additive =
             CreateParserLeftToRight(Multiplicative, Parse.Token(Token.Add, Token.Subtract));

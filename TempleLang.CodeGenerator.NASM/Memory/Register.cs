@@ -40,7 +40,6 @@
     public readonly struct Register : IMemory, IEquatable<Register>
     {
         public readonly RegisterName RegisterName;
-        public readonly RegisterKind Kind;
         public readonly RegisterFlags Flags;
         public readonly RegisterSize Size;
         public readonly RegisterName? Containing;
@@ -50,81 +49,81 @@
 
         private static readonly Dictionary<RegisterName, Register> _registers = new[]
         {
-            new Register(RegisterName.RAX, RegisterKind.Accumulator, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
-            new Register(RegisterName.EAX, RegisterKind.Accumulator, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.RAX),
-            new Register(RegisterName.AX,  RegisterKind.Accumulator, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.EAX),
-            new Register(RegisterName.AH,  RegisterKind.Accumulator, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.AX),
-            new Register(RegisterName.AL,  RegisterKind.Accumulator, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.AX),
+            new Register(RegisterName.RAX, RegisterFlags.Preserved, RegisterSize.Bytes8),
+            new Register(RegisterName.EAX, RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.RAX),
+            new Register(RegisterName.AX,  RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.EAX),
+            new Register(RegisterName.AH,  RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.AX),
+            new Register(RegisterName.AL,  RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.AX),
 
-            new Register(RegisterName.RBX, RegisterKind.Base,        RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
-            new Register(RegisterName.EBX, RegisterKind.Base,        RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.RBX),
-            new Register(RegisterName.BX,  RegisterKind.Base,        RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.EBX),
-            new Register(RegisterName.BH,  RegisterKind.Base,        RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.BX),
-            new Register(RegisterName.BL,  RegisterKind.Base,        RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.BX),
+            new Register(RegisterName.RBX, RegisterFlags.Preserved, RegisterSize.Bytes8),
+            new Register(RegisterName.EBX, RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.RBX),
+            new Register(RegisterName.BX,  RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.EBX),
+            new Register(RegisterName.BH,  RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.BX),
+            new Register(RegisterName.BL,  RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.BX),
 
-            new Register(RegisterName.RCX, RegisterKind.Counter,     RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
-            new Register(RegisterName.ECX, RegisterKind.Counter,     RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.RCX),
-            new Register(RegisterName.CX,  RegisterKind.Counter,     RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.ECX),
-            new Register(RegisterName.CH,  RegisterKind.Counter,     RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.CX),
-            new Register(RegisterName.CL,  RegisterKind.Counter,     RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.CX),
+            new Register(RegisterName.RCX, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
+            new Register(RegisterName.ECX, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.RCX),
+            new Register(RegisterName.CX,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.ECX),
+            new Register(RegisterName.CH,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.CX),
+            new Register(RegisterName.CL,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.CX),
 
-            new Register(RegisterName.RDX, RegisterKind.Data,        RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
-            new Register(RegisterName.EDX, RegisterKind.Data,        RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.RDX),
-            new Register(RegisterName.DX,  RegisterKind.Data,        RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.EDX),
-            new Register(RegisterName.DH,  RegisterKind.Data,        RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.DX),
-            new Register(RegisterName.DL,  RegisterKind.Data,        RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.DX),
+            new Register(RegisterName.RDX, RegisterFlags.Preserved, RegisterSize.Bytes8),
+            new Register(RegisterName.EDX, RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.RDX),
+            new Register(RegisterName.DX,  RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.EDX),
+            new Register(RegisterName.DH,  RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.DX),
+            new Register(RegisterName.DL,  RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.DX),
 
-            new Register(RegisterName.RSP, RegisterKind.StackPointer,     RegisterFlags.Preserved, RegisterSize.Bytes8),
-            new Register(RegisterName.RBP, RegisterKind.StackBasePointer, RegisterFlags.Preserved, RegisterSize.Bytes8),
+            new Register(RegisterName.RSP, RegisterFlags.Preserved, RegisterSize.Bytes8),
+            new Register(RegisterName.RBP, RegisterFlags.Preserved, RegisterSize.Bytes8),
 
 #region 64-Bit General Purpose Rn
 
-            new Register(RegisterName.R8,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
-            new Register(RegisterName.R9,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
-            new Register(RegisterName.R10, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
-            new Register(RegisterName.R11, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
-            new Register(RegisterName.R12, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
-            new Register(RegisterName.R13, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
-            new Register(RegisterName.R14, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
-            new Register(RegisterName.R15, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
+            new Register(RegisterName.R8,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
+            new Register(RegisterName.R9,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
+            new Register(RegisterName.R10, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
+            new Register(RegisterName.R11, RegisterFlags.GeneralPurpose, RegisterSize.Bytes8),
+            new Register(RegisterName.R12, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
+            new Register(RegisterName.R13, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
+            new Register(RegisterName.R14, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
+            new Register(RegisterName.R15, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes8),
 
 #endregion 64-Bit General Purpose Rn
 
 #region 32-Bit General Purpose RnD
 
-            new Register(RegisterName.R8D,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R8 ),
-            new Register(RegisterName.R9D,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R9 ),
-            new Register(RegisterName.R10D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R10),
-            new Register(RegisterName.R11D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R11),
-            new Register(RegisterName.R12D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R12),
-            new Register(RegisterName.R13D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R13),
-            new Register(RegisterName.R14D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R14),
-            new Register(RegisterName.R15D, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R15),
+            new Register(RegisterName.R8D,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R8 ),
+            new Register(RegisterName.R9D,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R9 ),
+            new Register(RegisterName.R10D, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R10),
+            new Register(RegisterName.R11D, RegisterFlags.GeneralPurpose, RegisterSize.Bytes4, RegisterName.R11),
+            new Register(RegisterName.R12D, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R12),
+            new Register(RegisterName.R13D, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R13),
+            new Register(RegisterName.R14D, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R14),
+            new Register(RegisterName.R15D, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes4, RegisterName.R15),
 #endregion 32-Bit General Purpose RnD
 
 #region 16-Bit General Purpose RnW
 
-            new Register(RegisterName.R8W,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R8D),
-            new Register(RegisterName.R9W,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R9D),
-            new Register(RegisterName.R10W, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R10D),
-            new Register(RegisterName.R11W, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R11D),
-            new Register(RegisterName.R12W, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R12D),
-            new Register(RegisterName.R13W, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R13D),
-            new Register(RegisterName.R14W, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R14D),
-            new Register(RegisterName.R15W, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R15D),
+            new Register(RegisterName.R8W,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R8D),
+            new Register(RegisterName.R9W,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R9D),
+            new Register(RegisterName.R10W, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R10D),
+            new Register(RegisterName.R11W, RegisterFlags.GeneralPurpose, RegisterSize.Bytes2, RegisterName.R11D),
+            new Register(RegisterName.R12W, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R12D),
+            new Register(RegisterName.R13W, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R13D),
+            new Register(RegisterName.R14W, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R14D),
+            new Register(RegisterName.R15W, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes2, RegisterName.R15D),
 
 #endregion 16-Bit General Purpose RnW
 
 #region 16-Bit General Purpose RnB
 
-            new Register(RegisterName.R8B,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R8W),
-            new Register(RegisterName.R9B,  RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R9W),
-            new Register(RegisterName.R10B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R10W),
-            new Register(RegisterName.R11B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R11W),
-            new Register(RegisterName.R12B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R12W),
-            new Register(RegisterName.R13B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R13W),
-            new Register(RegisterName.R14B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R14W),
-            new Register(RegisterName.R15B, RegisterKind.StrictlyGeneralPurpose, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R15W),
+            new Register(RegisterName.R8B,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R8W),
+            new Register(RegisterName.R9B,  RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R9W),
+            new Register(RegisterName.R10B, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R10W),
+            new Register(RegisterName.R11B, RegisterFlags.GeneralPurpose, RegisterSize.Bytes1, RegisterName.R11W),
+            new Register(RegisterName.R12B, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R12W),
+            new Register(RegisterName.R13B, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R13W),
+            new Register(RegisterName.R14B, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R14W),
+            new Register(RegisterName.R15B, RegisterFlags.GeneralPurpose | RegisterFlags.Preserved, RegisterSize.Bytes1, RegisterName.R15W),
 
 #endregion 16-Bit General Purpose RnB
         }
@@ -134,10 +133,9 @@
 
         public static Register Get(RegisterName name) => _registers[name];
 
-        private Register(RegisterName register, RegisterKind kind, RegisterFlags flags, RegisterSize size, RegisterName? containing = null)
+        private Register(RegisterName register, RegisterFlags flags, RegisterSize size, RegisterName? containing = null)
         {
             RegisterName = register;
-            Kind = kind;
             Flags = flags;
             Size = size;
             Containing = containing;
@@ -153,11 +151,6 @@
         {
             var hashCode = -1235707855;
             hashCode = (hashCode * -1521134295) + RegisterName.GetHashCode();
-            hashCode = (hashCode * -1521134295) + Kind.GetHashCode();
-            hashCode = (hashCode * -1521134295) + Flags.GetHashCode();
-            hashCode = (hashCode * -1521134295) + Size.GetHashCode();
-            hashCode = (hashCode * -1521134295) + Containing.GetHashCode();
-            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Name);
             return hashCode;
         }
 
@@ -173,23 +166,6 @@
         Bytes2 = 2,
         Bytes4 = 4,
         Bytes8 = 8,
-    }
-
-    public enum RegisterKind
-    {
-        StrictlyGeneralPurpose,
-        Accumulator,
-        Base,
-        Counter,
-        Data,
-        StackPointer,
-        StackBasePointer,
-        SourceIndex,
-        DestinationIndex,
-        FloatingPoint,
-        Flags,
-        InstructionPointer,
-        SIMD,
     }
 
     [Flags]

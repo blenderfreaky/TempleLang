@@ -19,15 +19,16 @@
         private string RequestName()
         {
             _counter++;
-            return "N" + _counter;
-            //return Guid.NewGuid().ToString().Replace("-", "_");
+            return "T" + _counter;
         }
 
         private Variable RequestLocal() =>
             new Variable(RequestName(), true);
 
-        private LabelInstruction RequestLabel() =>
-            new LabelInstruction("." + RequestName());
+        private string RequestLabel() => "." + RequestName();
+
+        private LabelInstruction RequestLabelInstruction() =>
+            new LabelInstruction(RequestLabel());
 
         private IEnumerable<IInstruction> GetValue(IExpression expr, out IReadableValue location)
         {

@@ -2,8 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using TempleLang.Diagnostic;
     using TempleLang.Lexer;
     using TempleLang.Lexer.Abstractions;
@@ -52,6 +54,46 @@
             var compiler = new DeclarationCompiler();
 
             return new Compilation(compiler.Compile(parserResult.Result, out diagnostics), compiler.Externs, compiler.ConstantTable);
+        }
+
+        public static string GenerateExecutable(
+            Compilation compilation,
+            string name,
+            string tempPath,
+            string execPath)
+        {
+            var builder = new StringBuilder();
+
+            builder.AppendLine("section .data");
+
+            foreach (var instruction in compilation.WriteConstantTable()) builder.AppendLine(instruction.ToNASM());
+
+            builder.AppendLine("section .text");
+
+            foreach (var instruction in compilation.WriteExterns()) builder.AppendLine(instruction.ToNASM());
+
+            foreach (var region in compilation.WriteProcedures()) builder.AppendLine(region.ToNASM());
+
+            var code = builder.ToString();
+
+            tempPath = Path.GetFullPath(tempPath);
+            string asmFile = Path.Combine(tempPath, name + ".asm");
+            string objFile = Path.Combine(tempPath, name + ".obj");
+            execPath = Path.GetFullPath(execPath);
+            string exeFile = Path.Combine(execPath, name + ".exe");
+
+            Directory.CreateDirectory(tempPath);
+            File.WriteAllText(asmFile, code);
+
+            Process.Start("nasm", $"-f win64 -o \"{objFile}\" \"{asmFile}\"").WaitForExit();
+
+            Directory.CreateDirectory(execPath);
+
+            string libraries = @"""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\kernel32.lib"" ""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\user32.lib""";
+            string arguments = $"/entry:_start /subsystem:console /out:\"{exeFile}\" \"{objFile}\" {libraries}";
+            Process.Start("link", arguments).WaitForExit();
+
+            return exeFile;
         }
     }
 }

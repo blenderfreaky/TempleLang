@@ -23,13 +23,13 @@
         public override string ToString() => $"let {Name}{(Assignment == null ? string.Empty : " = " + Assignment.ToString())};";
 
         public static new readonly Parser<LocalDeclarationStatement, Token> Parser =
-            (from _ in Parse.Token(Token.Declarator)
+            (from _ in Parse.Token(Token.Let)
              from name in TypeAnnotatedName.Parser
              from __ in Parse.Token(Token.Assign)
              from assignment in Expression.Parser
              from ___ in Parse.Token(Token.Semicolon)
              select new LocalDeclarationStatement(name, assignment))
-            .Or(from _ in Parse.Token(Token.Declarator)
+            .Or(from _ in Parse.Token(Token.Let)
                 from name in TypeAnnotatedName.Parser
                 from __ in Parse.Token(Token.Semicolon)
                 select new LocalDeclarationStatement(name));

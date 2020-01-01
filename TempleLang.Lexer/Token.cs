@@ -3,21 +3,22 @@
     public enum Token
     {
         Semicolon,
-        Declarator,
+        Let,
         TypeSetter,
         Accessor,
         Dereference,
         Reference,
 
-        Return,
         Using,
         Namespace,
+        Func,
 
         If,
         Else,
         While,
         Do,
         For,
+        Return,
 
         LeftExpressionDelimiter,
         RightExpressionDelimiter,

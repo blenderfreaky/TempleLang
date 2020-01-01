@@ -40,6 +40,6 @@
             }
         }
 
-        public IValue BindLiteral(StringLiteral expr) => new Constant<string>(expr.Value, PrimitiveType.String, expr.Location);
+        public IValue BindLiteral(StringLiteral expr) => new Constant<string>(expr.Value, PrimitiveType.StringPointer, expr.Location);
     }
 }

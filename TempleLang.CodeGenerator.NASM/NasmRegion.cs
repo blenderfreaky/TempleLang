@@ -5,17 +5,19 @@
 
     public struct NasmRegion
     {
+        public string? Comment { get; }
         public string Name { get; }
         public IEnumerable<NasmInstruction> Instructions { get; }
 
-        public NasmRegion(string name, IEnumerable<NasmInstruction> instructions)
+        public NasmRegion(string? comment, string name, IEnumerable<NasmInstruction> instructions)
         {
+            Comment = comment;
             Name = name;
             Instructions = instructions;
         }
 
         public string ToNASM() =>
-            Name + ":\n"
+            Name + ": ; " + Comment + "\n"
             + string.Join("\n", Instructions.Select(x => "    " + x));
 
         public override bool Equals(object? obj) => obj is NasmRegion region && Name == region.Name && EqualityComparer<IEnumerable<NasmInstruction>>.Default.Equals(Instructions, region.Instructions);

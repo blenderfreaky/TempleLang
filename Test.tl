@@ -1,25 +1,48 @@
 namespace Program;
 
-let _start() : long
+func _start() : long
 {
-    let a = 1;
-    if (a < 2)
+    let digits = "0123456789";
+    
+    print(digits + 0, 1);
+
+    print("\n", 2);
+
+    printNum(42);
+}
+
+func printNum(num : long) : long
+{
+    if (num < 0)
     {
-        print("a <  2", 6);
+        print("-", 1);
+        num *= -1;
     }
-    else
+
+    if (num == 0)
     {
-        print("a >=> 2", 6);
+        print("0", 1);
+        return 0;
+    }
+
+    let digits = "0123456789";
+
+    while (num > 0)
+    {
+        let remainder = num % 10;
+        num /= 10;
+        printNum(num);
+        print(digits + remainder * 2, 1);
     }
 }
 
-let print(ptr:long, len:long) : long
+func print(ptr:long, len:long) : long
 {
     let stdOut = GetStdHandle(-11);
     let numberOfCharsWritten = 0;
     return WriteConsoleW(stdOut, ptr, len, ref numberOfCharsWritten, 0);
 }
 
-let GetStdHandle(id : long) : long using "GetStdHandle"
+func GetStdHandle(id : long) : long using "GetStdHandle"
 
-let WriteConsoleW(stdOut : long, message : long, messageLength : long, numberOfCharsWritten : long, zero : long) : long using "WriteConsoleW"
+func WriteConsoleW(stdOut : long, message : long, messageLength : long, numberOfCharsWritten : long, zero : long) : long using "WriteConsoleW"

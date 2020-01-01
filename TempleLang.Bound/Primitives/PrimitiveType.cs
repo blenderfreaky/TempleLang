@@ -11,7 +11,7 @@
         public static PrimitiveType Double { get; } = new PrimitiveType("double", "double");
         public static PrimitiveType Long { get; } = new PrimitiveType("long", "long");
         public static PrimitiveType Bool { get; } = new PrimitiveType("bool", "bool");
-        public static PrimitiveType String { get; } = new PrimitiveType("string", "string");
+        public static PrimitiveType StringPointer { get; } = new PrimitiveType("string", "string");
         public static PrimitiveType Unknown { get; } = new PrimitiveType("?", "?");
 
         public string Name { get; }
@@ -42,7 +42,7 @@
             Double,
             Long,
             Bool,
-            String,
+            StringPointer,
         }.ToDictionary(x => x.Name, x => x);
     }
 }

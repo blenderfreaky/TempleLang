@@ -34,7 +34,8 @@
             Location = location;
         }
 
-        public override string ToString() => $"let {Name.Value}({string.Join(", ", Parameters)}) : {ReturnType?.ToString() ?? "void"} {EntryPoint}";
+        public override string ToString() => $"func {Signature} {EntryPoint}";
+        public string Signature => $"{Name.Value}({string.Join(", ", Parameters)}) : {ReturnType?.ToString() ?? "void"}";
 
         public bool TryGetMember(string name, out IMemberInfo? member)
         {

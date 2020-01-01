@@ -25,8 +25,8 @@
             ConstantTable = new Dictionary<Constant, DataLocation>();
             Externs = new List<string>();
 
-            FalseConstant =RegisterConstant(new Constant("0", PrimitiveType.Long, "FALSE"),true);
-            TrueConstant =RegisterConstant(new Constant("1", PrimitiveType.Long, "TRUE"), true);
+            FalseConstant = RegisterConstant(new Constant("0", PrimitiveType.Long, "FALSE"), true);
+            TrueConstant = RegisterConstant(new Constant("1", PrimitiveType.Long, "TRUE"), true);
         }
 
         public List<ProcedureCompilation> Compile(S.NamespaceDeclaration declaration, out IEnumerable<DiagnosticInfo> diagnostics)
@@ -47,12 +47,20 @@
             return procedures.ToList();
         }
 
-        private DataLocation RegisterConstant(Constant constant, bool customName = false) =>
-            ConstantTable[constant] = new DataLocation(
-                customName
-                ? constant.DebugName
-                : constant.Type.FullyQualifiedName + Guid.NewGuid().ToString().Replace('-', '_'),
-                constant.Type.Size);
+        private int _counter = 0;
+        private string RequestName() => "C" + _counter++;
+
+        private DataLocation RegisterConstant(Constant constant, bool customName = false)
+        {
+            if (ConstantTable.TryGetValue(constant, out var location)) return location;
+
+            return ConstantTable[constant] =
+                new DataLocation(
+                    customName
+                    ? constant.DebugName
+                    : constant.Type.FullyQualifiedName + RequestName(),
+                    constant.Type.Size);
+        }
 
         private IEnumerable<ProcedureCompilation> CompileDeclaration(IDeclaration declaration)
         {

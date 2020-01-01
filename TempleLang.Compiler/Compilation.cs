@@ -21,24 +21,25 @@
 
         public IEnumerable<NasmInstruction> WriteExterns()
         {
-            return Externs.Select(x => new NasmInstruction("extern", new LiteralParameter(x)));
+            yield return NasmInstruction.Call("global", new LiteralParameter("_start"));
+            foreach (var externName in Externs) yield return NasmInstruction.Call("extern", new LiteralParameter(externName));
         }
 
         public IEnumerable<NasmRegion> WriteProcedures()
         {
-            return ProcedureCompilations.Select(x => new NasmRegion(x.Procedure.Name, x.CompileInstructions()));
+            return ProcedureCompilations.Select(x => new NasmRegion(x.Procedure.Signature, x.Procedure.Name, x.CompileInstructions()));
         }
 
         public IEnumerable<NasmInstruction> WriteConstantTable()
         {
             foreach (var constant in ConstantTable)
             {
-                var isString = constant.Key.Type == PrimitiveType.String;
+                var isString = constant.Key.Type == PrimitiveType.StringPointer;
 
-                yield return new NasmInstruction(
+                yield return NasmInstruction.LabeledCall(
                     label: constant.Value.LabelName,
                     name: isString ? "db" : "equ",
-                    new LiteralParameter(isString ? $"__utf16__(\"{constant.Key.ValueText}\")" : constant.Key.ValueString));
+                    new LiteralParameter(isString ? $"__utf16__(`{constant.Key.ValueText}`)" : constant.Key.ValueString));
             }
         }
     }

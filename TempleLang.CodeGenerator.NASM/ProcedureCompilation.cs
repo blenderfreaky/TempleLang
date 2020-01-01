@@ -16,7 +16,7 @@
         public List<IInstruction> Instructions { get; }
         public Dictionary<Constant, DataLocation> ConstantTable { get; }
         public DataLocation FalseConstant { get; }
-        public DataLocation TrueConstant{ get; }
+        public DataLocation TrueConstant { get; }
         public RegisterAllocation RegisterAllocation { get; }
         public int StackRegisterTemporary { get; }
         public int StackHomeSpace { get; }
@@ -45,7 +45,7 @@
                 // Check how many variables are live at the instruction and get the max
                 .Max(x => RegisterAllocation.GetAllLiveAt(x.i).Count());
 
-            StackHomeSpace = Align(StackRegisterTemporary + maxCallDeposit);
+            StackHomeSpace = Align(StackRegisterTemporary + maxCallDeposit * 8);
 
             int maxParameters = Instructions
                 .Where(x => x is CallInstruction)
@@ -60,35 +60,46 @@
         {
             int stackSize = StackEnd;
 
-            yield return new NasmInstruction("sub", new MemoryParameter(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString()));
+            yield return NasmInstruction.Call("sub", Memory(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString())).WithComment("Allocate stack");
 
             foreach (var instruction in Instructions.SelectMany((x, i) => CompileInstruction(i, x))) yield return instruction;
 
-            yield return new NasmInstruction(".__exit");
-            yield return new NasmInstruction("add", new MemoryParameter(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString()));
-            yield return new NasmInstruction(name: "ret");
+            yield return NasmInstruction.Label(".__exit").WithComment("Function exit/return label");
+            yield return NasmInstruction.Call("add", Memory(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString())).WithComment("Return stack");
+            yield return NasmInstruction.Call(name: "ret");
         }
 
-        private IEnumerable<NasmInstruction> CompileInstruction(int i, IInstruction instruction) => instruction switch
+        private IEnumerable<NasmInstruction> CompileInstruction(int i, IInstruction instruction)
         {
-            UnaryComputationAssignment inst => CompileCore(inst),
-            BinaryComputationAssignment inst => CompileCore(inst),
-            ConditionalJump inst => CompileCore(inst),
-            UnconditionalJump inst => CompileCore(inst),
-            LabelInstruction inst => CompileCore(inst),
-            CallInstruction inst => CompileCore(i, inst),
-            ReturnInstruction inst => CompileCore(inst),
-            ParameterQueryAssignment inst => CompileCore(inst),
-            _ => throw new ArgumentException(nameof(instruction))
-        };
+            yield return NasmInstruction.Comment(instruction.ToString());
+            foreach (var inst in instruction switch
+            {
+                UnaryComputationAssignment inst => CompileCore(inst),
+                BinaryComputationAssignment inst => CompileCore(inst),
+                ConditionalJump inst => CompileCore(inst),
+                UnconditionalJump inst => CompileCore(inst),
+                LabelInstruction inst => CompileCore(inst),
+                CallInstruction inst => CompileCore(i, inst),
+                ReturnInstruction inst => CompileCore(inst),
+                ParameterQueryAssignment inst => CompileCore(inst),
+                _ => throw new ArgumentException(nameof(instruction))
+            })
+            {
+                yield return inst;
+            }
+            yield return NasmInstruction.Comment("/");
+            yield return NasmInstruction.Empty();
+        }
 
-        private IMemory? GetMemory(IReadableValue memory) => memory switch
+        private IMemory? TryGetMemory(IReadableValue memory) => memory switch
         {
             Variable mem => RegisterAllocation.AssignedLocation[mem],
             Constant mem => ConstantTable[mem],
             DiscardValue mem => null,
             _ => throw new ArgumentException(nameof(memory)),
         };
+
+        private IMemory GetMemory(IReadableValue memory) => TryGetMemory(memory) ?? throw new InvalidOperationException($"Unmapped memory value {memory}");
 
         private IMemory ParameterLocation(int index)
         {
@@ -102,11 +113,21 @@
             };
         }
 
-        private NasmInstruction Move(IMemory target, IParameter source) =>
-            new NasmInstruction(
-                    "mov",
-                    new MemoryParameter(target),
-                    source);
+        private static NasmInstruction Move(IMemory target, IParameter source) =>
+            NasmInstruction.Call("mov", Memory(target), source);
+
+        private static NasmInstruction Move(IMemory target, IMemory source) =>
+            NasmInstruction.Call("mov", Memory(target), Memory(source));
+
+        private static NasmInstruction Jump(string label) =>
+            NasmInstruction.Call("jmp", new LabelParameter(label));
+
+        private static MemoryParameter Memory(IMemory memory) => new MemoryParameter(memory);
+        private static MemoryParameter Memory(RegisterName registerName) => new MemoryParameter(Register.Get(registerName));
+        private MemoryParameter Memory(IReadableValue memory) => new MemoryParameter(GetMemory(memory));
+
+        private int _counter = 0;
+        private string RequestName() => "CG" + _counter++;
 
         private readonly OperatorTable<UnaryOperatorType> _unaryOperators = new OperatorTable<UnaryOperatorType>
         {
@@ -116,17 +137,14 @@
 
         private IEnumerable<NasmInstruction> CompileCore(UnaryComputationAssignment inst)
         {
-            var operandMemory = GetMemory(inst.Operand) ?? throw new ArgumentException(nameof(inst));
+            var operandMemory = GetMemory(inst.Operand);
             var targetMemory = GetMemory(inst.Target);
-
-            if (targetMemory == null) yield break;
 
             if (inst.Operator == UnaryOperatorType.Dereference)
             {
-                if (inst.OperandType != PrimitiveType.Long) throw new ArgumentException(nameof(inst));
+                if (inst.OperandType != PrimitiveType.Long) throw new InvalidOperationException("Dereferncing operand of invalid type");
 
-                yield return Move(targetMemory,
-                    new DereferenceParameter(new MemoryParameter(operandMemory)));
+                yield return Move(targetMemory, new DereferenceParameter(Memory(operandMemory))).WithComment($"Dereference {inst.Operand}");
                 yield break;
             }
 
@@ -134,28 +152,26 @@
             {
                 if (inst.OperandType != PrimitiveType.Long) throw new ArgumentException(nameof(inst));
 
-                yield return new NasmInstruction("lea",
-                    new MemoryParameter(targetMemory),
-                    new DereferenceParameter(new MemoryParameter(operandMemory)));
+                yield return NasmInstruction.Call("lea", Memory(targetMemory), new DereferenceParameter(Memory(operandMemory))).WithComment($"Create reference to {inst.Operand}");
                 yield break;
             }
 
-            yield return Move(targetMemory, new MemoryParameter(operandMemory));
+            if (targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
 
-            yield return new NasmInstruction(
-                _unaryOperators[inst.Operator, inst.OperandType],
-                new MemoryParameter(targetMemory));
+            yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Memory(targetMemory));
         }
 
         private readonly OperatorTable<BinaryOperatorType> _binaryOperators = new OperatorTable<BinaryOperatorType>
         {
             [BinaryOperatorType.Add, PrimitiveType.Long] = "add",
+            [BinaryOperatorType.Add, PrimitiveType.StringPointer] = "add",
             [BinaryOperatorType.Subtract, PrimitiveType.Long] = "sub",
+            [BinaryOperatorType.Subtract, PrimitiveType.StringPointer] = "sub",
             [BinaryOperatorType.Multiply, PrimitiveType.Long] = "imul",
             [BinaryOperatorType.Assign] = "mov",
         };
 
-        private readonly Dictionary<BinaryOperatorType, string> _binaryComparisonOperators = new Dictionary<BinaryOperatorType, string>
+        private readonly Dictionary<BinaryOperatorType, string> _binaryArithmeticComparisonOperators = new Dictionary<BinaryOperatorType, string>
         {
             [BinaryOperatorType.ComparisonGreaterThan] = "jg",
             [BinaryOperatorType.ComparisonGreaterThanOrEqual] = "jge",
@@ -167,9 +183,9 @@
 
         private IEnumerable<NasmInstruction> CompileCore(BinaryComputationAssignment inst)
         {
-            var lhsMemory = GetMemory(inst.Lhs) ?? throw new ArgumentException(nameof(inst));
-            var rhsMemory = GetMemory(inst.Rhs) ?? throw new ArgumentException(nameof(inst));
-            var targetMemory = GetMemory(inst.Target);
+            var lhsMemory = GetMemory(inst.Lhs);
+            var rhsMemory = GetMemory(inst.Rhs);
+            var targetMemory = TryGetMemory(inst.Target);
 
             if (targetMemory == null)
             {
@@ -177,67 +193,73 @@
                 else yield break;
             }
 
-            if (lhsMemory != targetMemory) yield return Move(targetMemory, new MemoryParameter(lhsMemory));
+            if (lhsMemory != targetMemory) yield return Move(targetMemory, lhsMemory).WithComment("Assign LHS to target memory");
 
-            if (_binaryComparisonOperators.TryGetValue(inst.Operator, out var jmp))
+            if (_binaryArithmeticComparisonOperators.TryGetValue(inst.Operator, out var jmp))
             {
-                var trueLabel = "." + Guid.NewGuid().ToString().Replace('-', '_');
-                var exitLabel = "." + Guid.NewGuid().ToString().Replace('-', '_');
-                yield return new NasmInstruction(
-                    "cmp",
-                    new MemoryParameter(targetMemory),
-                    new MemoryParameter(rhsMemory));
-                yield return new NasmInstruction(
-                    jmp,
-                    new LabelParameter(trueLabel));
+                var trueLabel = "." + RequestName();
+                var exitLabel = "." + RequestName();
 
-                yield return Move(
-                    targetMemory,
-                    new MemoryParameter(FalseConstant));
-                yield return new NasmInstruction(
-                    "jmp",
-                    new LabelParameter(exitLabel));
+                yield return NasmInstruction.Call("cmp", Memory(targetMemory), Memory(rhsMemory)).WithComment("Set condition codes according to operands");
+                yield return NasmInstruction.Call(jmp, new LabelParameter(trueLabel)).WithComment("Jump to True if the comparison is true");
 
-                yield return new NasmInstruction(trueLabel);
-                yield return Move(
-                    targetMemory,
-                    new MemoryParameter(TrueConstant));
+                yield return Move(targetMemory, FalseConstant).WithComment("Assign false to output");
+                yield return Jump(exitLabel).WithComment("Jump to Exit");
 
-                yield return new NasmInstruction(exitLabel);
+                yield return NasmInstruction.Label(trueLabel).WithComment("True");
+                yield return Move(targetMemory, TrueConstant).WithComment("Assign true to output");
+
+                yield return NasmInstruction.Label(exitLabel).WithComment("Exit");
+            }
+            else if (inst.OperandType == PrimitiveType.Long
+                && (inst.Operator == BinaryOperatorType.Divide || inst.Operator == BinaryOperatorType.Remainder))
+            {
+                yield return NasmInstruction.Call("xor", Memory(RegisterName.RDX), Memory(RegisterName.RDX)).WithComment("Empty out higher bits of dividend");
+                yield return Move(Register.Get(RegisterName.RAX), GetMemory(inst.Lhs)).WithComment("Assign lhs to dividend");
+
+                IMemory divisor = GetMemory(inst.Rhs);
+
+                if (!(divisor is Register))
+                {
+                    var register = Register.Get(RegisterName.RBX);
+                    yield return Move(register, divisor).WithComment("Move divisor into RBX, as a register is required for idiv");
+                    divisor = register;
+                }
+
+                yield return NasmInstruction.Call("idiv", Memory(divisor)).WithComment("Assign remainder to RDX, quotient to RAX");
+
+                var result = inst.Operator switch
+                {
+                    BinaryOperatorType.Divide => Register.Get(RegisterName.RAX),
+                    BinaryOperatorType.Remainder => Register.Get(RegisterName.RDX),
+                    _ => throw new InvalidOperationException(),
+                };
+
+                yield return Move(GetMemory(inst.Target), result).WithComment("Assign result to target memory");
             }
             else
             {
-                yield return new NasmInstruction(
-                    _binaryOperators[inst.Operator, inst.OperandType],
-                    new MemoryParameter(targetMemory),
-                    new MemoryParameter(rhsMemory));
+                yield return NasmInstruction.Call(_binaryOperators[inst.Operator, inst.OperandType], Memory(targetMemory), Memory(rhsMemory));
             }
         }
 
         private IEnumerable<NasmInstruction> CompileCore(ConditionalJump inst)
         {
-            var conditionMemory = GetMemory(inst.Condition) ?? throw new ArgumentException(nameof(inst));
+            var conditionMemory = GetMemory(inst.Condition);
 
-            yield return new NasmInstruction(
-                "test",
-                new MemoryParameter(conditionMemory),
-                new MemoryParameter(conditionMemory));
+            yield return NasmInstruction.Call("test", Memory(conditionMemory), Memory(conditionMemory)).WithComment("Set condition codes according to condition");
 
-            yield return new NasmInstruction(
-                inst.Inverted ? "jz" : "jnz",
-                new LabelParameter(inst.Target.Name));
+            yield return NasmInstruction.Call(inst.Inverted ? "jz" : "jnz", new LabelParameter(inst.Target.Name)).WithComment("Jump if condition is " + (inst.Inverted ? "false/zero" : "true/non-zero"));
         }
 
         private IEnumerable<NasmInstruction> CompileCore(UnconditionalJump inst)
         {
-            yield return new NasmInstruction(
-                "jmp",
-                new LabelParameter(inst.Target.Name));
+            yield return Jump(inst.Target.Name);
         }
 
         private IEnumerable<NasmInstruction> CompileCore(LabelInstruction inst)
         {
-            yield return new NasmInstruction(inst.Name);
+            yield return NasmInstruction.Label(inst.Name);
         }
 
         private IEnumerable<NasmInstruction> CompileCore(int index, CallInstruction inst)
@@ -249,24 +271,24 @@
 
             foreach (var live in lives)
             {
-                yield return Move(live.Temporary, new MemoryParameter(RegisterAllocation.AssignedLocation[live.Variable]));
+                yield return Move(live.Temporary, RegisterAllocation.AssignedLocation[live.Variable]).WithComment("Store live variable onto stack");
             }
 
             for (int i = 0; i < inst.Parameters.Count; i++)
             {
-                yield return Move(ParameterLocation(i), new MemoryParameter(GetMemory(inst.Parameters[i]) ?? throw new ArgumentException(nameof(inst))));
+                yield return Move(ParameterLocation(i), GetMemory(inst.Parameters[i])).WithComment($"Pass parameter #{i}");
             }
 
-            yield return new NasmInstruction("call", new LiteralParameter(inst.Name));
+            yield return NasmInstruction.Call("call", new LabelParameter(inst.Name));
 
             if (inst.Target != null && !(inst.Target is DiscardValue))
             {
-                yield return Move(GetMemory(inst.Target) ?? throw new ArgumentException(nameof(inst)), new MemoryParameter(Register.Get(RegisterName.RAX)));
+                yield return Move(GetMemory(inst.Target), Register.Get(RegisterName.RAX)).WithComment($"Assign return value to {inst.Target}");
             }
 
             foreach (var live in lives)
             {
-                yield return Move(RegisterAllocation.AssignedLocation[live.Variable], new MemoryParameter(live.Temporary));
+                yield return Move(RegisterAllocation.AssignedLocation[live.Variable], live.Temporary).WithComment("Restore live variable from stack");
             }
         }
 
@@ -274,17 +296,17 @@
         {
             if (inst.ReturnValue != null)
             {
-                yield return Move(Register.Get(RegisterName.RAX), new MemoryParameter(GetMemory(inst.ReturnValue) ?? throw new ArgumentException(nameof(inst))));
+                yield return Move(Register.Get(RegisterName.RAX), GetMemory(inst.ReturnValue)).WithComment($"Return {inst.ReturnValue}");
             }
 
-            yield return new NasmInstruction("jmp", new LabelParameter(".__exit"));
+            yield return Jump(".__exit");
         }
 
         private IEnumerable<NasmInstruction> CompileCore(ParameterQueryAssignment inst)
         {
             if (inst.Target != null && !(inst.Target is DiscardValue))
             {
-                yield return Move(GetMemory(inst.Target) ?? throw new ArgumentException(nameof(inst)), new MemoryParameter(ParameterLocation(inst.ParameterIndex)));
+                yield return Move(GetMemory(inst.Target), ParameterLocation(inst.ParameterIndex)).WithComment($"Read parameter #{inst.ParameterIndex}");
             }
         }
     }

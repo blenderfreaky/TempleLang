@@ -44,8 +44,8 @@
 
             foreach (var instruction in GetValue(stmt.Condition, out conditionResult)) yield return instruction;
 
-            var trueLabel = RequestLabel();
-            var exitLabel = RequestLabel();
+            var trueLabel = RequestLabelInstruction();
+            var exitLabel = RequestLabelInstruction();
 
             yield return new ConditionalJump(trueLabel, conditionResult);
 
@@ -69,7 +69,7 @@
 
             if (stmt.IsDoLoop)
             {
-                var entryLabel = RequestLabel();
+                var entryLabel = RequestLabelInstruction();
 
                 yield return entryLabel;
 
@@ -80,8 +80,8 @@
             }
             else
             {
-                var entryLabel = RequestLabel();
-                var exitLabel = RequestLabel();
+                var entryLabel = RequestLabelInstruction();
+                var exitLabel = RequestLabelInstruction();
 
                 yield return entryLabel;
                 foreach (var instruction in conditionInstructions) yield return instruction;

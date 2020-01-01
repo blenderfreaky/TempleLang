@@ -20,12 +20,13 @@
             ["for"] = Token.For,
             ["while"] = Token.While,
             ["do"] = Token.Do,
-            ["let"] = Token.Declarator,
+            ["let"] = Token.Let,
             ["return"] = Token.Return,
             ["ref"] = Token.Reference,
             ["deref"] = Token.Dereference,
             ["using"] = Token.Using,
             ["namespace"] = Token.Namespace,
+            ["func"] = Token.Func
         };
 
         public Lexer(TextReader textReader, SourceFile sourceFile)

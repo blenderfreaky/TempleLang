@@ -46,7 +46,6 @@
             && EqualityComparer<byte[]?>.Default.Equals(ValueBytes, constant.ValueBytes)
             && ValueText == constant.ValueText
             && Type == constant.Type
-            && DebugName == constant.DebugName
             && ValueString == constant.ValueString;
 
         public override int GetHashCode()
@@ -55,7 +54,6 @@
             hashCode = (hashCode * -1521134295) + EqualityComparer<byte[]?>.Default.GetHashCode(ValueBytes);
             hashCode = (hashCode * -1521134295) + EqualityComparer<string?>.Default.GetHashCode(ValueText);
             hashCode = (hashCode * -1521134295) + EqualityComparer<PrimitiveType>.Default.GetHashCode(Type);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(DebugName);
             hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(ValueString);
             return hashCode;
         }

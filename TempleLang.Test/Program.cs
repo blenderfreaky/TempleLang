@@ -2,13 +2,16 @@
 {
     using Compiler;
     using System;
+    using System.Diagnostics;
     using System.IO;
+    using System.Text;
     using TempleLang.Lexer;
 
     public static class Program
     {
         public static void Main(string[] args)
         {
+            var stopwatch = Stopwatch.StartNew();
             var text = File.ReadAllText("../../../../Test.tl");
 
             var compiled = TempleLangHelper.Compile(text, new SourceFile("Console", null), out var parserError, out var diagnostics);
@@ -19,17 +22,12 @@
 
             if (compiled == null) return;
 
-            Console.WriteLine("section .data");
+            var file = TempleLangHelper.GenerateExecutable(compiled, "Test", "temp", "../../../../");
+            stopwatch.Stop();
 
-            foreach (var instruction in compiled.WriteConstantTable()) Console.WriteLine(instruction.ToNASM());
+            Console.WriteLine("Finished in " + stopwatch.Elapsed);
 
-            Console.WriteLine("section .text");
-
-            Console.WriteLine("    global _start");
-
-            foreach (var instruction in compiled.WriteExterns()) Console.WriteLine(instruction.ToNASM());
-
-            foreach (var region in compiled.WriteProcedures()) Console.WriteLine(region.ToNASM());
+            Process.Start(file);
         }
     }
 }

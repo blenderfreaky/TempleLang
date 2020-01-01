@@ -48,8 +48,8 @@
 
             foreach (var instruction in GetValue(expr.Condition, out conditionResult)) yield return instruction;
 
-            var trueLabel = RequestLabel();
-            var exitLabel = RequestLabel();
+            var trueLabel = RequestLabelInstruction();
+            var exitLabel = RequestLabelInstruction();
 
             yield return new ConditionalJump(trueLabel, conditionResult);
 
