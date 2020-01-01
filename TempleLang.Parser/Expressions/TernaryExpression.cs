@@ -27,9 +27,9 @@
 
         public static Parser<TernaryExpression, Token> CreatePureParser(Parser<Expression, Token> parser) =>
             from condition in parser
-            from _ in Parse.Token(Token.TernaryTruePrefix)
+            from _ in Parse.Token(Token.QuestionMark)
             from trueValue in parser
-            from __ in Parse.Token(Token.TernaryFalsePrefix)
+            from __ in Parse.Token(Token.Colon)
             from falseValue in parser
             select new TernaryExpression(condition, trueValue, falseValue);
     }

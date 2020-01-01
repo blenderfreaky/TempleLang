@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Parser
 {
+    using Statements;
     using TempleLang.Diagnostic;
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
@@ -24,6 +25,9 @@
             .Or(BlockStatement.Parser)
             .Or(IfStatement.Parser)
             .Or(WhileStatement.Parser)
-            .Or(ReturnStatement.Parser);
+            .Or(ForStatement.Parser)
+            .Or(ReturnStatement.Parser)
+            .Or(BreakStatement.Parser)
+            .Or(ContinueStatement.Parser);
     }
 }

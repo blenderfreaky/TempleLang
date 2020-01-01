@@ -19,9 +19,9 @@
         }
 
         public static readonly Parser<Expression, Token> ParenthesizedExpression =
-            from l in Parse.Token(Token.LeftExpressionDelimiter)
+            from l in Parse.Token(Token.LParens)
             from expr in Parse.Ref(() => Parser)
-            from r in Parse.Token(Token.RightExpressionDelimiter)
+            from r in Parse.Token(Token.RParens)
             select expr;
 
         public static readonly Parser<Expression, Token> Atomic =

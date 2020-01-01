@@ -19,9 +19,9 @@
         public override string ToString() => $"\n{{\n{string.Join(Environment.NewLine, Statements.Select(x => "    " + x.ToString()))}\n}}";
 
         public static new readonly Parser<BlockStatement, Token> Parser =
-            from ldelim in Parse.Token(Token.LeftCodeDelimiter)
+            from ldelim in Parse.Token(Token.LBraces)
             from statements in Statement.Parser.Many()
-            from rdelim in Parse.Token(Token.RightCodeDelimiter)
+            from rdelim in Parse.Token(Token.RBraces)
             select new BlockStatement(statements, FileLocation.Concat(ldelim, rdelim));
     }
 }

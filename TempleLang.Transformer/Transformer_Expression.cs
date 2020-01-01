@@ -64,7 +64,7 @@
 
         private IEnumerable<IInstruction> TransformExpressionCore(CallExpression expr, IAssignableValue target)
         {
-            if (!(expr.Callee is CallableValue callable)) throw new InvalidOperationException();
+            if (!(expr.Callee is CallableValue callable))  throw new InvalidOperationException();
 
             var parameterResults = new List<IReadableValue>(expr.Parameters.Count);
 

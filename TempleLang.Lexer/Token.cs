@@ -3,8 +3,9 @@
     public enum Token
     {
         Semicolon,
+        Colon,
         Let,
-        TypeSetter,
+
         Accessor,
         Dereference,
         Reference,
@@ -19,13 +20,15 @@
         Do,
         For,
         Return,
+        Break,
+        Continue,
 
-        LeftExpressionDelimiter,
-        RightExpressionDelimiter,
-        LeftCodeDelimiter,
-        RightCodeDelimiter,
-        LeftEnumerationDelimiter,
-        RightEnumerationDelimiter,
+        LParens,
+        RParens,
+        LBraces,
+        RBraces,
+        LBrackets,
+        RBrackets,
 
         Comma,
 
@@ -69,8 +72,7 @@
         ComparisonEqual,
         ComparisonNotEqual,
 
-        TernaryTruePrefix,
-        TernaryFalsePrefix,
+        QuestionMark,
 
         IntegerLiteral,
         FloatLiteral,

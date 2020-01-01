@@ -42,11 +42,11 @@
         public static new readonly Parser<ProcedureDeclaration, Token> Parser =
             from start in Parse.Token(Token.Func)
             from name in Identifier.Parser
-            from __ in Parse.Token(Token.LeftExpressionDelimiter)
+            from __ in Parse.Token(Token.LParens)
             from parameters in TypeAnnotatedName.Parser.SeparatedBy(Parse.Token(Token.Comma))
-            from ___ in Parse.Token(Token.RightExpressionDelimiter)
+            from ___ in Parse.Token(Token.RParens)
             from returnType in
-                (from _ in Parse.Token(Token.TypeSetter)
+                (from _ in Parse.Token(Token.Colon)
                  from type in AccessExpression.Parser
                  select type).Maybe()
             from result in

@@ -4,17 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-
-    public interface IParserResult<out T, TToken>
-    {
-        public bool IsSuccessful { get; }
-
-        public string? ErrorMessage { get; }
-
-        public T Result { get; }
-
-        public LexemeString<TToken> RemainingLexemeString { get; }
-    }
+    using System.Linq;
 
     [DebuggerStepThrough]
     public struct ParserResult<T, TToken> : IParserResult<T, TToken>
@@ -71,22 +61,5 @@
         public static bool operator ==(ParserResult<T, TToken> left, ParserResult<T, TToken> right) => left.Equals(right);
 
         public static bool operator !=(ParserResult<T, TToken> left, ParserResult<T, TToken> right) => !(left == right);
-    }
-
-    public static class ParserResult
-    {
-        [DebuggerStepThrough]
-        public static ParserResult<T, TToken> Success<T, TToken>(T result, LexemeString<TToken> remainingLexemeString) =>
-            new ParserResult<T, TToken>(result, remainingLexemeString);
-
-        [DebuggerStepThrough]
-        public static ParserResult<T, TToken> Failure<T, TToken>(string errorMessage, LexemeString<TToken> remainingLexemeString) =>
-            new ParserResult<T, TToken>(errorMessage, remainingLexemeString);
-
-        [DebuggerStepThrough]
-        public static ParserResult<U, TToken> Failure<T, U, TToken>(IParserResult<T, TToken> error) =>
-            error.IsSuccessful
-            ? throw new ArgumentException(nameof(error))
-            : new ParserResult<U, TToken>(error.ErrorMessage!, error.RemainingLexemeString);
     }
 }

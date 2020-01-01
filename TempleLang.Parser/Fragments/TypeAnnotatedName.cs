@@ -28,7 +28,7 @@
 
         public static readonly Parser<TypeAnnotatedName, Token> Parser =
             (from name in Identifier.Parser
-             from _ in Parse.Token(Token.TypeSetter)
+             from _ in Parse.Token(Token.Colon)
              from typeAnnotation in AccessExpression.Parser
              select new TypeAnnotatedName(name, typeAnnotation))
             .Or(from name in Identifier.Parser

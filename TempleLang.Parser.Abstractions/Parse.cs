@@ -4,19 +4,19 @@
     using System;
     using System.Collections.Generic;
 
-    public static class Parse
+    public static partial class Parse
     {
         public static Parser<Lexeme<TToken>, TToken> Token<TToken>(TToken token) =>
             input =>
             {
                 if (input.Length == 0)
                 {
-                    return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected {token}", input);
+                    return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected {token}");
                 }
 
                 if (!EqualityComparer<TToken>.Default.Equals(input[0].Token, token))
                 {
-                    return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected {token}", input);
+                    return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected {token}");
                 }
 
                 return ParserResult.Success(input[0], input.Advance(1));
@@ -33,7 +33,7 @@
             {
                 if (input.Length == 0)
                 {
-                    return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected [{string.Join(", ", tokens)}]", input);
+                    return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected [{string.Join(", ", tokens)}]");
                 }
 
                 foreach (var token in tokens)
@@ -46,7 +46,7 @@
                     return ParserResult.Success(input[0], input.Advance(1));
                 }
 
-                return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected [{string.Join(", ", tokens)}]", input);
+                return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected [{string.Join(", ", tokens)}]");
             };
         }
 
@@ -64,6 +64,8 @@
             input => ParserResult.Success(value, input);
 
         public static Parser<object?, TToken> Epsilon<TToken>() => Value<object?, TToken>(null);
+
+        public static Parser<T, TToken> Epsilon<T, TToken>() => Value<T, TToken>(default!);
 
         private class RefContainer<T>
             where T : class
@@ -197,7 +199,7 @@
 
                 return result.IsSuccessful
                 ? ParserResult.Success(result.Result, input)
-                : ParserResult.Failure<T,TToken>(result.ErrorMessage!, input);
+                : ParserResult.Failure<T,TToken>(result.ErrorMessage!);
             };
         }
     }

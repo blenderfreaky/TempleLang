@@ -23,9 +23,9 @@
         public static readonly Parser<NamespaceDeclaration, Token> ParenthesizedParser =
             from declarator in Parse.Token(Token.Namespace)
             from name in Parse.Token(Token.Identifier)
-            from ldelim in Parse.Token(Token.LeftCodeDelimiter)
+            from ldelim in Parse.Token(Token.LBraces)
             from declarations in Declaration.Parser.Many()
-            from rdelim in Parse.Token(Token.RightCodeDelimiter)
+            from rdelim in Parse.Token(Token.RBraces)
             select new NamespaceDeclaration(name, declarations, FileLocation.Concat(declarator, rdelim));
 
         public static readonly Parser<NamespaceDeclaration, Token> FileWideParser =

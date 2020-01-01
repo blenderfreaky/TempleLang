@@ -19,6 +19,8 @@
             ["else"] = Token.Else,
             ["for"] = Token.For,
             ["while"] = Token.While,
+            ["break"] = Token.Break,
+            ["continue"] = Token.Continue,
             ["do"] = Token.Do,
             ["let"] = Token.Let,
             ["return"] = Token.Return,
@@ -212,28 +214,31 @@
                     return MakeLexeme(Token.StringLiteral);
 
                 case '{':
-                    return MakeLexeme(Token.LeftCodeDelimiter);
+                    return MakeLexeme(Token.LBraces);
 
                 case '}':
-                    return MakeLexeme(Token.RightCodeDelimiter);
+                    return MakeLexeme(Token.RBraces);
 
                 case '[':
-                    return MakeLexeme(Token.LeftEnumerationDelimiter);
+                    return MakeLexeme(Token.LBrackets);
 
                 case ']':
-                    return MakeLexeme(Token.RightEnumerationDelimiter);
+                    return MakeLexeme(Token.RBrackets);
 
                 case '(':
-                    return MakeLexeme(Token.LeftExpressionDelimiter);
+                    return MakeLexeme(Token.LParens);
 
                 case ')':
-                    return MakeLexeme(Token.RightExpressionDelimiter);
+                    return MakeLexeme(Token.RParens);
 
                 case ';':
                     return MakeLexeme(Token.Semicolon);
 
                 case ':':
-                    return MakeLexeme(Token.TypeSetter);
+                    return MakeLexeme(Token.Colon);
+
+                case '?':
+                    return MakeLexeme(Token.QuestionMark);
 
                 case ',':
                     return MakeLexeme(Token.Comma);

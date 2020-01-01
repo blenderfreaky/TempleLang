@@ -29,8 +29,7 @@
 
                 if (rightResult.IsSuccessful) return rightResult;
 
-                // TODO: Combinate errors
-                return leftResult;
+                return ParserResult.Failure(leftResult, rightResult);
             };
         }
 
@@ -167,7 +166,7 @@
                     {
                         if (i < least)
                         {
-                            return ParserResult.Failure<List<T>, TToken>("Too few elements. Expected at least " + least, remainder);
+                            return ParserResult.Failure<List<T>, TToken>("Too few elements. Expected at least " + least);
                         }
 
                         return ParserResult.Success(elements, remainder);
@@ -217,7 +216,7 @@
                     {
                         if (i < least)
                         {
-                            return ParserResult.Failure<List<T>, TToken>("Too few elements. Expected at least " + least, remainder);
+                            return ParserResult.Failure<List<T>, TToken>("Too few elements. Expected at least " + least);
                         }
 
                         return ParserResult.Success(elements, remainder);
@@ -231,7 +230,7 @@
                     {
                         if (i < least)
                         {
-                            return ParserResult.Failure<List<T>, TToken>("Too few elements. Expected at least " + least, result.RemainingLexemeString);
+                            return ParserResult.Failure<List<T>, TToken>("Too few elements. Expected at least " + least);
                         }
 
                         return ParserResult.Success(elements, result.RemainingLexemeString);

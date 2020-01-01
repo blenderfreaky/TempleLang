@@ -14,24 +14,29 @@
 
     public partial class CodeBinder : Binder
     {
-        public IStatement? BindStatement(Statement syntaxStatement) => syntaxStatement switch
+        public IStatement? BindNullableStatement(Statement? syntaxStatement) =>
+            syntaxStatement == null ? null : BindStatement(syntaxStatement);
+
+        public IStatement BindStatement(Statement syntaxStatement) => syntaxStatement switch
         {
             S.ExpressionStatement stmt => BindStatement(stmt),
             LocalDeclarationStatement stmt => BindStatement(stmt),
             S.BlockStatement stmt => BindStatement(stmt),
             S.IfStatement stmt => BindStatement(stmt),
             S.WhileStatement stmt => BindStatement(stmt),
+            S.ForStatement stmt => BindStatement(stmt),
             S.ReturnStatement stmt => BindStatement(stmt),
             _ => throw new ArgumentException(nameof(syntaxStatement)),
         };
 
-        public IS.ExpressionStatement? BindStatement(S.ExpressionStatement stmt) => new IS.ExpressionStatement(BindExpression(stmt.Expression), stmt.Location);
+        public IS.ExpressionStatement BindStatement(S.ExpressionStatement stmt) =>
+            new IS.ExpressionStatement(BindExpression(stmt.Expression), stmt.Location);
 
-        public IS.ExpressionStatement? BindStatement(LocalDeclarationStatement stmt)
+        public IS.ExpressionStatement BindStatement(LocalDeclarationStatement stmt)
         {
-            var assignedValue = stmt.Assignment == null ? null : BindExpression(stmt.Assignment);
+            var assignedValue = BindExpression(stmt.Assignment);
 
-            var assignedType = assignedValue?.ReturnType;
+            var assignedType = assignedValue.ReturnType;
             var annotatedType = stmt.Name.TypeAnnotation == null ? null : FindType(stmt.Name.TypeAnnotation);
             var returnType = assignedType ?? annotatedType;
 
@@ -55,37 +60,47 @@
 
             Locals[local.Name] = local;
 
-            if (assignedValue == null) return null;
-
             return new IS.ExpressionStatement(new IE.BinaryExpression(local, assignedValue, BinaryOperatorType.Assign, returnType, stmt.Location), stmt.Location);
         }
 
-        public IS.BlockStatement? BindStatement(S.BlockStatement stmt)
+        public IS.BlockStatement BindStatement(S.BlockStatement stmt)
         {
             using CodeBinder binder = new CodeBinder(this);
 
             var statements = stmt.Statements.Select(binder.BindStatement).ToList();
 
-            return new IS.BlockStatement(binder.Locals.Values, statements!, stmt.Location);
+            return new IS.BlockStatement(binder.Locals.Values, statements, stmt.Location);
         }
 
-        public IS.IfStatement? BindStatement(S.IfStatement stmt) =>
+        public IS.IfStatement BindStatement(S.IfStatement stmt) =>
             new IS.IfStatement(
                 BindExpression(stmt.Condition),
-                BindStatement(stmt.TrueStatement)!,
-                stmt.FalseStatement == null ? null : BindStatement(stmt.FalseStatement),
+                BindStatement(stmt.TrueStatement),
+                BindNullableStatement(stmt.FalseStatement),
                 stmt.Location);
 
-        public IS.WhileStatement? BindStatement(S.WhileStatement stmt) =>
+        public IS.WhileStatement BindStatement(S.WhileStatement stmt) =>
             new IS.WhileStatement(
                 BindExpression(stmt.Condition),
-                BindStatement(stmt.Statement)!,
+                BindStatement(stmt.Statement),
                 stmt.IsDoLoop,
                 stmt.Location);
 
-        public IS.ReturnStatement? BindStatement(S.ReturnStatement stmt) =>
+        public IS.ForStatement BindStatement(S.ForStatement stmt)
+        {
+            using CodeBinder codeBinder = new CodeBinder(this);
+
+            return new IS.ForStatement(
+                codeBinder.BindNullableStatement(stmt.Prefix),
+                codeBinder.BindNullableExpression(stmt.Condition),
+                codeBinder.BindNullableExpression(stmt.Step),
+                codeBinder.BindStatement(stmt.Statement),
+                stmt.Location);
+        }
+
+        public IS.ReturnStatement BindStatement(S.ReturnStatement stmt) =>
             new IS.ReturnStatement(
-                stmt.Expression == null ?null:BindExpression(stmt.Expression),
+                stmt.Expression == null ? null : BindExpression(stmt.Expression),
                 stmt.Location);
     }
 }

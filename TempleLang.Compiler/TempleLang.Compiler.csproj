@@ -16,6 +16,7 @@
     <ProjectReference Include="..\TempleLang.Lexer\TempleLang.Lexer.csproj" />
     <ProjectReference Include="..\TempleLang.Parser.Abstractions\TempleLang.Parser.Abstractions.csproj" />
     <ProjectReference Include="..\TempleLang.Parser\TempleLang.Parser.csproj" />
+    <ProjectReference Include="..\TempleLang.Transformer\TempleLang.Transformer.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,34 +5,20 @@
 
     public struct Constant : IImmutableValue
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<Pending>")]
-        public byte[]? ValueBytes { get; }
-
-        public string? ValueText { get; }
+        public string ValueText { get; }
 
         public PrimitiveType Type { get; }
 
         public string DebugName { get; }
 
-        public string ValueString => ValueBytes == null ? ValueText! : "0x" + ByteArrayToString(ValueBytes);
-
         public Constant(string valueText, PrimitiveType type, string debugName)
         {
-            ValueBytes = null;
             Type = type;
             ValueText = valueText;
             DebugName = debugName;
         }
 
-        public Constant(byte[] value, PrimitiveType type, string debugName)
-        {
-            ValueBytes = value;
-            Type = type;
-            ValueText = null;
-            DebugName = debugName;
-        }
-
-        public override string ToString() => $"{ValueString}";
+        public override string ToString() => $"{ValueText}";
 
         private static string ByteArrayToString(byte[] ba)
         {
@@ -43,18 +29,16 @@
 
         public override bool Equals(object? obj) =>
             obj is Constant constant
-            && EqualityComparer<byte[]?>.Default.Equals(ValueBytes, constant.ValueBytes)
             && ValueText == constant.ValueText
             && Type == constant.Type
-            && ValueString == constant.ValueString;
+            && ValueText == constant.ValueText;
 
         public override int GetHashCode()
         {
             var hashCode = -446177807;
-            hashCode = (hashCode * -1521134295) + EqualityComparer<byte[]?>.Default.GetHashCode(ValueBytes);
             hashCode = (hashCode * -1521134295) + EqualityComparer<string?>.Default.GetHashCode(ValueText);
             hashCode = (hashCode * -1521134295) + EqualityComparer<PrimitiveType>.Default.GetHashCode(Type);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(ValueString);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(ValueText);
             return hashCode;
         }
 

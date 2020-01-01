@@ -38,18 +38,23 @@
             RegisterAllocation = registerAllocation;
             StackRegisterTemporary = Align(RegisterAllocation.StackOffset);
 
-            int maxCallDeposit = Instructions
+            var calls = Instructions
                 .Select((x, i) => (x, i))
                 // Get all CallInstructions with their indicies
                 .Where(x => x.x is CallInstruction)
-                // Check how many variables are live at the instruction and get the max
-                .Max(x => RegisterAllocation.GetAllLiveAt(x.i).Count());
+                .Select(x => (Call: (CallInstruction)x.x, Index: x.i))
+                .ToList();
 
-            StackHomeSpace = Align(StackRegisterTemporary + maxCallDeposit * 8);
+            int maxCallDeposit = calls.Count > 0
+                ? // Check how many variables are live at the instruction and get the max
+                  calls.Max(x => RegisterAllocation.GetAllLiveAt(x.Index).Count())
+                : 0;
 
-            int maxParameters = Instructions
-                .Where(x => x is CallInstruction)
-                .Max(x => ((CallInstruction)x).Parameters.Count);
+            StackHomeSpace = Align(StackRegisterTemporary + (maxCallDeposit * 8));
+
+            int maxParameters = calls.Count > 0
+                ? calls.Max(x => x.Call.Parameters.Count)
+                : 0;
 
             StackEnd = StackHomeSpace + 32 + ((maxParameters - 4) * 8);
         }
@@ -61,12 +66,14 @@
             int stackSize = StackEnd;
 
             yield return NasmInstruction.Call("sub", Memory(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString())).WithComment("Allocate stack");
+            yield return NasmInstruction.Empty();
 
             foreach (var instruction in Instructions.SelectMany((x, i) => CompileInstruction(i, x))) yield return instruction;
 
             yield return NasmInstruction.Label(".__exit").WithComment("Function exit/return label");
             yield return NasmInstruction.Call("add", Memory(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString())).WithComment("Return stack");
             yield return NasmInstruction.Call(name: "ret");
+            yield return NasmInstruction.Empty();
         }
 
         private IEnumerable<NasmInstruction> CompileInstruction(int i, IInstruction instruction)
@@ -133,6 +140,10 @@
         {
             [UnaryOperatorType.BitwiseNot, PrimitiveType.Long] = "not",
             [UnaryOperatorType.Negation, PrimitiveType.Long] = "neg",
+            [UnaryOperatorType.PreIncrement, PrimitiveType.Long] = "inc",
+            [UnaryOperatorType.PostIncrement, PrimitiveType.Long] = "inc",
+            [UnaryOperatorType.PreDecrement, PrimitiveType.Long] = "dec",
+            [UnaryOperatorType.PostDecrement, PrimitiveType.Long] = "dec",
         };
 
         private IEnumerable<NasmInstruction> CompileCore(UnaryComputationAssignment inst)
@@ -140,25 +151,40 @@
             var operandMemory = GetMemory(inst.Operand);
             var targetMemory = GetMemory(inst.Target);
 
-            if (inst.Operator == UnaryOperatorType.Dereference)
+            switch (inst.Operator)
             {
-                if (inst.OperandType != PrimitiveType.Long) throw new InvalidOperationException("Dereferncing operand of invalid type");
+                case UnaryOperatorType.Dereference:
+                    if (inst.OperandType != PrimitiveType.Long) throw new InvalidOperationException("Dereferncing operand of invalid type");
 
-                yield return Move(targetMemory, new DereferenceParameter(Memory(operandMemory))).WithComment($"Dereference {inst.Operand}");
-                yield break;
+                    yield return Move(targetMemory, new DereferenceParameter(Memory(operandMemory))).WithComment($"Dereference {inst.Operand}");
+                    break;
+
+                case UnaryOperatorType.Reference:
+                    if (inst.OperandType != PrimitiveType.Long) throw new ArgumentException(nameof(inst));
+
+                    yield return NasmInstruction.Call("lea", Memory(targetMemory), new DereferenceParameter(Memory(operandMemory))).WithComment($"Create reference to {inst.Operand}");
+                    break;
+
+                case UnaryOperatorType.PreDecrement:
+                case UnaryOperatorType.PreIncrement:
+                    yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Memory(operandMemory));
+
+                    if (targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
+                    break;
+
+                case UnaryOperatorType.PostDecrement:
+                case UnaryOperatorType.PostIncrement:
+                    if (targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
+
+                    yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Memory(operandMemory));
+                    break;
+
+                default:
+                    if (targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
+
+                    yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Memory(targetMemory));
+                    break;
             }
-
-            if (inst.Operator == UnaryOperatorType.Reference)
-            {
-                if (inst.OperandType != PrimitiveType.Long) throw new ArgumentException(nameof(inst));
-
-                yield return NasmInstruction.Call("lea", Memory(targetMemory), new DereferenceParameter(Memory(operandMemory))).WithComment($"Create reference to {inst.Operand}");
-                yield break;
-            }
-
-            if (targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
-
-            yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Memory(targetMemory));
         }
 
         private readonly OperatorTable<BinaryOperatorType> _binaryOperators = new OperatorTable<BinaryOperatorType>
@@ -193,14 +219,12 @@
                 else yield break;
             }
 
-            if (lhsMemory != targetMemory) yield return Move(targetMemory, lhsMemory).WithComment("Assign LHS to target memory");
-
             if (_binaryArithmeticComparisonOperators.TryGetValue(inst.Operator, out var jmp))
             {
                 var trueLabel = "." + RequestName();
                 var exitLabel = "." + RequestName();
 
-                yield return NasmInstruction.Call("cmp", Memory(targetMemory), Memory(rhsMemory)).WithComment("Set condition codes according to operands");
+                yield return NasmInstruction.Call("cmp", Memory(lhsMemory), Memory(rhsMemory)).WithComment("Set condition codes according to operands");
                 yield return NasmInstruction.Call(jmp, new LabelParameter(trueLabel)).WithComment("Jump to True if the comparison is true");
 
                 yield return Move(targetMemory, FalseConstant).WithComment("Assign false to output");
@@ -239,6 +263,8 @@
             }
             else
             {
+                if (lhsMemory != targetMemory) yield return Move(targetMemory, lhsMemory).WithComment("Assign LHS to target memory");
+
                 yield return NasmInstruction.Call(_binaryOperators[inst.Operator, inst.OperandType], Memory(targetMemory), Memory(rhsMemory));
             }
         }
@@ -247,9 +273,25 @@
         {
             var conditionMemory = GetMemory(inst.Condition);
 
-            yield return NasmInstruction.Call("test", Memory(conditionMemory), Memory(conditionMemory)).WithComment("Set condition codes according to condition");
+            if (conditionMemory is DataLocation location)
+            {
+                var constant = ConstantTable.First(x => x.Value == location).Key;
 
-            yield return NasmInstruction.Call(inst.Inverted ? "jz" : "jnz", new LabelParameter(inst.Target.Name)).WithComment("Jump if condition is " + (inst.Inverted ? "false/zero" : "true/non-zero"));
+                if ((int.TryParse(constant.ValueText, out var num) && num == 0) ^ inst.Inverted)
+                {
+                    yield return NasmInstruction.Comment("Always evaluates to false => No Jump");
+                }
+                else
+                {
+                    yield return Jump(inst.Target.Name).WithComment("Always evaluates to true => Unconditional Jump");
+                }
+            }
+            else
+            {
+                yield return NasmInstruction.Call("test", Memory(conditionMemory), Memory(conditionMemory)).WithComment("Set condition codes according to condition");
+
+                yield return NasmInstruction.Call(inst.Inverted ? "jz" : "jnz", new LabelParameter(inst.Target.Name)).WithComment("Jump if condition is " + (inst.Inverted ? "false/zero" : "true/non-zero"));
+            }
         }
 
         private IEnumerable<NasmInstruction> CompileCore(UnconditionalJump inst)

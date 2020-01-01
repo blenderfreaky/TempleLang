@@ -14,7 +14,10 @@
 
     public partial class CodeBinder : Binder
     {
-        public IExpression BindExpression(Expression syntaxExpression) => syntaxExpression switch
+        public IExpression? BindNullableExpression(Expression? syntaxExpression) =>
+            syntaxExpression == null ? null : BindExpression(syntaxExpression);
+
+        public IExpression BindExpression(Expression? syntaxExpression) => syntaxExpression switch
         {
             PrefixExpression expr => BindExpression(expr),
             PostfixExpression expr => BindExpression(expr),

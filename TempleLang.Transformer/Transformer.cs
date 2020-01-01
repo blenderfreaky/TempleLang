@@ -30,6 +30,9 @@
         private LabelInstruction RequestLabelInstruction() =>
             new LabelInstruction(RequestLabel());
 
+        private LabelInstruction RequestLabelInstruction(string name) =>
+            new LabelInstruction(name);
+
         private IEnumerable<IInstruction> GetValue(IExpression expr, out IReadableValue location)
         {
             if (expr is IValue val)
