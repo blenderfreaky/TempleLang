@@ -22,7 +22,7 @@
 
             if (compiled == null) return;
 
-            var file = TempleLangHelper.GenerateExecutable(compiled, "Test", "temp", "../../../../");
+            var file = TempleLangHelper.GenerateExecutable(compiled, "Test", "../../../../", "../../../../");
             stopwatch.Stop();
 
             Console.WriteLine("Finished in " + stopwatch.Elapsed);
