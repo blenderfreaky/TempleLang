@@ -45,7 +45,7 @@
         private static readonly Parser<Positioned<string>, Token> _number =
             Parse.Token(Token.IntegerLiteral)
             .Or(Parse.Token(Token.FloatLiteral))
-            .Transform(x => x.PositionedText);
+            .Select(x => x.PositionedText);
 
         private static readonly Parser<Positioned<NumberFlags>, Token> _suffix =
             Parse.Token(Token.FloatSingleSuffix).AsPositioned(NumberFlags.SuffixSingle)
@@ -55,7 +55,7 @@
             .Or(Parse.Token(Token.Int32Suffix).AsPositioned(NumberFlags.SuffixInt32))
             .Or(Parse.Token(Token.Int64Suffix).AsPositioned(NumberFlags.SuffixInt64))
             .Or(Parse.Token(Token.UnsignedSuffix).AsPositioned(NumberFlags.Unsigned))
-            .Many().Transform(x =>
+            .Many().Select(x =>
             x.Count == 0 ? FileLocation.Null.WithValue(NumberFlags.None) : x.Aggregate((a, y) => FileLocation.Concat(a, y).WithValue(a.Value | y.Value)));
 
         public static new readonly Parser<NumberLiteral, Token> Parser =

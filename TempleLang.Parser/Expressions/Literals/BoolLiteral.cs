@@ -16,7 +16,7 @@
         public override string ToString() => $"{Value}";
 
         public static new readonly Parser<BoolLiteral, Token> Parser =
-            Parse.Token(Token.BooleanFalseLiteral).Transform(x => new BoolLiteral(x.Location.WithValue(false)))
-            .Or(Parse.Token(Token.BooleanTrueLiteral).Transform(x => new BoolLiteral(x.Location.WithValue(true))));
+            Parse.Token(Token.BooleanFalseLiteral).Select(x => new BoolLiteral(x.Location.WithValue(false)))
+            .Or(Parse.Token(Token.BooleanTrueLiteral).Select(x => new BoolLiteral(x.Location.WithValue(true))));
     }
 }

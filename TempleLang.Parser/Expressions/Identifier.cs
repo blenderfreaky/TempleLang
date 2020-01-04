@@ -19,6 +19,6 @@
 
         public static new readonly Parser<Identifier, Token> Parser =
             Parse.Token(Token.Identifier)
-            .Transform(x => new Identifier(x.PositionedText));
+            .Select(x => new Identifier(x.PositionedText));
     }
 }

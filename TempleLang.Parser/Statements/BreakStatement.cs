@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Diagnostic;
-using TempleLang.Lexer;
-using TempleLang.Parser.Abstractions;
-
-namespace TempleLang.Parser.Statements
+﻿namespace TempleLang.Parser.Statements
 {
+    using TempleLang.Diagnostic;
+    using TempleLang.Lexer;
+    using TempleLang.Parser.Abstractions;
+
     public class BreakStatement : Statement
     {
         public BreakStatement(FileLocation location) : base(location)

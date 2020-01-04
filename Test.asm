@@ -70,20 +70,9 @@ _start: ; _start() : long
       ; /
     
       ; _ = call print(\n, 1)
-        mov     qword [rsp - 24], R15 ; Store live variable onto stack
         mov     RCX, stringC0 ; Pass parameter #0
         mov     RDX, TRUE ; Pass parameter #1
         call    print
-        mov     R15, qword [rsp - 24] ; Restore live variable from stack
-      ; /
-    
-      ; <>T8 = i Add 1
-        mov     R14, R15 ; Assign LHS to target memory
-        add     R14, TRUE
-      ; /
-    
-      ; _ = f Assign <>T8
-        mov     R15, R14
       ; /
     
       ; .T7:
@@ -135,24 +124,24 @@ fib: ; fib(num : long) : ?
         mov     R12, FALSE
       ; /
     
-      ; Jump .T11:
-        jmp     .T11
+      ; Jump .T10:
+        jmp     .T10
+      ; /
+    
+      ; .T9:
+    .T9:         
+      ; /
+    
+      ; <>T12 = PreIncrement i
+        inc     R12
+        mov     R11, R12 ; Assign operand to target
       ; /
     
       ; .T10:
     .T10:         
       ; /
     
-      ; <>T13 = PreIncrement i
-        inc     R12
-        mov     R11, R12 ; Assign operand to target
-      ; /
-    
-      ; .T11:
-    .T11:         
-      ; /
-    
-      ; <>T14 = i ComparisonLessThan num
+      ; <>T13 = i ComparisonLessThan num
         cmp     R12, R15 ; Set condition codes according to operands
         jl      .CG0 ; Jump to True if the comparison is true
         mov     R11, FALSE ; Assign false to output
@@ -162,9 +151,9 @@ fib: ; fib(num : long) : ?
     .CG1:          ; Exit
       ; /
     
-      ; If !<>T14 Jump .T12:
+      ; If !<>T13 Jump .T11:
         test    R11, R11 ; Set condition codes according to condition
-        jz      .T12 ; Jump if condition is false/zero
+        jz      .T11 ; Jump if condition is false/zero
       ; /
     
       ; _ = temp Assign m1
@@ -175,25 +164,25 @@ fib: ; fib(num : long) : ?
         mov     R14, R13
       ; /
     
-      ; <>T16 = temp Add m2
+      ; <>T15 = temp Add m2
         mov     R12, R11 ; Assign LHS to target memory
         add     R12, R13
       ; /
     
-      ; _ = m2 Assign <>T16
+      ; _ = m2 Assign <>T15
         mov     R13, R12
       ; /
     
-      ; .T15:
-    .T15:         
+      ; .T14:
+    .T14:         
       ; /
     
-      ; Jump .T10:
-        jmp     .T10
+      ; Jump .T9:
+        jmp     .T9
       ; /
     
-      ; .T12:
-    .T12:         
+      ; .T11:
+    .T11:         
       ; /
     
       ; return m1
@@ -201,8 +190,8 @@ fib: ; fib(num : long) : ?
         jmp     .__exit
       ; /
     
-      ; .T9:
-    .T9:         
+      ; .T8:
+    .T8:         
       ; /
     
       ; .__exit:
@@ -220,7 +209,7 @@ printNum: ; printNum(num : long) : long
         mov     R15, RCX ; Read parameter #0
       ; /
     
-      ; <>T18 = num ComparisonLessThan 0
+      ; <>T17 = num ComparisonLessThan 0
         cmp     R15, FALSE ; Set condition codes according to operands
         jl      .CG0 ; Jump to True if the comparison is true
         mov     R14, FALSE ; Assign false to output
@@ -230,17 +219,17 @@ printNum: ; printNum(num : long) : long
     .CG1:          ; Exit
       ; /
     
-      ; If <>T18 Jump .T19:
+      ; If <>T17 Jump .T18:
         test    R14, R14 ; Set condition codes according to condition
-        jnz     .T19 ; Jump if condition is true/non-zero
+        jnz     .T18 ; Jump if condition is true/non-zero
       ; /
     
-      ; Jump .T20:
-        jmp     .T20
+      ; Jump .T19:
+        jmp     .T19
       ; /
     
-      ; .T19:
-    .T19:         
+      ; .T18:
+    .T18:         
       ; /
     
       ; _ = call print(-, 1)
@@ -251,12 +240,12 @@ printNum: ; printNum(num : long) : long
         mov     R15, qword [rsp - 24] ; Restore live variable from stack
       ; /
     
-      ; <>T22 = Negation num
+      ; <>T21 = Negation num
         mov     R14, R15 ; Assign operand to target
         neg     R14
       ; /
     
-      ; _ = call printNum(<>T22)
+      ; _ = call printNum(<>T21)
         mov     qword [rsp - 24], R15 ; Store live variable onto stack
         mov     qword [rsp - 32], R14 ; Store live variable onto stack
         mov     RCX, R14 ; Pass parameter #0
@@ -269,15 +258,15 @@ printNum: ; printNum(num : long) : long
         jmp     .__exit
       ; /
     
-      ; .T21:
-    .T21:         
-      ; /
-    
       ; .T20:
     .T20:         
       ; /
     
-      ; <>T23 = num Remainder 10
+      ; .T19:
+    .T19:         
+      ; /
+    
+      ; <>T22 = num Remainder 10
         xor     RDX, RDX ; Empty out higher bits of dividend
         mov     RAX, R15 ; Assign lhs to dividend
         mov     RBX, longC1 ; Move divisor into RBX, as a register is required for idiv
@@ -285,11 +274,11 @@ printNum: ; printNum(num : long) : long
         mov     R14, RDX ; Assign result to target memory
       ; /
     
-      ; _ = digit Assign <>T23
+      ; _ = digit Assign <>T22
         mov     R13, R14
       ; /
     
-      ; <>T24 = num Divide 10
+      ; <>T23 = num Divide 10
         xor     RDX, RDX ; Empty out higher bits of dividend
         mov     RAX, R15 ; Assign lhs to dividend
         mov     RBX, longC1 ; Move divisor into RBX, as a register is required for idiv
@@ -297,11 +286,11 @@ printNum: ; printNum(num : long) : long
         mov     R14, RAX ; Assign result to target memory
       ; /
     
-      ; _ = rest Assign <>T24
+      ; _ = rest Assign <>T23
         mov     R15, R14
       ; /
     
-      ; <>T25 = rest ComparisonGreaterThan 0
+      ; <>T24 = rest ComparisonGreaterThan 0
         cmp     R15, FALSE ; Set condition codes according to operands
         jg      .CG2 ; Jump to True if the comparison is true
         mov     R14, FALSE ; Assign false to output
@@ -311,17 +300,17 @@ printNum: ; printNum(num : long) : long
     .CG3:          ; Exit
       ; /
     
-      ; If <>T25 Jump .T26:
+      ; If <>T24 Jump .T25:
         test    R14, R14 ; Set condition codes according to condition
-        jnz     .T26 ; Jump if condition is true/non-zero
+        jnz     .T25 ; Jump if condition is true/non-zero
       ; /
     
-      ; Jump .T27:
-        jmp     .T27
+      ; Jump .T26:
+        jmp     .T26
       ; /
     
-      ; .T26:
-    .T26:         
+      ; .T25:
+    .T25:         
       ; /
     
       ; _ = call printNum(rest)
@@ -333,8 +322,8 @@ printNum: ; printNum(num : long) : long
         mov     R15, qword [rsp - 32] ; Restore live variable from stack
       ; /
     
-      ; .T27:
-    .T27:         
+      ; .T26:
+    .T26:         
       ; /
     
       ; _ = call printDigit(digit)
@@ -344,8 +333,8 @@ printNum: ; printNum(num : long) : long
         mov     R13, qword [rsp - 24] ; Restore live variable from stack
       ; /
     
-      ; .T17:
-    .T17:         
+      ; .T16:
+    .T16:         
       ; /
     
       ; .__exit:
@@ -367,17 +356,17 @@ printDigit: ; printDigit(digit : long) : long
         mov     R14, stringC3
       ; /
     
-      ; <>T30 = digit Multiply 2
+      ; <>T29 = digit Multiply 2
         mov     R13, R15 ; Assign LHS to target memory
         imul    R13, longC4
       ; /
     
-      ; <>T29 = digits Add <>T30
+      ; <>T28 = digits Add <>T29
         mov     R15, R14 ; Assign LHS to target memory
         add     R15, R13
       ; /
     
-      ; _ = call print(<>T29, 1)
+      ; _ = call print(<>T28, 1)
         mov     qword [rsp - 24], R15 ; Store live variable onto stack
         mov     RCX, R15 ; Pass parameter #0
         mov     RDX, TRUE ; Pass parameter #1
@@ -385,8 +374,8 @@ printDigit: ; printDigit(digit : long) : long
         mov     R15, qword [rsp - 24] ; Restore live variable from stack
       ; /
     
-      ; .T28:
-    .T28:         
+      ; .T27:
+    .T27:         
       ; /
     
       ; .__exit:
@@ -408,24 +397,24 @@ print: ; print(ptr : long, len : long) : long
         mov     R14, RDX ; Read parameter #1
       ; /
     
-      ; <>T33 = Negation 11
+      ; <>T32 = Negation 11
         mov     R13, longC5 ; Assign operand to target
         neg     R13
       ; /
     
-      ; <>T32 = call GetStdHandle(<>T33)
+      ; <>T31 = call GetStdHandle(<>T32)
         mov     qword [rsp - 24], R15 ; Store live variable onto stack
         mov     qword [rsp - 32], R14 ; Store live variable onto stack
         mov     qword [rsp - 40], R13 ; Store live variable onto stack
         mov     RCX, R13 ; Pass parameter #0
         call    GetStdHandle
-        mov     R12, RAX ; Assign return value to <>T32
+        mov     R12, RAX ; Assign return value to <>T31
         mov     R15, qword [rsp - 24] ; Restore live variable from stack
         mov     R14, qword [rsp - 32] ; Restore live variable from stack
         mov     R13, qword [rsp - 40] ; Restore live variable from stack
       ; /
     
-      ; _ = stdOut Assign <>T32
+      ; _ = stdOut Assign <>T31
         mov     R13, R12
       ; /
     
@@ -433,11 +422,11 @@ print: ; print(ptr : long, len : long) : long
         mov     R12, FALSE
       ; /
     
-      ; <>T35 = Reference numberOfCharsWritten
+      ; <>T34 = Reference numberOfCharsWritten
         lea     R11, [R12] ; Create reference to numberOfCharsWritten
       ; /
     
-      ; <>T34 = call WriteConsoleW(stdOut, ptr, len, <>T35, 0)
+      ; <>T33 = call WriteConsoleW(stdOut, ptr, len, <>T34, 0)
         mov     qword [rsp - 24], R15 ; Store live variable onto stack
         mov     qword [rsp - 32], R14 ; Store live variable onto stack
         mov     qword [rsp - 40], R13 ; Store live variable onto stack
@@ -448,20 +437,20 @@ print: ; print(ptr : long, len : long) : long
         mov     R9, R11 ; Pass parameter #3
         mov     qword [rsp - 88], FALSE ; Pass parameter #4
         call    WriteConsoleW
-        mov     R11, RAX ; Assign return value to <>T34
+        mov     R11, RAX ; Assign return value to <>T33
         mov     R15, qword [rsp - 24] ; Restore live variable from stack
         mov     R14, qword [rsp - 32] ; Restore live variable from stack
         mov     R13, qword [rsp - 40] ; Restore live variable from stack
         mov     R11, qword [rsp - 48] ; Restore live variable from stack
       ; /
     
-      ; return <>T34
-        mov     RAX, R11 ; Return <>T34
+      ; return <>T33
+        mov     RAX, R11 ; Return <>T33
         jmp     .__exit
       ; /
     
-      ; .T31:
-    .T31:         
+      ; .T30:
+    .T30:         
       ; /
     
       ; .__exit:

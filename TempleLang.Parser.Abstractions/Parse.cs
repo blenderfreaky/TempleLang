@@ -3,24 +3,37 @@
     using Lexer;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using TempleLang.Lexer.Abstractions;
 
-    public static partial class Parse
+    public static class Parse
     {
-        public static Parser<Lexeme<TToken>, TToken> Token<TToken>(TToken token) =>
+        public static Parser<Lexeme<TToken>, TToken> One<TToken>(string errorMessage) =>
             input =>
+                input.Length == 0
+                ? ParserResult.Error<Lexeme<TToken>, TToken>(errorMessage, input)
+                : ParserResult.Success(input[0], input.Advance(1));
+
+        public static Parser<T, TToken> Value<T, TToken>(T value) =>
+            input => ParserResult.Success(value, input);
+
+        public static Parser<T, TToken> Error<T, TToken>(string errorMessage) =>
+            input => ParserResult.Error<T, TToken>(errorMessage, input);
+
+        public static Parser<Lexeme<TToken>, TToken> OneWithPredicate<TToken>(Predicate<Lexeme<TToken>> predicate, string errorMessage)
+        {
+            if (predicate is null)
             {
-                if (input.Length == 0)
-                {
-                    return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected {token}");
-                }
+                throw new ArgumentNullException(nameof(predicate));
+            }
 
-                if (!EqualityComparer<TToken>.Default.Equals(input[0].Token, token))
-                {
-                    return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected {token}");
-                }
+            return One<TToken>(errorMessage).Predicate(predicate, errorMessage);
+        }
 
-                return ParserResult.Success(input[0], input.Advance(1));
-            };
+        public static Parser<Lexeme<TToken>, TToken> Token<TToken>(TToken token) =>
+            OneWithPredicate<TToken>(
+                lexeme => EqualityComparer<TToken>.Default.Equals(lexeme.Token, token),
+                $"Expected {token}");
 
         public static Parser<Lexeme<TToken>, TToken> Token<TToken>(params TToken[] tokens)
         {
@@ -29,25 +42,9 @@
                 throw new ArgumentNullException(nameof(tokens));
             }
 
-            return input =>
-            {
-                if (input.Length == 0)
-                {
-                    return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected [{string.Join(", ", tokens)}]");
-                }
-
-                foreach (var token in tokens)
-                {
-                    if (!EqualityComparer<TToken>.Default.Equals(input[0].Token, token))
-                    {
-                        continue;
-                    }
-
-                    return ParserResult.Success(input[0], input.Advance(1));
-                }
-
-                return ParserResult.Failure<Lexeme<TToken>, TToken>($"Expected [{string.Join(", ", tokens)}]");
-            };
+            return OneWithPredicate<TToken>(
+                lexeme => tokens.Contains(lexeme.Token),
+                $"Expected [{string.Join(", ", tokens)}]");
         }
 
         public static Parser<T, TToken> Ref<T, TToken>(Func<Parser<T, TToken>> parser)
@@ -59,11 +56,6 @@
 
             return input => parser()(input);
         }
-
-        public static Parser<T, TToken> Value<T, TToken>(T value = default) =>
-            input => ParserResult.Success(value, input);
-
-        public static Parser<object?, TToken> Epsilon<TToken>() => Value<object?, TToken>(null);
 
         public static Parser<T, TToken> Epsilon<T, TToken>() => Value<T, TToken>(default!);
 
@@ -167,7 +159,7 @@
                 if (!result.IsSuccessful) return result;
 
                 T accumulator = result.Result;
-                var remainder = result.RemainingLexemeString;
+                var remainder = result.RemainingLexemes;
 
                 while (true)
                 {
@@ -175,11 +167,11 @@
 
                     if (!op.IsSuccessful) return ParserResult.Success(accumulator, remainder);
 
-                    var res = rhsParser(op.RemainingLexemeString);
+                    var res = rhsParser(op.RemainingLexemes);
 
                     if (!op.IsSuccessful) return ParserResult.Success(accumulator, remainder);
 
-                    remainder = res.RemainingLexemeString;
+                    remainder = res.RemainingLexemes;
 
                     accumulator = factory(accumulator, op.Result, res.Result);
                 }
@@ -199,7 +191,7 @@
 
                 return result.IsSuccessful
                 ? ParserResult.Success(result.Result, input)
-                : ParserResult.Failure<T,TToken>(result.ErrorMessage!);
+                : ParserResult.Error<T, TToken>(result.ErrorMessage, input);
             };
         }
     }

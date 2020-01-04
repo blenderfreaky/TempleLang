@@ -2,28 +2,26 @@
 {
     using Lexer.Abstractions;
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
 
     public static class ParserResult
     {
         [DebuggerStepThrough]
-        public static ParserResult<T, TToken> Success<T, TToken>(T result, LexemeString<TToken> remainingLexemeString) =>
-            new ParserResult<T, TToken>(result, remainingLexemeString);
+        public static IParserResult<T, TToken> Success<T, TToken>(T result, LexemeString<TToken> remainingLexemes) =>
+            new ParserSuccess<T, TToken>(result, remainingLexemes);
+
+        //[DebuggerStepThrough]
+        public static IParserResult<T, TToken> Error<T, TToken>(string errorMessage, LexemeString<TToken> remainingLexemes) =>
+            new ParserError<T, TToken>(errorMessage, remainingLexemes);
 
         [DebuggerStepThrough]
-        public static ParserResult<T, TToken> Failure<T, TToken>(string errorMessage) =>
-            new ParserResult<T, TToken>(errorMessage, default);
-
-        [DebuggerStepThrough]
-        public static ParserResult<U, TToken> Failure<T, U, TToken>(IParserResult<T, TToken> error) =>
+        public static IParserResult<U, TToken> Error<T, U, TToken>(IParserResult<T, TToken> error) =>
             error.IsSuccessful
             ? throw new ArgumentException(nameof(error))
-            : new ParserResult<U, TToken>(error.ErrorMessage!, default);
+            : new ParserError<U, TToken>(error.ErrorMessage, error.RemainingLexemes);
 
         [DebuggerStepThrough]
-        public static IParserResult<T, TToken> Failure<T, TToken>(params IParserResult<T, TToken>[] errors) =>
+        public static IParserResult<T, TToken> Error<T, TToken>(params IParserResult<T, TToken>[] errors) =>
             new ParserAggregateError<T, TToken>(errors);
     }
 }

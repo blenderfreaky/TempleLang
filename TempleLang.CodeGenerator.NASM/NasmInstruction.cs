@@ -24,16 +24,21 @@
         }
 
         private readonly static NasmInstruction _empty = new NasmInstruction(null, null, null, null);
+
         public static NasmInstruction Empty() => _empty;
+
         public static NasmInstruction Comment(string comment) => new NasmInstruction(null, null, comment, null);
 
         public static NasmInstruction Label(string label) => new NasmInstruction(label, null, null, null);
+
         public static NasmInstruction Label(string label, string comment) => new NasmInstruction(label, null, comment, null);
 
         public static NasmInstruction Call(string name, params IParameter[] parameters) => new NasmInstruction(null, name, null, parameters);
+
         public static NasmInstruction Call(string name, string comment, params IParameter[] parameters) => new NasmInstruction(null, name, comment, parameters);
 
         public static NasmInstruction LabeledCall(string label, string name, params IParameter[] parameters) => new NasmInstruction(label, name, null, parameters);
+
         public static NasmInstruction LabeledCall(string label, string name, string comment, params IParameter[] parameters) => new NasmInstruction(label, name, comment, parameters);
 
         public NasmInstruction WithComment(string comment) => new NasmInstruction(LabelName, Name, comment, Parameters);

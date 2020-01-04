@@ -56,7 +56,7 @@
                     from import in Parse.Token(Token.StringLiteral)
                     select new ProcedureDeclaration(
                         import.Location.WithValue(
-                            import.Text.Substring(1,import.Text.Length-2)),
+                            import.Text.Substring(1, import.Text.Length - 2)),
                         name,
                         returnType,
                         parameters,

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Diagnostic;
-using TempleLang.Lexer;
-using TempleLang.Parser.Abstractions;
-
-namespace TempleLang.Parser
+﻿namespace TempleLang.Parser
 {
+    using TempleLang.Diagnostic;
+    using TempleLang.Lexer;
+    using TempleLang.Parser.Abstractions;
+
     public class ForStatement : Statement
     {
         public Statement? Prefix { get; }

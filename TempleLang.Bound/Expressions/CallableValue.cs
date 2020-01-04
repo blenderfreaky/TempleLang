@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Diagnostic;
-
-namespace TempleLang.Bound.Expressions
+﻿namespace TempleLang.Bound.Expressions
 {
+    using System.Collections.Generic;
+    using TempleLang.Diagnostic;
+
     public struct CallableValue : IValue
     {
         public ICallable Callable { get; }

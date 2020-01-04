@@ -13,6 +13,6 @@
         public override string ToString() => "null";
 
         public static new readonly Parser<NullLiteral, Token> Parser =
-            Parse.Token(Token.NullLiteral).Transform(x => new NullLiteral(x.Location));
+            Parse.Token(Token.NullLiteral).Select(x => new NullLiteral(x.Location));
     }
 }

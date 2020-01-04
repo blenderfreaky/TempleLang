@@ -2,7 +2,6 @@
 {
     using Bound.Primitives;
     using Diagnostic;
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Binder;
@@ -48,6 +47,7 @@
         }
 
         private int _counter = 0;
+
         private string RequestName() => "C" + _counter++;
 
         private DataLocation RegisterConstant(Constant constant, bool customName = false)
@@ -69,6 +69,7 @@
                 case NamespaceDeclaration decl:
                     foreach (var compilation in decl.Declarations.SelectMany(CompileDeclaration)) yield return compilation;
                     break;
+
                 case Procedure procedure:
                     var transformed = Transformer.TransformStatementWithParameters(procedure.EntryPoint, procedure.Parameters).ToList();
 
@@ -76,6 +77,7 @@
 
                     yield return new ProcedureCompilation(procedure, transformed, ConstantTable, FalseConstant, TrueConstant, allocation);
                     break;
+
                 case ProcedureImport import:
                     Externs.Add(import.ImportedName);
                     break;

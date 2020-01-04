@@ -4,8 +4,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Bound.Declarations;
-    using TempleLang.Bound.Primitives;
     using TempleLang.Bound.Expressions;
+    using TempleLang.Bound.Primitives;
     using TempleLang.Bound.Statements;
     using TempleLang.Diagnostic;
     using S = Parser;
@@ -34,9 +34,11 @@
                         binder.Explore();
                         Namespaces.Add(binder);
                         break;
+
                     case S.ProcedureDeclaration decl:
                         Declarations[decl] = ExploreDeclaration(decl);
                         break;
+
                     default:
                         throw new InvalidOperationException("Invalid declaration");
                 }
@@ -74,6 +76,7 @@
                             }
 
                             return new Procedure(proc.Name, proc.ReturnType, proc.Parameters, boundStatement!, proc.Location);
+
                         default:
                             return x.Value;
                     }

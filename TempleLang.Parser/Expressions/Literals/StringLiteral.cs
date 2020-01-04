@@ -17,7 +17,7 @@
 
         public static new readonly Parser<StringLiteral, Token> Parser =
             Parse.Token(Token.StringLiteral)
-            .Transform(x => new StringLiteral(
+            .Select(x => new StringLiteral(
                 x.Location.WithValue(x.Text.Substring(1, x.Text.Length - 2)))); // Substring to get rid of double quotes
     }
 }

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TempleLang.Bound.Expressions;
-using TempleLang.Diagnostic;
-
-namespace TempleLang.Bound.Statements
+﻿namespace TempleLang.Bound.Statements
 {
+    using System.Collections.Generic;
+    using TempleLang.Bound.Expressions;
+    using TempleLang.Diagnostic;
+
     public struct ForStatement : IStatement
     {
         public IStatement? Prefix { get; }

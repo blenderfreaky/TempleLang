@@ -3,7 +3,6 @@
     using Lexer.Abstractions;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
 
     public class ParserAggregateError<T, TToken> : IParserResult<T, TToken>
@@ -15,7 +14,7 @@
 
         public T Result => throw new NotSupportedException();
 
-        public LexemeString<TToken> RemainingLexemeString => throw new NotSupportedException();
+        public LexemeString<TToken> RemainingLexemes => throw new NotSupportedException();
 
         public ParserAggregateError(IReadOnlyList<IParserResult<T, TToken>> errors)
         {

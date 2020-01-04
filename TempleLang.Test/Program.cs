@@ -4,7 +4,6 @@
     using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Text;
     using TempleLang.Lexer;
 
     public static class Program

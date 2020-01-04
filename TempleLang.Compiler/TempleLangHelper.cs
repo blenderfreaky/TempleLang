@@ -21,13 +21,13 @@
 
         private static IParserResult<T, Token> ParseEoF<T>(Parser<T, Token> parser, LexemeString<Token> lexemes)
         {
-            var eofParser =
-                (from r in parser
-                     // Match EoF to ensure the entire input is matched
-                 from _ in Parse.Token(Token.EoF)
-                 select r);
+            var result = parser(lexemes);
 
-            return eofParser(lexemes);
+            if (!result.IsSuccessful) return result;
+
+            if (result.RemainingLexemes.Length > 1) return ParserResult.Error<T, Token>("Error matching " + result.RemainingLexemes[result.RemainingLexemes.Length - 1], result.RemainingLexemes);
+
+            return result;
         }
 
         public static Compilation? Compile(

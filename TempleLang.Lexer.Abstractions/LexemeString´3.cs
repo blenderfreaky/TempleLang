@@ -1,9 +1,8 @@
 ﻿namespace TempleLang.Lexer.Abstractions
 {
-    using System.Collections;
     using System.Collections.Generic;
 
-    public readonly struct LexemeString<TToken> : IEnumerable<Lexeme<TToken>>
+    public readonly struct LexemeString<TToken>
     {
         private readonly Lexeme<TToken>[] _lexemes;
 
@@ -25,7 +24,7 @@
         public override string ToString() => $"Offset: {_offset} Remaining: {Length}";
 
         /// <inheritdoc/>
-        /// <remarks>Performs a shallow comparison, not a deep one.</remarks>
+        /// <remarks>Performs a shallow comparison.</remarks>
         public override bool Equals(object? obj) => obj is LexemeString<TToken> @string
             && EqualityComparer<Lexeme<TToken>[]>.Default.Equals(_lexemes, @string._lexemes)
             && _offset == @string._offset;
@@ -38,10 +37,6 @@
             hashCode = (hashCode * -1521134295) + _offset.GetHashCode();
             return hashCode;
         }
-
-        public IEnumerator<Lexeme<TToken>> GetEnumerator() => ((IEnumerable<Lexeme<TToken>>)_lexemes).GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<Lexeme<TToken>>)_lexemes).GetEnumerator();
 
         public static bool operator ==(LexemeString<TToken> left, LexemeString<TToken> right) => left.Equals(right);
 

@@ -20,7 +20,7 @@
 
         public override string ToString() => $"\n{{\n{string.Join(Environment.NewLine, Declarations.Select(x => "    " + x.ToString()))}\n}}";
 
-        public static readonly Parser<NamespaceDeclaration, Token> ParenthesizedParser =
+        public static new readonly Parser<NamespaceDeclaration, Token> Parser =
             from declarator in Parse.Token(Token.Namespace)
             from name in Parse.Token(Token.Identifier)
             from ldelim in Parse.Token(Token.LBraces)
@@ -31,22 +31,18 @@
         public static readonly Parser<NamespaceDeclaration, Token> FileWideParser =
             from declarator in Parse.Token(Token.Namespace)
             from name in Parse.Token(Token.Identifier)
-            from _ in Parse.Token(Token.Semicolon)
+            from semicolon in Parse.Token(Token.Semicolon)
             from declarations in Declaration.Parser.Many()
-            from terminator in Parse.Lookahead(Parse.Token(Token.EoF))
-            select new NamespaceDeclaration(name, declarations, FileLocation.Concat(declarator, terminator));
-
-        public static new readonly Parser<NamespaceDeclaration, Token> Parser =
-            ParenthesizedParser
-            .Or(FileWideParser);
+            select new NamespaceDeclaration(name, declarations, FileLocation.Concat(declarator, declarations.Count > 0 ? declarations.Last().Location : semicolon.Location));
 
         public static readonly Parser<NamespaceDeclaration, Token> GlobalNamespaceParser =
             from declarations in Declaration.Parser.Many()
+                .Or(FileWideParser.OfType<Declaration, Token>().Many(1, 1))
             select new NamespaceDeclaration(
                 FileLocation.Null.WithValue("global"),
                 declarations,
                 declarations.Count > 0
-                ? FileLocation.Concat(declarations[0], declarations[declarations.Count-1])
+                ? FileLocation.Concat(declarations[0], declarations[declarations.Count - 1])
                 : FileLocation.Null);
     }
 }

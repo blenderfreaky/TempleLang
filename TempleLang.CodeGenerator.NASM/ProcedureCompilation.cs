@@ -6,8 +6,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection.Emit;
-    using TempleLang.CodeGenerator.NASM;
     using TempleLang.Intermediate;
 
     public class ProcedureCompilation
@@ -130,10 +128,13 @@
             NasmInstruction.Call("jmp", new LabelParameter(label));
 
         private static MemoryParameter Memory(IMemory memory) => new MemoryParameter(memory);
+
         private static MemoryParameter Memory(RegisterName registerName) => new MemoryParameter(Register.Get(registerName));
+
         private MemoryParameter Memory(IReadableValue memory) => new MemoryParameter(GetMemory(memory));
 
         private int _counter = 0;
+
         private string RequestName() => "CG" + _counter++;
 
         private readonly OperatorTable<UnaryOperatorType> _unaryOperators = new OperatorTable<UnaryOperatorType>

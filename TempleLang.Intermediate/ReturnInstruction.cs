@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public struct ReturnInstruction :IInstruction
+    public struct ReturnInstruction : IInstruction
     {
         public IReadableValue? ReturnValue { get; }
 
