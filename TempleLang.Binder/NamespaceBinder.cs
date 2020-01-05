@@ -47,12 +47,17 @@
 
         private IDeclaration ExploreDeclaration(S.ProcedureDeclaration decl)
         {
-            var returnType = FindType(decl.ReturnTypeAnnotation);
-            var parameters = decl.Parameters.Select(x => new Local(x.Name.Name, ValueFlags.Readable | ValueFlags.Assignable, FindType(x.TypeAnnotation), x.Location)).ToList();
+            var returnType = decl.ReturnTypeAnnotation == null ? PrimitiveType.Unknown : FindType(decl.ReturnTypeAnnotation);
+            if (returnType == PrimitiveType.Unknown) Error(DiagnosticCode.InvalidTypeSpecifier, decl.Name.Location);
+
+            var parameters = decl.Parameters.Select(x => new Local(
+                x.Name.Name,
+                ValueFlags.Readable | ValueFlags.Assignable,
+                x.TypeAnnotation == null ? PrimitiveType.Unknown : FindType(x.TypeAnnotation))).ToList();
 
             return decl.ImportedName == null
-                ? (IDeclaration)new Procedure(decl.Name.PositionedText, returnType, parameters, null!, decl.Location)
-                : new ProcedureImport(decl.Name.PositionedText, returnType, parameters, decl.ImportedName.Value, decl.Location);
+                ? (IDeclaration)new Procedure(decl.Name.PositionedText, returnType, parameters, null!)
+                : new ProcedureImport(decl.Name.PositionedText, returnType, parameters, decl.ImportedName.Value);
         }
 
         public IDeclaration Bind()
@@ -64,18 +69,13 @@
                         case Procedure proc:
                             var syntaxDecl = (S.ProcedureDeclaration)x.Key;
 
-                            IStatement? boundStatement;
+                            IStatement boundStatement;
                             using (CodeBinder codeBinder = new CodeBinder(proc.Parameters.ToDictionary(x => x.Name, x => x), this))
                             {
                                 boundStatement = codeBinder.BindStatement(syntaxDecl.EntryPoint!);
                             }
 
-                            if (boundStatement == null)
-                            {
-                                //Error()
-                            }
-
-                            return new Procedure(proc.Name, proc.ReturnType, proc.Parameters, boundStatement!, proc.Location);
+                            return new Procedure(proc.Name, proc.ReturnType, proc.Parameters, boundStatement);
 
                         default:
                             return x.Value;
@@ -84,7 +84,7 @@
                 .Concat(Namespaces.Select(x => x.Bind()))
                 .ToList();
 
-            return new NamespaceDeclaration(Declaration.Name, declarations, Declaration.Location);
+            return new NamespaceDeclaration(Declaration.Name, declarations);
         }
 
         public override IDeclaration? FindDeclaration(S.Expression expression)

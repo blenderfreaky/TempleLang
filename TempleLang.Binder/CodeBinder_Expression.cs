@@ -30,7 +30,7 @@
             _ => throw new ArgumentException(nameof(syntaxExpression)),
         };
 
-        public UnaryExpression BindExpression(PrefixExpression expr)
+        public IExpression BindExpression(PrefixExpression expr)
         {
             var val = BindExpression(expr.Value);
 
@@ -54,10 +54,10 @@
 
             var returnType = val.ReturnType;
 
-            return new UnaryExpression(val, op, returnType, expr.Location);
+            return Overload.FindUnaryOperator(val, op, this, expr.Location);
         }
 
-        public UnaryExpression BindExpression(PostfixExpression expr)
+        public IExpression BindExpression(PostfixExpression expr)
         {
             var val = BindExpression(expr.Value);
 
@@ -76,18 +76,13 @@
 
             var returnType = val.ReturnType;
 
-            return new UnaryExpression(val, op, returnType, expr.Location);
+            return Overload.FindUnaryOperator(val, op, this, expr.Location);
         }
 
-        public IE.BinaryExpression BindExpression(S.BinaryExpression expr)
+        public IExpression BindExpression(S.BinaryExpression expr)
         {
             var lhs = BindExpression(expr.Lhs);
             var rhs = BindExpression(expr.Rhs);
-
-            if ((lhs == null && rhs == null) || lhs?.ReturnType != rhs?.ReturnType)
-            {
-                Error(DiagnosticCode.InvalidType, expr.Location);
-            }
 
             var op = expr.Operator.Token switch
             {
@@ -134,9 +129,9 @@
                 Error(DiagnosticCode.InvalidOperator, expr.Location);
             }
 
-            var returnType = lhs?.ReturnType ?? rhs?.ReturnType;
+            var computationExpression = Overload.FindBinaryOperator(lhs, rhs, op, this, expr.Operator.Location);
 
-            var computationExpression = new IE.BinaryExpression(lhs!, rhs!, op, returnType!, expr.Location);
+            var returnType = computationExpression.ReturnType;
 
             switch (expr.Operator.Token)
             {
@@ -152,7 +147,7 @@
                 case Token.BitwiseXorCompoundAssign:
                 case Token.BitshiftLeftCompoundAssign:
                 case Token.BitshiftRightCompoundAssign:
-                    return new IE.BinaryExpression(lhs!, computationExpression, BinaryOperatorType.Assign, returnType!, expr.Location);
+                    return new IE.BinaryExpression(lhs, computationExpression, BinaryOperatorType.Assign, returnType);
 
                 default:
                     return computationExpression;
@@ -166,34 +161,58 @@
 
             if (trueVal.ReturnType != falseVal.ReturnType)
             {
-                Error(DiagnosticCode.InvalidType, expr.Location);
+                Error(DiagnosticCode.InvalidOperandTypes, expr.Location);
             }
 
             var condition = BindExpression(expr.Condition);
 
-            if (condition.ReturnType.FullyQualifiedName != "bool") //TODO
+            if (condition.ReturnType != PrimitiveType.Bool)
             {
                 Error(DiagnosticCode.InvalidConditionalType, expr.Location);
             }
 
             var returnType = trueVal.ReturnType;
 
-            return new IE.TernaryExpression(condition, trueVal, falseVal, returnType, expr.Location);
+            return new IE.TernaryExpression(condition, trueVal, falseVal, returnType);
         }
 
-        public IE.AccessExpression BindExpression(S.AccessExpression expr)
+        public IExpression BindExpression(S.AccessExpression expr)
         {
             var val = BindExpression(expr.Accessee);
 
             AccessOperationType op = expr.AccessOperator.Value switch
             {
                 Token.Accessor => AccessOperationType.Regular,
+                Token.StaticAccessor => AccessOperationType.Static,
 
                 _ => AccessOperationType.ERROR,
             };
 
-            //TODO
-            return new IE.AccessExpression(val, op, expr.Accessor.PositionedText, ValueFlags.Readable, PrimitiveType.Bool, expr.Location);
+            if (op == AccessOperationType.ERROR)
+            {
+                Error(DiagnosticCode.InvalidOperator, expr.Location);
+            }
+
+            if (op == AccessOperationType.Regular)
+            {
+                if (!val.ReturnType.TryGetMember(expr.Accessor.Name, out var member))
+                {
+                    Error(DiagnosticCode.UnknownMember, expr.Accessor.Location);
+                }
+
+                //TODO
+                throw new NotImplementedException();
+                //return new IE.AccessExpression(val, op, expr.Accessor.PositionedText, ValueFlags.Readable, PrimitiveType.Bool);
+            }
+            else if (op == AccessOperationType.Static)
+            {
+                //TODO
+                throw new NotImplementedException();
+            }
+
+            Error(DiagnosticCode.InvalidOperator, expr.Accessor.Location);
+
+            return new InvalidExpression(expr.Location);
         }
 
         public IE.CallExpression BindExpression(S.CallExpression expr)
@@ -205,11 +224,11 @@
 
             if (calledType is ICallable callable)
             {
-                return callable.BindOverload(callee, parameters, expr.Location, this);
+                return callable.BindOverload(callee, parameters, this, expr.Location);
             }
 
             Error(DiagnosticCode.CallingUncallable, expr.Location);
-            return new IE.CallExpression(null!, null!, PrimitiveType.Unknown, expr.Location);
+            return new IE.CallExpression(null!, null!, PrimitiveType.Unknown);
         }
 
         public IValue BindExpression(Identifier expr) => FindValue(expr)!;

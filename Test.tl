@@ -15,7 +15,7 @@ func _start() : long
     print("\n", 1);
 }
 
-func fib(num : long)
+func fib(num : long) : long
 {
     let m1 = 0;
     let m2 = 1;
@@ -51,17 +51,20 @@ func printDigit(digit : long) : long
     print(digits + digit * 2, 1);
 }
 
-func print(ptr:long, len:long) : long
+func print(ptr:ptr, len:long) : long
 {
     let stdOut = GetStdHandle(-11);
     let numberOfCharsWritten = 0;
     return WriteConsoleW(stdOut, ptr, len, ref numberOfCharsWritten, 0);
 }
 
-func GetStdHandle(id : long) : long
-    using "GetStdHandle"
+func GetStdHandle(id : long) : ptr
+    using "kernel32.lib";
 
 func WriteConsoleW(
-    stdOut : long, message : long, messageLength : long,
-    numberOfCharsWritten : long, zero : long) : long
-    using "WriteConsoleW"
+    stdOut : ptr,
+    message : ptr,
+    messageLength : long,
+    numberOfCharsWritten : ptr,
+    zero : long) : long
+    using "kernel32.lib";

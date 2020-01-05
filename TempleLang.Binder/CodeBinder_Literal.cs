@@ -16,7 +16,7 @@
             _ => throw new ArgumentException(nameof(syntaxLiteral)),
         };
 
-        public IValue BindLiteral(BoolLiteral expr) => new Constant<bool>(expr.Value, PrimitiveType.Bool, expr.Location);
+        public IValue BindLiteral(BoolLiteral expr) => new Constant<bool>(expr.Value, PrimitiveType.Bool);
 
         public IValue BindLiteral(NumberLiteral expr)
         {
@@ -27,7 +27,7 @@
                     Error(DiagnosticCode.InvalidNumeric, expr.Location);
                 }
 
-                return new Constant<double>(result, PrimitiveType.Double, expr.Location);
+                return new Constant<double>(result, PrimitiveType.Double);
             }
             else
             {
@@ -36,10 +36,10 @@
                     Error(DiagnosticCode.InvalidNumeric, expr.Location);
                 }
 
-                return new Constant<long>(result, PrimitiveType.Long, expr.Location);
+                return new Constant<long>(result, PrimitiveType.Long);
             }
         }
 
-        public IValue BindLiteral(StringLiteral expr) => new Constant<string>(expr.Value, PrimitiveType.StringPointer, expr.Location);
+        public IValue BindLiteral(StringLiteral expr) => new Constant<string>(expr.Value, PrimitiveType.Pointer);
     }
 }

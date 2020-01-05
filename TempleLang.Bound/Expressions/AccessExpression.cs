@@ -15,21 +15,18 @@
 
         public ITypeInfo ReturnType { get; }
 
-        public FileLocation Location { get; }
-
-        public AccessExpression(IExpression accessee, AccessOperationType accessOperator, Positioned<string> accessor, ValueFlags flags, ITypeInfo returnType, FileLocation location)
+        public AccessExpression(IExpression accessee, AccessOperationType accessOperator, Positioned<string> accessor, ValueFlags flags, ITypeInfo returnType)
         {
             Accessee = accessee;
             AccessOperator = accessOperator;
             Accessor = accessor;
             Flags = flags;
             ReturnType = returnType;
-            Location = location;
         }
 
         public override string ToString() => $"({Accessee} {AccessOperator} {Accessor})";
 
-        public override bool Equals(object? obj) => obj is AccessExpression expression && EqualityComparer<IExpression>.Default.Equals(Accessee, expression.Accessee) && AccessOperator == expression.AccessOperator && EqualityComparer<Positioned<string>>.Default.Equals(Accessor, expression.Accessor) && Flags == expression.Flags && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, expression.ReturnType) && EqualityComparer<FileLocation>.Default.Equals(Location, expression.Location);
+        public override bool Equals(object? obj) => obj is AccessExpression expression && EqualityComparer<IExpression>.Default.Equals(Accessee, expression.Accessee) && AccessOperator == expression.AccessOperator && EqualityComparer<Positioned<string>>.Default.Equals(Accessor, expression.Accessor) && Flags == expression.Flags && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, expression.ReturnType);
 
         public override int GetHashCode()
         {
@@ -39,7 +36,6 @@
             hashCode = (hashCode * -1521134295) + Accessor.GetHashCode();
             hashCode = (hashCode * -1521134295) + Flags.GetHashCode();
             hashCode = (hashCode * -1521134295) + EqualityComparer<ITypeInfo>.Default.GetHashCode(ReturnType);
-            hashCode = (hashCode * -1521134295) + Location.GetHashCode();
             return hashCode;
         }
 
@@ -51,6 +47,7 @@
     public enum AccessOperationType
     {
         Regular,
+        Static,
 
         ERROR,
     }

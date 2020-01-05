@@ -42,7 +42,7 @@
                     buffer.Append(new string(' ', start)).AppendLine(new string('^', end - start));
                 }
 
-                pos += text[i].Length;
+                pos += text[i].Length + 1; // + 1 for newline
             }
 
             return buffer.ToString();

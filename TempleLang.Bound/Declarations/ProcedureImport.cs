@@ -7,34 +7,32 @@
 
     public sealed class ProcedureImport : IDeclaration, ICallable
     {
-        public Positioned<string> Name { get; }
+        public string Name { get; }
 
         public ITypeInfo ReturnType { get; }
 
         public IReadOnlyList<Local> Parameters { get; }
 
-        public Positioned<string> ImportedName { get; }
+        public string ImportedName { get; }
 
-        public FileLocation Location { get; }
-
-        string ITypeInfo.Name => Name.Value;
+        string ITypeInfo.Name => Name;
 
         //TODO
-        string ITypeInfo.FullyQualifiedName => Name.Value;
+        string ITypeInfo.FullyQualifiedName => Name;
 
         int ITypeInfo.Size => 8;
 
-        public ProcedureImport(Positioned<string> name, ITypeInfo returnType, IReadOnlyList<Local> parameters, Positioned<string> importedName, FileLocation location)
+        public ProcedureImport(string name, ITypeInfo returnType, IReadOnlyList<Local> parameters, string importedName)
         {
             Name = name;
             ReturnType = returnType;
             Parameters = parameters;
             ImportedName = importedName;
-            Location = location;
+
         }
 
         public override string ToString() =>
-            $"let {Name.Value}({string.Join(", ", Parameters)}) : {ReturnType?.ToString() ?? "void"} {"using \"" + ImportedName.Value + "\""}";
+            $"let {Name}({string.Join(", ", Parameters)}) : {ReturnType?.ToString() ?? "void"} {"using \"" + ImportedName + "\""}";
 
         public bool TryGetMember(string name, out IMemberInfo? member)
         {
@@ -42,12 +40,12 @@
             return false;
         }
 
-        public CallExpression BindOverload(IExpression callee, IReadOnlyList<IExpression> parameters, FileLocation location, IDiagnosticReceiver diagnosticReceiver)
+        public CallExpression BindOverload(IExpression callee, IReadOnlyList<IExpression> parameters, IDiagnosticReceiver diagnosticReceiver, FileLocation location)
         {
             if (Parameters.Count != parameters.Count)
             {
                 diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidParamCount, location, true);
-                return new CallExpression(null!, null!, PrimitiveType.Unknown, location);
+                return new CallExpression(null!, null!, PrimitiveType.Unknown);
             }
 
             for (int i = 0; i < parameters.Count; i++)
@@ -57,7 +55,7 @@
                 diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidParamType, location, true);
             }
 
-            return new CallExpression(callee, parameters, ReturnType, location);
+            return new CallExpression(callee, parameters, ReturnType);
         }
     }
 }

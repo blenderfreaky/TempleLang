@@ -14,23 +14,6 @@
                     : Parse.Error<T, TToken>(errorMessage)
             select result;
 
-        private class Memoization<T, TToken>
-        {
-            public Dictionary<(LexemeString<TToken>, Parser<T, TToken>), IParserResult<T, TToken>> Elements { get; } = new Dictionary<(LexemeString<TToken>, Parser<T, TToken>), IParserResult<T, TToken>>();
-
-            public static Dictionary<int, Memoization<T, TToken>> Memoizations { get; } = new Dictionary<int, Memoization<T, TToken>>();
-        }
-
-        private static Parser<T, TToken> Memoize<T, TToken>(this Parser<T, TToken> parser, string id)
-        {
-            if (!Memoization<T, TToken>.Memoizations.TryGetValue(id.GetHashCode(), out var value))
-            {
-                value = Memoization<T, TToken>.Memoizations[id.GetHashCode()] = new Memoization<T, TToken>();
-            }
-
-            return input => value.Elements.TryGetValue((input, parser), out var ret) ? ret : value.Elements[input] = parser(input);
-        }
-
         public static Parser<T, TToken> Or<T, TToken>(this Parser<T, TToken> left, Parser<T, TToken> right)
         {
             if (left is null)
@@ -43,15 +26,14 @@
                 throw new ArgumentNullException(nameof(right));
             }
 
-            return Memoize<T,TToken>(input =>
+            return input =>
             {
                 var leftResult = left(input);
-                var rightResult = right(input);
 
-                return rightResult.RemainingLexemes.Length >= leftResult.RemainingLexemes.Length
-                    ? leftResult
-                    : rightResult;
-            }, nameof(Or));
+                if (leftResult.IsSuccessful) return leftResult;
+
+                return right(input);
+            };
         }
 
         public static Parser<U, TToken> SelectMany<T, U, TToken>(this Parser<T, TToken> left, Func<T, Parser<U, TToken>> func)
@@ -66,7 +48,7 @@
                 throw new ArgumentNullException(nameof(func));
             }
 
-            return Memoize<U, TToken>(input =>
+            return input =>
             {
                 var leftResult = left(input);
 
@@ -75,7 +57,7 @@
                 var rightParser = func(leftResult.Result);
 
                 return rightParser(leftResult.RemainingLexemes);
-            }, nameof(SelectMany));
+            };
         }
 
         public static Parser<V, TToken> SelectMany<T, U, V, TToken>(this Parser<T, TToken> left, Func<T, Parser<U, TToken>> right, Func<T, U, V> selector)
@@ -95,7 +77,7 @@
                 throw new ArgumentNullException(nameof(selector));
             }
 
-            return Memoize<V, TToken>(input =>
+            return input =>
             {
                 var leftResult = left(input);
 
@@ -106,7 +88,7 @@
                 if (!rightResult.IsSuccessful) return ParserResult.Error<U, V, TToken>(rightResult);
 
                 return ParserResult.Success(selector(leftResult.Result!, rightResult.Result!), rightResult.RemainingLexemes);
-            }, nameof(SelectMany) + "2");
+            };
         }
 
         public static Parser<U, TToken> Select<T, U, TToken>(this Parser<T, TToken> parser, Func<T, U> selector)
@@ -121,14 +103,14 @@
                 throw new ArgumentNullException(nameof(selector));
             }
 
-            return Memoize<U, TToken>(input =>
+            return input =>
             {
                 var result = parser(input);
 
                 if (!result.IsSuccessful) return ParserResult.Error<T, U, TToken>(result);
 
                 return ParserResult.Success(selector(result.Result!), result.RemainingLexemes);
-            }, nameof(Select));
+            };
         }
 
         public static Parser<U, TToken> As<T, U, TToken>(this Parser<T, TToken> parser, U value)
@@ -158,7 +140,7 @@
                 throw new ArgumentNullException(nameof(parser));
             }
 
-            return Memoize<T, TToken>(parser.Or(Parse.Value<T, TToken>(noneValue)), nameof(Maybe));
+            return parser.Or(Parse.Value<T, TToken>(noneValue));
         }
 
         public static Parser<Positioned<U>, TToken> AsPositioned<T, U, TToken>(this Parser<T, TToken> parser, U value)
@@ -179,7 +161,7 @@
                 throw new ArgumentNullException(nameof(parser));
             }
 
-            return Memoize<List<T>, TToken>(input =>
+            return input =>
             {
                 List<T> elements = new List<T>();
                 LexemeString<TToken> remainder = input;
@@ -205,7 +187,7 @@
                 }
 
                 return ParserResult.Success(elements, remainder);
-            }, nameof(Many));
+            };
         }
 
         public static Parser<List<T>, TToken> SeparatedBy<T, U, TToken>(this Parser<T, TToken> parser, Parser<U, TToken> separator, int least = 0, int most = int.MaxValue)
@@ -220,7 +202,7 @@
                 throw new ArgumentNullException(nameof(separator));
             }
 
-            return Memoize<List<T>, TToken>(input =>
+            return input =>
             {
                 List<T> elements = new List<T>();
                 LexemeString<TToken> remainder = input;
@@ -259,7 +241,7 @@
                 }
 
                 return ParserResult.Success(elements, remainder);
-            }, nameof(SeparatedBy));
+            };
         }
     }
 }

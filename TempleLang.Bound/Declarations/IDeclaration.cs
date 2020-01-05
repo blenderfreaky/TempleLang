@@ -1,9 +1,7 @@
 ﻿namespace TempleLang.Bound.Declarations
 {
-    using TempleLang.Diagnostic;
-
-    public interface IDeclaration : IPositioned
+    public interface IDeclaration
     {
-        Positioned<string> Name { get; }
+        string Name { get; }
     }
 }

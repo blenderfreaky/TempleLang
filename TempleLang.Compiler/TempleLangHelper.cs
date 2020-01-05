@@ -56,7 +56,7 @@
             return new Compilation(compiler.Compile(parserResult.Result, out diagnostics), compiler.Externs, compiler.Imports, compiler.ConstantTable);
         }
 
-        public static string GenerateExecutable(
+        public static string? GenerateExecutable(
             Compilation compilation,
             string name,
             string tempPath,
@@ -87,13 +87,16 @@
 
             Process.Start("nasm", $"-f win64 -o \"{objFile}\" \"{asmFile}\"").WaitForExit();
 
+            if (!File.Exists(objFile)) return null;
+
             Directory.CreateDirectory(execPath);
 
-            string libraries = string.Join(" ", compilation.Imports); //@"""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\kernel32.lib"" ""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\user32.lib""";
+            //                                                                      Hack: LINK.EXE doesn't properly find kernel32.lib otherwise
+            string libraries = string.Join(" ", compilation.Imports.Select(x => $@"""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\{x}"""));
             string arguments = $"/entry:_start /subsystem:console /out:\"{exeFile}\" \"{objFile}\" {libraries}";
             Process.Start("link", arguments).WaitForExit();
 
-            return exeFile;
+            return File.Exists(exeFile) ? exeFile : null;
         }
     }
 }

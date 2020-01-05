@@ -8,6 +8,6 @@
     {
         ITypeInfo ReturnType { get; }
 
-        CallExpression BindOverload(IExpression callee, IReadOnlyList<IExpression> parameters, FileLocation location, IDiagnosticReceiver diagnosticReceiver);
+        CallExpression BindOverload(IExpression callee, IReadOnlyList<IExpression> parameters, IDiagnosticReceiver diagnosticReceiver, FileLocation location);
     }
 }

@@ -7,7 +7,7 @@
         UnknownValue,
         InvalidNumeric,
         MissingType,
-        InvalidType,
+        InvalidOperandTypes,
         TypeInferenceFailed,
         InvalidTypeSpecifier,
         UnknownType,
@@ -15,5 +15,6 @@
         InvalidParamType,
         EmptyProcedure,
         CallingUncallable,
+        UnknownMember,
     }
 }

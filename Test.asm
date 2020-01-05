@@ -1,10 +1,10 @@
 section .data
 FALSE: equ     0
 TRUE: equ     1
-stringC0: db      __utf16__(`\n`)
+ptrC0: db      __utf16__(`\n`)
 longC1: equ     10
-stringC2: db      __utf16__(`-`)
-stringC3: db      __utf16__(`0123456789`)
+ptrC2: db      __utf16__(`-`)
+ptrC3: db      __utf16__(`0123456789`)
 longC4: equ     2
 longC5: equ     11
 section .text
@@ -15,13 +15,13 @@ _start: ; _start() : long
         sub     RSP, 48 ; Allocate stack
     
       ; _ = call print(\n, 1)
-        mov     RCX, stringC0 ; Pass parameter #0
+        mov     RCX, ptrC0 ; Pass parameter #0
         mov     RDX, TRUE ; Pass parameter #1
         call    print
       ; /
     
       ; _ = call print(\n, 1)
-        mov     RCX, stringC0 ; Pass parameter #0
+        mov     RCX, ptrC0 ; Pass parameter #0
         mov     RDX, TRUE ; Pass parameter #1
         call    print
       ; /
@@ -70,7 +70,7 @@ _start: ; _start() : long
       ; /
     
       ; _ = call print(\n, 1)
-        mov     RCX, stringC0 ; Pass parameter #0
+        mov     RCX, ptrC0 ; Pass parameter #0
         mov     RDX, TRUE ; Pass parameter #1
         call    print
       ; /
@@ -88,7 +88,7 @@ _start: ; _start() : long
       ; /
     
       ; _ = call print(\n, 1)
-        mov     RCX, stringC0 ; Pass parameter #0
+        mov     RCX, ptrC0 ; Pass parameter #0
         mov     RDX, TRUE ; Pass parameter #1
         call    print
       ; /
@@ -105,7 +105,7 @@ _start: ; _start() : long
         add     RSP, 48 ; Return stack
         ret     
     
-fib: ; fib(num : long) : ?
+fib: ; fib(num : long) : long
         sub     RSP, 16 ; Allocate stack
     
       ; num = param 0
@@ -234,7 +234,7 @@ printNum: ; printNum(num : long) : long
     
       ; _ = call print(-, 1)
         mov     qword [rsp - 24], R15 ; Store live variable onto stack
-        mov     RCX, stringC2 ; Pass parameter #0
+        mov     RCX, ptrC2 ; Pass parameter #0
         mov     RDX, TRUE ; Pass parameter #1
         call    print
         mov     R15, qword [rsp - 24] ; Restore live variable from stack
@@ -353,7 +353,7 @@ printDigit: ; printDigit(digit : long) : long
       ; /
     
       ; _ = digits Assign 0123456789
-        mov     R14, stringC3
+        mov     R14, ptrC3
       ; /
     
       ; <>T29 = digit Multiply 2
@@ -386,7 +386,7 @@ printDigit: ; printDigit(digit : long) : long
         add     RSP, 48 ; Return stack
         ret     
     
-print: ; print(ptr : long, len : long) : long
+print: ; print(ptr : ptr, len : long) : long
         sub     RSP, 88 ; Allocate stack
     
       ; ptr = param 0

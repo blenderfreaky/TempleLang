@@ -36,7 +36,7 @@
         {
             foreach (var constant in ConstantTable)
             {
-                var isString = constant.Key.Type == PrimitiveType.StringPointer;
+                var isString = constant.Key.Type == PrimitiveType.Pointer;
 
                 yield return NasmInstruction.LabeledCall(
                     label: constant.Value.LabelName,

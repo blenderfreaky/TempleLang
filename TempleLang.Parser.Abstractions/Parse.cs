@@ -4,7 +4,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TempleLang.Lexer.Abstractions;
 
     public static class Parse
     {

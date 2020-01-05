@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using TempleLang.Bound.Expressions;
-    using TempleLang.Diagnostic;
 
     public struct WhileStatement : IStatement
     {
@@ -12,17 +11,14 @@
 
         public bool IsDoLoop { get; }
 
-        public FileLocation Location { get; }
-
-        public WhileStatement(IExpression condition, IStatement statement, bool isDoLoop, FileLocation location)
+        public WhileStatement(IExpression condition, IStatement statement, bool isDoLoop)
         {
             Condition = condition;
             Statement = statement;
             IsDoLoop = isDoLoop;
-            Location = location;
         }
 
-        public override bool Equals(object? obj) => obj is WhileStatement statement && EqualityComparer<IExpression>.Default.Equals(Condition, statement.Condition) && EqualityComparer<IStatement>.Default.Equals(Statement, statement.Statement) && IsDoLoop == statement.IsDoLoop && EqualityComparer<FileLocation>.Default.Equals(Location, statement.Location);
+        public override bool Equals(object? obj) => obj is WhileStatement statement && EqualityComparer<IExpression>.Default.Equals(Condition, statement.Condition) && EqualityComparer<IStatement>.Default.Equals(Statement, statement.Statement) && IsDoLoop == statement.IsDoLoop;
 
         public override int GetHashCode()
         {
@@ -30,7 +26,6 @@
             hashCode = (hashCode * -1521134295) + EqualityComparer<IExpression>.Default.GetHashCode(Condition);
             hashCode = (hashCode * -1521134295) + EqualityComparer<IStatement>.Default.GetHashCode(Statement);
             hashCode = (hashCode * -1521134295) + IsDoLoop.GetHashCode();
-            hashCode = (hashCode * -1521134295) + Location.GetHashCode();
             return hashCode;
         }
 

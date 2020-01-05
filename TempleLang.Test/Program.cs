@@ -24,9 +24,10 @@
             var file = TempleLangHelper.GenerateExecutable(compiled, "Test", "../../../../", "../../../../");
             stopwatch.Stop();
 
+            Console.WriteLine(file != null ? "Success" : "Failure");
             Console.WriteLine("Finished in " + stopwatch.Elapsed);
 
-            Process.Start(file);
+            if (file != null) Process.Start(file);
         }
     }
 }

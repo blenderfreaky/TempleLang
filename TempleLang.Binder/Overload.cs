@@ -1,0 +1,55 @@
+﻿namespace TempleLang.Binder
+{
+    using Bound.Expressions;
+    using Bound.Primitives;
+    using Diagnostic;
+
+    public static class Overload
+    {
+        public static IExpression FindBinaryOperator(IExpression lhs, IExpression rhs, BinaryOperatorType operatorType, IDiagnosticReceiver diagnosticReceiver, FileLocation location)
+        {
+            // Temporary basic implementation
+            if (lhs.ReturnType == rhs.ReturnType || (lhs.ReturnType == PrimitiveType.Pointer && rhs.ReturnType == PrimitiveType.Long))
+            {
+                var returnType = operatorType switch
+                {
+                    BinaryOperatorType.ComparisonGreaterThan => PrimitiveType.Bool,
+                    BinaryOperatorType.ComparisonGreaterThanOrEqual => PrimitiveType.Bool,
+                    BinaryOperatorType.ComparisonLessThan => PrimitiveType.Bool,
+                    BinaryOperatorType.ComparisonLessThanOrEqual => PrimitiveType.Bool,
+                    BinaryOperatorType.ComparisonEqual => PrimitiveType.Bool,
+                    BinaryOperatorType.ComparisonNotEqual => PrimitiveType.Bool,
+                    _ => lhs.ReturnType
+                };
+
+                return new BinaryExpression(lhs, rhs, operatorType, returnType);
+            }
+
+            diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidOperandTypes, location, true);
+            return new InvalidExpression(location);
+        }
+
+        public static IExpression FindUnaryOperator(IExpression operand, UnaryOperatorType operatorType, IDiagnosticReceiver diagnosticReceiver, FileLocation location)
+        {
+            // Temporary basic implementation
+            if (operatorType == UnaryOperatorType.Reference)
+            {
+                return new UnaryExpression(operand, operatorType, PrimitiveType.Pointer);
+            }
+
+            if (operand.ReturnType != PrimitiveType.Pointer || operatorType == UnaryOperatorType.Reference)
+            {
+                var returnType = operatorType switch
+                {
+                    UnaryOperatorType.Reference => PrimitiveType.Pointer,
+                    _ => operand.ReturnType
+                };
+
+                return new UnaryExpression(operand, operatorType, operand.ReturnType);
+            }
+
+            diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidOperandTypes, location, true);
+            return new InvalidExpression(location);
+        }
+    }
+}

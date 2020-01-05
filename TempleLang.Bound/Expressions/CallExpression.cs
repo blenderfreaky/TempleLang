@@ -1,7 +1,6 @@
 ﻿namespace TempleLang.Bound.Expressions
 {
     using System.Collections.Generic;
-    using TempleLang.Diagnostic;
 
     public struct CallExpression : IExpression
     {
@@ -11,19 +10,16 @@
 
         public ITypeInfo ReturnType { get; }
 
-        public FileLocation Location { get; }
-
-        public CallExpression(IExpression callee, IReadOnlyList<IExpression> parameters, ITypeInfo returnType, FileLocation location)
+        public CallExpression(IExpression callee, IReadOnlyList<IExpression> parameters, ITypeInfo returnType)
         {
             Callee = callee;
             Parameters = parameters;
-            ReturnType = returnType;
-            Location = location;
+            ReturnType = returnType;
         }
 
         public override string ToString() => $"({Callee}({string.Join(", ", Parameters)}) : {ReturnType})";
 
-        public override bool Equals(object? obj) => obj is CallExpression expression && EqualityComparer<IExpression>.Default.Equals(Callee, expression.Callee) && EqualityComparer<IReadOnlyList<IExpression>>.Default.Equals(Parameters, expression.Parameters) && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, expression.ReturnType) && EqualityComparer<FileLocation>.Default.Equals(Location, expression.Location);
+        public override bool Equals(object? obj) => obj is CallExpression expression && EqualityComparer<IExpression>.Default.Equals(Callee, expression.Callee) && EqualityComparer<IReadOnlyList<IExpression>>.Default.Equals(Parameters, expression.Parameters) && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, expression.ReturnType);
 
         public override int GetHashCode()
         {
@@ -31,7 +27,6 @@
             hashCode = (hashCode * -1521134295) + EqualityComparer<IExpression>.Default.GetHashCode(Callee);
             hashCode = (hashCode * -1521134295) + EqualityComparer<IReadOnlyList<IExpression>>.Default.GetHashCode(Parameters);
             hashCode = (hashCode * -1521134295) + EqualityComparer<ITypeInfo>.Default.GetHashCode(ReturnType);
-            hashCode = (hashCode * -1521134295) + Location.GetHashCode();
             return hashCode;
         }
 

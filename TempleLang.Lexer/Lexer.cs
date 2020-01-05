@@ -134,6 +134,11 @@
                        ('=', Token.ComparisonEqual),
                        ('>', Token.Arrow)));
 
+                case ':':
+                    return MakeLexeme(SwitchOnNextCharacter(
+                       Token.Colon,
+                       (':', Token.StaticAccessor)));
+
                 case '&':
                     var andType = SwitchOnNextCharacter(
                         Token.BitwiseAnd,
@@ -234,9 +239,6 @@
 
                 case ';':
                     return MakeLexeme(Token.Semicolon);
-
-                case ':':
-                    return MakeLexeme(Token.Colon);
 
                 case '?':
                     return MakeLexeme(Token.QuestionMark);

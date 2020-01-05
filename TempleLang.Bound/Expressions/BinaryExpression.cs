@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using TempleLang.Bound;
-    using TempleLang.Diagnostic;
 
     public struct BinaryExpression : IExpression
     {
@@ -13,20 +12,17 @@
 
         public ITypeInfo ReturnType { get; }
 
-        public FileLocation Location { get; }
-
-        public BinaryExpression(IExpression lhs, IExpression rhs, BinaryOperatorType @operator, ITypeInfo returnType, FileLocation location)
+        public BinaryExpression(IExpression lhs, IExpression rhs, BinaryOperatorType @operator, ITypeInfo returnType)
         {
             Lhs = lhs;
             Rhs = rhs;
             Operator = @operator;
             ReturnType = returnType;
-            Location = location;
         }
 
         public override string ToString() => $"({Lhs} {Operator} {Rhs}) : {ReturnType}";
 
-        public override bool Equals(object? obj) => obj is BinaryExpression expression && EqualityComparer<IExpression>.Default.Equals(Lhs, expression.Lhs) && EqualityComparer<IExpression>.Default.Equals(Rhs, expression.Rhs) && Operator == expression.Operator && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, expression.ReturnType) && EqualityComparer<FileLocation>.Default.Equals(Location, expression.Location);
+        public override bool Equals(object? obj) => obj is BinaryExpression expression && EqualityComparer<IExpression>.Default.Equals(Lhs, expression.Lhs) && EqualityComparer<IExpression>.Default.Equals(Rhs, expression.Rhs) && Operator == expression.Operator && EqualityComparer<ITypeInfo>.Default.Equals(ReturnType, expression.ReturnType);
 
         public override int GetHashCode()
         {
@@ -35,7 +31,6 @@
             hashCode = (hashCode * -1521134295) + EqualityComparer<IExpression>.Default.GetHashCode(Rhs);
             hashCode = (hashCode * -1521134295) + Operator.GetHashCode();
             hashCode = (hashCode * -1521134295) + EqualityComparer<ITypeInfo>.Default.GetHashCode(ReturnType);
-            hashCode = (hashCode * -1521134295) + Location.GetHashCode();
             return hashCode;
         }
 

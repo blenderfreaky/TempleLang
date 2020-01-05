@@ -191,9 +191,9 @@
         private readonly OperatorTable<BinaryOperatorType> _binaryOperators = new OperatorTable<BinaryOperatorType>
         {
             [BinaryOperatorType.Add, PrimitiveType.Long] = "add",
-            [BinaryOperatorType.Add, PrimitiveType.StringPointer] = "add",
+            [BinaryOperatorType.Add, PrimitiveType.Pointer] = "add",
             [BinaryOperatorType.Subtract, PrimitiveType.Long] = "sub",
-            [BinaryOperatorType.Subtract, PrimitiveType.StringPointer] = "sub",
+            [BinaryOperatorType.Subtract, PrimitiveType.Pointer] = "sub",
             [BinaryOperatorType.Multiply, PrimitiveType.Long] = "imul",
             [BinaryOperatorType.Assign] = "mov",
         };

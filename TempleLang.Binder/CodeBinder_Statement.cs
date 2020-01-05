@@ -30,7 +30,7 @@
         };
 
         public IS.ExpressionStatement BindStatement(S.ExpressionStatement stmt) =>
-            new IS.ExpressionStatement(BindExpression(stmt.Expression), stmt.Location);
+            new IS.ExpressionStatement(BindExpression(stmt.Expression));
 
         public IS.ExpressionStatement BindStatement(LocalDeclarationStatement stmt)
         {
@@ -42,25 +42,25 @@
 
             if (assignedType == null && annotatedType == null)
             {
-                Error(DiagnosticCode.TypeInferenceFailed, stmt.Location);
+                Error(DiagnosticCode.TypeInferenceFailed, stmt.Name.Location);
             }
 
             if (assignedType != null && annotatedType != null && assignedType != annotatedType)
             {
-                Error(DiagnosticCode.InvalidType, stmt.Location);
+                Error(DiagnosticCode.InvalidOperandTypes, stmt.Name.Location);
             }
 
             if (returnType == null)
             {
-                Error(DiagnosticCode.MissingType, stmt.Location);
+                Error(DiagnosticCode.MissingType, stmt.Name.Location);
                 returnType = PrimitiveType.Long;
             }
 
-            var local = new Local(stmt.Name.Name.Name, ValueFlags.Assignable | ValueFlags.Readable, returnType, stmt.Location);
+            var local = new Local(stmt.Name.Name.Name, ValueFlags.Assignable | ValueFlags.Readable, returnType);
 
             Locals[local.Name] = local;
 
-            return new IS.ExpressionStatement(new IE.BinaryExpression(local, assignedValue, BinaryOperatorType.Assign, returnType, stmt.Location), stmt.Location);
+            return new IS.ExpressionStatement(new IE.BinaryExpression(local, assignedValue, BinaryOperatorType.Assign, returnType));
         }
 
         public IS.BlockStatement BindStatement(S.BlockStatement stmt)
@@ -69,22 +69,20 @@
 
             var statements = stmt.Statements.Select(binder.BindStatement).ToList();
 
-            return new IS.BlockStatement(binder.Locals.Values, statements, stmt.Location);
+            return new IS.BlockStatement(binder.Locals.Values, statements);
         }
 
         public IS.IfStatement BindStatement(S.IfStatement stmt) =>
             new IS.IfStatement(
                 BindExpression(stmt.Condition),
                 BindStatement(stmt.TrueStatement),
-                BindNullableStatement(stmt.FalseStatement),
-                stmt.Location);
+                BindNullableStatement(stmt.FalseStatement));
 
         public IS.WhileStatement BindStatement(S.WhileStatement stmt) =>
             new IS.WhileStatement(
                 BindExpression(stmt.Condition),
                 BindStatement(stmt.Statement),
-                stmt.IsDoLoop,
-                stmt.Location);
+                stmt.IsDoLoop);
 
         public IS.ForStatement BindStatement(S.ForStatement stmt)
         {
@@ -94,13 +92,11 @@
                 codeBinder.BindNullableStatement(stmt.Prefix),
                 codeBinder.BindNullableExpression(stmt.Condition),
                 codeBinder.BindNullableExpression(stmt.Step),
-                codeBinder.BindStatement(stmt.Statement),
-                stmt.Location);
+                codeBinder.BindStatement(stmt.Statement));
         }
 
         public IS.ReturnStatement BindStatement(S.ReturnStatement stmt) =>
             new IS.ReturnStatement(
-                stmt.Expression == null ? null : BindExpression(stmt.Expression),
-                stmt.Location);
+                stmt.Expression == null ? null : BindExpression(stmt.Expression));
     }
 }

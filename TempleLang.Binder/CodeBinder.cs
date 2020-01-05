@@ -38,7 +38,7 @@
 
             var type = Parent?.FindDeclaration(expr);
 
-            if (type is ICallable callable) return new CallableValue(callable, ValueFlags.Readable, expr.Location);
+            if (type is ICallable callable) return new CallableValue(callable, ValueFlags.Readable);
 
             //TODO
             Error(DiagnosticCode.UnknownValue, expr.Location);

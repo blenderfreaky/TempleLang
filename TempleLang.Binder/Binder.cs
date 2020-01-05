@@ -24,9 +24,9 @@
             DiagnosticsBag = new ConcurrentBag<DiagnosticInfo>();
         }
 
-        protected void Error(DiagnosticCode invalidType, FileLocation location)
+        protected void Error(DiagnosticCode diagnostic, FileLocation location)
         {
-            ReceiveDiagnostic(new DiagnosticInfo(invalidType, location), true);
+            ReceiveDiagnostic(new DiagnosticInfo(diagnostic, location), true);
         }
 
         public void ReceiveDiagnostic(DiagnosticInfo info, bool error)
@@ -37,18 +37,12 @@
 
         public abstract IDeclaration? FindDeclaration(S.Expression expression);
 
-        public ITypeInfo FindType(S.Expression? expression)
+        public ITypeInfo FindType(S.Expression expression)
         {
-            if (expression == null)
-            {
-                Error(DiagnosticCode.MissingType, FileLocation.Null);
-
-                return PrimitiveType.Unknown;
-            }
-
             var returnType = FindDeclaration(expression) as ITypeInfo;
 
-            if (returnType == null) Error(DiagnosticCode.InvalidType, expression.Location);
+            if (returnType == null)
+                Error(DiagnosticCode.InvalidOperandTypes, expression.Location);
 
             return returnType ?? PrimitiveType.Unknown;
         }

@@ -58,10 +58,10 @@
         public override int GetHashCode()
         {
             var hashCode = -2093788837;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(LabelName);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(CommentText);
-            hashCode = hashCode * -1521134295 + EqualityComparer<IReadOnlyList<IParameter>?>.Default.GetHashCode(Parameters);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string?>.Default.GetHashCode(LabelName);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string?>.Default.GetHashCode(Name);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string?>.Default.GetHashCode(CommentText);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<IReadOnlyList<IParameter>?>.Default.GetHashCode(Parameters);
             return hashCode;
         }
 
