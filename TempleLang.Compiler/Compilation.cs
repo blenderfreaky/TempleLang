@@ -10,12 +10,14 @@
     {
         public List<ProcedureCompilation> ProcedureCompilations { get; }
         public List<string> Externs { get; }
+        public List<string> Imports { get; }
         public Dictionary<Constant, DataLocation> ConstantTable { get; }
 
-        public Compilation(List<ProcedureCompilation> procedureCompilations, List<string> externs, Dictionary<Constant, DataLocation> constantTable)
+        public Compilation(List<ProcedureCompilation> procedureCompilations, List<string> externs, List<string> imports, Dictionary<Constant, DataLocation> constantTable)
         {
             ProcedureCompilations = procedureCompilations;
             Externs = externs;
+            Imports = imports;
             ConstantTable = constantTable;
         }
 

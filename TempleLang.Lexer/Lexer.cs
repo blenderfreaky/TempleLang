@@ -131,7 +131,8 @@
                 case '=':
                     return MakeLexeme(SwitchOnNextCharacter(
                        Token.Assign,
-                       ('=', Token.ComparisonEqual)));
+                       ('=', Token.ComparisonEqual),
+                       ('>', Token.Arrow)));
 
                 case '&':
                     var andType = SwitchOnNextCharacter(

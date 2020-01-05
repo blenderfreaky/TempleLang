@@ -39,7 +39,7 @@
             using var stringReader = new StringReader(text);
 
             var lexemes = Lex(stringReader, sourceFile);
-            var parserResult = ParseEoF(Parser.NamespaceDeclaration.GlobalNamespaceParser, lexemes);
+            var parserResult = ParseEoF(Parser.NamespaceDeclaration.FileParser, lexemes);
 
             if (!parserResult.IsSuccessful)
             {
@@ -53,7 +53,7 @@
 
             var compiler = new DeclarationCompiler();
 
-            return new Compilation(compiler.Compile(parserResult.Result, out diagnostics), compiler.Externs, compiler.ConstantTable);
+            return new Compilation(compiler.Compile(parserResult.Result, out diagnostics), compiler.Externs, compiler.Imports, compiler.ConstantTable);
         }
 
         public static string GenerateExecutable(
@@ -89,7 +89,7 @@
 
             Directory.CreateDirectory(execPath);
 
-            string libraries = @"""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\kernel32.lib"" ""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\user32.lib""";
+            string libraries = string.Join(" ", compilation.Imports); //@"""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\kernel32.lib"" ""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\user32.lib""";
             string arguments = $"/entry:_start /subsystem:console /out:\"{exeFile}\" \"{objFile}\" {libraries}";
             Process.Start("link", arguments).WaitForExit();
 

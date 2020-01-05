@@ -28,7 +28,7 @@
                 value = Memoization<T, TToken>.Memoizations[id.GetHashCode()] = new Memoization<T, TToken>();
             }
 
-            return input => value.Elements.TryGetValue((input, parser), out var ret) ? ret : value.Elements[(input, parser)] = parser(input);
+            return input => value.Elements.TryGetValue((input, parser), out var ret) ? ret : value.Elements[input] = parser(input);
         }
 
         public static Parser<T, TToken> Or<T, TToken>(this Parser<T, TToken> left, Parser<T, TToken> right)

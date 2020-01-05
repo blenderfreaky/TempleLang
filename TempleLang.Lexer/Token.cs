@@ -31,6 +31,7 @@
         RBrackets,
 
         Comma,
+        Arrow,
 
         Add,
         Subtract,

@@ -15,6 +15,7 @@
         private Transformer Transformer { get; }
         public Dictionary<Constant, DataLocation> ConstantTable { get; }
         public List<string> Externs { get; }
+        public List<string> Imports { get; }
         public DataLocation FalseConstant { get; }
         public DataLocation TrueConstant { get; }
 
@@ -23,6 +24,7 @@
             Transformer = new Transformer();
             ConstantTable = new Dictionary<Constant, DataLocation>();
             Externs = new List<string>();
+            Imports = new List<string>();
 
             FalseConstant = RegisterConstant(new Constant("0", PrimitiveType.Long, "FALSE"), true);
             TrueConstant = RegisterConstant(new Constant("1", PrimitiveType.Long, "TRUE"), true);
@@ -79,7 +81,8 @@
                     break;
 
                 case ProcedureImport import:
-                    Externs.Add(import.ImportedName);
+                    Externs.Add(import.Name);
+                    Imports.Add(import.ImportedName);
                     break;
             }
         }

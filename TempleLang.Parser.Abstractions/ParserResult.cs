@@ -10,7 +10,7 @@
         public static IParserResult<T, TToken> Success<T, TToken>(T result, LexemeString<TToken> remainingLexemes) =>
             new ParserSuccess<T, TToken>(result, remainingLexemes);
 
-        //[DebuggerStepThrough]
+        [DebuggerStepThrough]
         public static IParserResult<T, TToken> Error<T, TToken>(string errorMessage, LexemeString<TToken> remainingLexemes) =>
             new ParserError<T, TToken>(errorMessage, remainingLexemes);
 

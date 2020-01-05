@@ -50,10 +50,15 @@
                  from type in AccessExpression.Parser
                  select type).Maybe()
             from result in
-                ((from stmt in Statement.Parser
+                ((from stmt in BlockStatement.Parser
+                  select new ProcedureDeclaration(stmt, name, returnType, parameters, FileLocation.Concat(start, stmt)))
+                .Or(
+                  from _ in Parse.Token(Token.Arrow)
+                  from stmt in ExpressionStatement.Parser
                   select new ProcedureDeclaration(stmt, name, returnType, parameters, FileLocation.Concat(start, stmt)))
                 .Or(from _ in Parse.Token(Token.Using)
                     from import in Parse.Token(Token.StringLiteral)
+                    from __ in Parse.Token(Token.Semicolon)
                     select new ProcedureDeclaration(
                         import.Location.WithValue(
                             import.Text.Substring(1, import.Text.Length - 2)),
