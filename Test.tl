@@ -2,34 +2,35 @@ namespace Program;
 
 func _start() : long
 {
-    print("\n", 1);
+    //print("\n", 1);
+    print("Start", 5);
     //printNum(fib(3));
     print("\n", 1);
 
-    for let i = 0; i < 10; i++
-    {
-        printNum(i);
-        print("\n", 1);
-    }
+    //for let i = 0; i < 1; i++
+    //{
+    //    printNum(i);
+    //    print("\n", 1);
+    //}
 
     print("\n", 1);
 }
 
-func fib(num : long) : long
-{
-    let m1 = 0;
-    let m2 = 1;
-
-    for let i = 0; i < num; ++i
-    {
-        let temp = m1;
-        m1 = m2;
-        m2 = temp + m2;
-    }
-
-    return m1;
-}
-
+//  func fib(num : long) : long
+//  {
+//      let m1 = 0;
+//      let m2 = 1;
+//  
+//      for let i = 0; i < num; ++i
+//      {
+//          let temp = m1;
+//          m1 = m2;
+//          m2 = temp + m2;
+//      }
+//  
+//      return m1;
+//  }
+//  
 func printNum(num : long) : long
 {
     if (num < 0)

@@ -47,6 +47,7 @@
             Active = new List<LiveInterval>();
 
             AllocateRegisters();
+            //AssignedLocation = LiveIntervalsByVariable.ToDictionary(x => x.Key, _ => (IMemory)StackAlloc(8));
         }
 
         public Dictionary<Variable, IMemory> AssignedLocation { get; }

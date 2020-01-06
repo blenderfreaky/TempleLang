@@ -150,7 +150,16 @@
         private IEnumerable<NasmInstruction> CompileCore(UnaryComputationAssignment inst)
         {
             var operandMemory = GetMemory(inst.Operand);
-            var targetMemory = GetMemory(inst.Target);
+            var actualTargetMemory = GetMemory(inst.Target);
+
+            var targetMemory = actualTargetMemory;
+
+            if (targetMemory is StackLocation && inst.Operator != UnaryOperatorType.Reference)
+            {
+                var register = Register.Get(RegisterName.RBX);
+                yield return Move(register, operandMemory).WithComment("Move RHS into register so operation is possible");
+                targetMemory = operandMemory = register;
+            }
 
             switch (inst.Operator)
             {
@@ -163,7 +172,15 @@
                 case UnaryOperatorType.Reference:
                     if (inst.OperandType != PrimitiveType.Long) throw new ArgumentException(nameof(inst));
 
-                    yield return NasmInstruction.Call("lea", Memory(targetMemory), new DereferenceParameter(Memory(operandMemory))).WithComment($"Create reference to {inst.Operand}");
+                    if (operandMemory is StackLocation stackLocation)
+                    {
+                        yield return Move(targetMemory, Register.Get(RegisterName.RSP)).WithComment("Assign stackpointer");
+                        yield return NasmInstruction.Call("sub", Memory(targetMemory), new LiteralParameter(stackLocation.Offset.ToString())).WithComment("and subtract to get correct position");
+                    }
+                    else
+                    {
+                        yield return NasmInstruction.Call("lea", Memory(targetMemory), new DereferenceParameter(Memory(operandMemory))).WithComment($"Create reference to {inst.Operand}");
+                    }
                     break;
 
                 case UnaryOperatorType.PreDecrement:
@@ -186,6 +203,8 @@
                     yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Memory(targetMemory));
                     break;
             }
+
+            if (actualTargetMemory != targetMemory) yield return Move(actualTargetMemory, targetMemory).WithComment("Assign result to actual target memory");
         }
 
         private readonly OperatorTable<BinaryOperatorType> _binaryOperators = new OperatorTable<BinaryOperatorType>
@@ -212,12 +231,29 @@
         {
             var lhsMemory = GetMemory(inst.Lhs);
             var rhsMemory = GetMemory(inst.Rhs);
-            var targetMemory = TryGetMemory(inst.Target);
+            var actualTargetMemory = TryGetMemory(inst.Target);
 
-            if (targetMemory == null)
+            if (actualTargetMemory == null)
             {
-                if (inst.Operator == BinaryOperatorType.Assign) targetMemory = lhsMemory;
+                if (inst.Operator == BinaryOperatorType.Assign) actualTargetMemory = lhsMemory;
                 else yield break;
+            }
+
+            var register = Register.Get(RegisterName.RBX);
+            var targetMemory = actualTargetMemory;
+
+            if (targetMemory is StackLocation)
+            {
+                if (inst.Operator != BinaryOperatorType.Assign)
+                {
+                    yield return Move(register, lhsMemory).WithComment("Move RHS into register so operation is possible");
+                    targetMemory = lhsMemory = register;
+                }
+                else if (rhsMemory is StackLocation)
+                {
+                    yield return Move(register, rhsMemory).WithComment("Move RHS into register so operation is possible");
+                    rhsMemory = register;
+                }
             }
 
             if (_binaryArithmeticComparisonOperators.TryGetValue(inst.Operator, out var jmp))
@@ -240,13 +276,12 @@
                 && (inst.Operator == BinaryOperatorType.Divide || inst.Operator == BinaryOperatorType.Remainder))
             {
                 yield return NasmInstruction.Call("xor", Memory(RegisterName.RDX), Memory(RegisterName.RDX)).WithComment("Empty out higher bits of dividend");
-                yield return Move(Register.Get(RegisterName.RAX), GetMemory(inst.Lhs)).WithComment("Assign lhs to dividend");
+                yield return Move(Register.Get(RegisterName.RAX), GetMemory(inst.Lhs)).WithComment("Assign LHS to dividend");
 
                 IMemory divisor = GetMemory(inst.Rhs);
 
                 if (!(divisor is Register))
                 {
-                    var register = Register.Get(RegisterName.RBX);
                     yield return Move(register, divisor).WithComment("Move divisor into RBX, as a register is required for idiv");
                     divisor = register;
                 }
@@ -260,7 +295,7 @@
                     _ => throw new InvalidOperationException(),
                 };
 
-                yield return Move(GetMemory(inst.Target), result).WithComment("Assign result to target memory");
+                yield return Move(targetMemory, result).WithComment("Assign result to target memory");
             }
             else
             {
@@ -268,15 +303,17 @@
 
                 yield return NasmInstruction.Call(_binaryOperators[inst.Operator, inst.OperandType], Memory(targetMemory), Memory(rhsMemory));
             }
+
+            if (actualTargetMemory != targetMemory) yield return Move(actualTargetMemory, targetMemory).WithComment("Assign result to actual target memory");
         }
 
         private IEnumerable<NasmInstruction> CompileCore(ConditionalJump inst)
         {
             var conditionMemory = GetMemory(inst.Condition);
 
-            if (conditionMemory is DataLocation location)
+            if (conditionMemory is DataLocation dataLocation)
             {
-                var constant = ConstantTable.First(x => x.Value == location).Key;
+                var constant = ConstantTable.First(x => x.Value == dataLocation).Key;
 
                 if ((int.TryParse(constant.ValueText, out var num) && num == 0) ^ inst.Inverted)
                 {
@@ -286,13 +323,19 @@
                 {
                     yield return Jump(inst.Target.Name).WithComment("Always evaluates to true => Unconditional Jump");
                 }
+                yield break;
             }
-            else
-            {
-                yield return NasmInstruction.Call("test", Memory(conditionMemory), Memory(conditionMemory)).WithComment("Set condition codes according to condition");
 
-                yield return NasmInstruction.Call(inst.Inverted ? "jz" : "jnz", new LabelParameter(inst.Target.Name)).WithComment("Jump if condition is " + (inst.Inverted ? "false/zero" : "true/non-zero"));
+            if (conditionMemory is StackLocation stackLocation)
+            {
+                var register = Register.Get(RegisterName.RBX);
+                yield return Move(register, conditionMemory).WithComment("Move condition into register so operation is possible");
+                conditionMemory = register;
             }
+
+            yield return NasmInstruction.Call("test", Memory(conditionMemory), Memory(conditionMemory)).WithComment("Set condition codes according to condition");
+
+            yield return NasmInstruction.Call(inst.Inverted ? "jz" : "jnz", new LabelParameter(inst.Target.Name)).WithComment("Jump if condition is " + (inst.Inverted ? "false/zero" : "true/non-zero"));
         }
 
         private IEnumerable<NasmInstruction> CompileCore(UnconditionalJump inst)
@@ -309,12 +352,14 @@
         {
             var lives = RegisterAllocation
                 .GetAllLiveAt(index)
+                .Select(x => GetMemory(x))
+                .Where(x => !(x is StackLocation)) // Don't move if already on the stack
                 .Select((x, i) => (Variable: x, Temporary: new StackLocation(RegisterAllocation.StackOffset + 8 + (i * 8), 8)))
                 .ToList();
 
             foreach (var live in lives)
             {
-                yield return Move(live.Temporary, RegisterAllocation.AssignedLocation[live.Variable]).WithComment("Store live variable onto stack");
+                yield return Move(live.Temporary, live.Variable).WithComment("Store live variable onto stack");
             }
 
             for (int i = 0; i < inst.Parameters.Count; i++)
@@ -331,7 +376,7 @@
 
             foreach (var live in lives)
             {
-                yield return Move(RegisterAllocation.AssignedLocation[live.Variable], live.Temporary).WithComment("Restore live variable from stack");
+                yield return Move(live.Variable, live.Temporary).WithComment("Restore live variable from stack");
             }
         }
 
