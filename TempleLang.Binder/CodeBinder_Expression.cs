@@ -215,7 +215,7 @@
             return new InvalidExpression(expr.Location);
         }
 
-        public IE.CallExpression BindExpression(S.CallExpression expr)
+        public IExpression BindExpression(S.CallExpression expr)
         {
             var callee = BindExpression(expr.Callee);
             var parameters = expr.Parameters.Select(BindExpression).ToList();
@@ -228,7 +228,7 @@
             }
 
             Error(DiagnosticCode.CallingUncallable, expr.Location);
-            return new IE.CallExpression(null!, null!, PrimitiveType.Unknown);
+            return new InvalidExpression();
         }
 
         public IValue BindExpression(Identifier expr) => FindValue(expr)!;

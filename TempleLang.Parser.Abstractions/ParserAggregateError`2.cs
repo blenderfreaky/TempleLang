@@ -10,7 +10,7 @@
         public IReadOnlyList<IParserResult<T, TToken>> Errors { get; }
         public bool IsSuccessful => false;
 
-        public string? ErrorMessage => $"[{string.Join(", ", Errors.Select(x => x.ErrorMessage))}]";
+        public string ErrorMessage => $"[{string.Join(", ", Errors.Select(x => x.ErrorMessage))}]";
 
         public T Result => throw new NotSupportedException();
 

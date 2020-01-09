@@ -30,13 +30,15 @@
             TrueConstant = RegisterConstant(new Constant("1", PrimitiveType.Long, "TRUE"), true);
         }
 
-        public List<ProcedureCompilation> Compile(S.NamespaceDeclaration declaration, out IEnumerable<DiagnosticInfo> diagnostics)
+        public List<ProcedureCompilation>? Compile(S.NamespaceDeclaration declaration, out IEnumerable<DiagnosticInfo> diagnostics)
         {
             var binder = new NamespaceBinder(declaration);
             binder.Explore();
             var bound = binder.Bind();
             binder.CollectDiagnostics();
             diagnostics = binder.Diagnostics;
+
+            if (binder.HasErrors) return null;
 
             var procedures = CompileDeclaration(bound).ToList();
 
@@ -61,7 +63,8 @@
                     customName
                     ? constant.DebugName
                     : constant.Type.FullyQualifiedName + RequestName(),
-                    constant.Type.Size);
+                    constant.Type.Size,
+                    constant.Type == PrimitiveType.Pointer);
         }
 
         private IEnumerable<ProcedureCompilation> CompileDeclaration(IDeclaration declaration)

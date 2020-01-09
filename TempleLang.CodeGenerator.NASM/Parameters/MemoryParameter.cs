@@ -21,7 +21,7 @@
             Memory switch
             {
                 Register register => register.Name.ToLowerInvariant(),
-                StackLocation stack => $"{WordSizeText} [rsp - {stack.Offset}]",
+                StackLocation stack => $"{WordSizeText} [rsp + {stack.Offset}]",
                 DataLocation data => data.LabelName,
                 _ => throw new InvalidOperationException(),
             };

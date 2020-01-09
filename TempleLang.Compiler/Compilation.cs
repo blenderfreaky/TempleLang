@@ -40,7 +40,7 @@
 
                 yield return NasmInstruction.LabeledCall(
                     label: constant.Value.LabelName,
-                    name: isString ? "db" : "equ",
+                    name: constant.Value.IsAddress ? "db" : "equ",
                     new LiteralParameter(isString ? $"__utf16__(`{constant.Key.ValueText}`)" : constant.Key.ValueText));
             }
         }

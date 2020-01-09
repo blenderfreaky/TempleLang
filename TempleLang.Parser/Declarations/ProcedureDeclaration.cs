@@ -13,12 +13,11 @@
 
         public Identifier Name { get; }
 
-        // NOTE: Types accesses and Expressions cannot be kept apart syntactically here
-        public Expression? ReturnTypeAnnotation { get; }
+        public TypeSpecifier? ReturnTypeAnnotation { get; }
 
         public List<TypeAnnotatedName> Parameters { get; }
 
-        public ProcedureDeclaration(Statement entryPoint, Identifier name, Expression? returnTypeAnnotation, List<TypeAnnotatedName> parameters, FileLocation location) : base(location)
+        public ProcedureDeclaration(Statement entryPoint, Identifier name, TypeSpecifier? returnTypeAnnotation, List<TypeAnnotatedName> parameters, FileLocation location) : base(location)
         {
             EntryPoint = entryPoint;
             ImportedName = null;
@@ -27,7 +26,7 @@
             Parameters = parameters;
         }
 
-        public ProcedureDeclaration(Positioned<string> importedName, Identifier name, Expression? returnTypeAnnotation, List<TypeAnnotatedName> parameters, FileLocation location) : base(location)
+        public ProcedureDeclaration(Positioned<string> importedName, Identifier name, TypeSpecifier? returnTypeAnnotation, List<TypeAnnotatedName> parameters, FileLocation location) : base(location)
         {
             EntryPoint = null;
             ImportedName = importedName;
@@ -47,7 +46,7 @@
             from ___ in Parse.Token(Token.RParens)
             from returnType in
                 (from _ in Parse.Token(Token.Colon)
-                 from type in AccessExpression.Parser
+                 from type in TypeSpecifier.Parser
                  select type).Maybe()
             from result in
                 ((from stmt in BlockStatement.Parser

@@ -53,7 +53,9 @@
 
             var compiler = new DeclarationCompiler();
 
-            return new Compilation(compiler.Compile(parserResult.Result, out diagnostics), compiler.Externs, compiler.Imports, compiler.ConstantTable);
+            var procedureCompilations = compiler.Compile(parserResult.Result, out diagnostics);
+            if (procedureCompilations == null) return null;
+            return new Compilation(procedureCompilations, compiler.Externs, compiler.Imports, compiler.ConstantTable);
         }
 
         public static string? GenerateExecutable(
@@ -85,16 +87,21 @@
             Directory.CreateDirectory(tempPath);
             File.WriteAllText(asmFile, code);
 
-            Process.Start("nasm", $"-f win64 -o \"{objFile}\" \"{asmFile}\"").WaitForExit();
+            string nasmArguments = $"-f win64 -o \"{objFile}\" \"{asmFile}\"";
+            Console.WriteLine("> nasm " + nasmArguments);
+            Process.Start("nasm", nasmArguments).WaitForExit();
 
             if (!File.Exists(objFile)) return null;
 
             Directory.CreateDirectory(execPath);
 
             //                                                                      Hack: LINK.EXE doesn't properly find kernel32.lib otherwise
-            string libraries = string.Join(" ", compilation.Imports.Select(x => $@"""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\{x}"""));
-            string arguments = $"/entry:_start /subsystem:console /out:\"{exeFile}\" \"{objFile}\" {libraries}";
-            Process.Start("link", arguments).WaitForExit();
+            string linkLibraries = string.Join(" ", compilation.Imports.Select(x => $@"""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\{x}"""));
+            string linkArguments = $"/entry:_start /debug /subsystem:console /out:\"{exeFile}\" \"{objFile}\" {linkLibraries}";
+
+            Console.WriteLine("");
+            Console.WriteLine("> link " + linkArguments);
+            Process.Start("link", linkArguments).WaitForExit();
 
             return File.Exists(exeFile) ? exeFile : null;
         }

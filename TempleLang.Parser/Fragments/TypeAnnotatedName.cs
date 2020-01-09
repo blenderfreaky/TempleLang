@@ -2,13 +2,13 @@
 {
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
+    using TempleLang.Parser;
 
     public class TypeAnnotatedName : Fragment
     {
         public Identifier Name { get; }
 
-        // NOTE: Types accesses and Expressions cannot be kept apart syntactically here
-        public Expression? TypeAnnotation { get; }
+        public TypeSpecifier? TypeAnnotation { get; }
 
         public TypeAnnotatedName(Identifier name) : base(name)
         {
@@ -16,7 +16,7 @@
             TypeAnnotation = null;
         }
 
-        public TypeAnnotatedName(Identifier name, Expression typeAnnotation) : base(name, typeAnnotation)
+        public TypeAnnotatedName(Identifier name, TypeSpecifier typeAnnotation) : base(name, typeAnnotation)
         {
             Name = name;
             TypeAnnotation = typeAnnotation;
@@ -29,7 +29,7 @@
         public static readonly Parser<TypeAnnotatedName, Token> Parser =
             (from name in Identifier.Parser
              from _ in Parse.Token(Token.Colon)
-             from typeAnnotation in AccessExpression.Parser
+             from typeAnnotation in TypeSpecifier.Parser
              select new TypeAnnotatedName(name, typeAnnotation))
             .Or(from name in Identifier.Parser
                 select new TypeAnnotatedName(name));

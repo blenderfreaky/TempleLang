@@ -2,36 +2,56 @@ namespace Program;
 
 func _start() : long
 {
-    //print("\n", 1);
-    print("Start", 5);
-    //printNum(fib(3));
-    print("\n", 1);
+    print("Start\n", 6);
+    printNum(fac(8));
 
-    //for let i = 0; i < 1; i++
-    //{
-    //    printNum(i);
-    //    print("\n", 1);
-    //}
-
-    print("\n", 1);
+    //printNumAny(43242,16);
 }
 
-//  func fib(num : long) : long
-//  {
-//      let m1 = 0;
-//      let m2 = 1;
-//  
-//      for let i = 0; i < num; ++i
-//      {
-//          let temp = m1;
-//          m1 = m2;
-//          m2 = temp + m2;
-//      }
-//  
-//      return m1;
-//  }
-//  
-func printNum(num : long) : long
+func pow(base : long, exp : long) : long
+{
+    let acc = 1;
+
+    for ; exp > 0; --exp
+    {
+        acc *= base;
+    }
+
+    return acc;
+}
+
+func fac(num : long) : long
+{
+    let acc = 1;
+
+    for let i = 1; i <= num; ++i
+    {
+        acc *= i;
+    }
+
+    return acc;
+}
+
+func fib(num : long) : long
+{
+    if num == 0 return 0;
+
+    let m1 = 0;
+    let m2 = 1;
+
+    for let i = 0; i < num-1; ++i
+    {
+        let temp = m1;
+        m1 = m2;
+        m2 = temp + m2;
+    }
+
+    return m2;
+}
+
+func printNum(num : long) : long => printNumAny(num, 10);
+
+func printNumAny(num : long, base : long) : long
 {
     if (num < 0)
     {
@@ -40,15 +60,15 @@ func printNum(num : long) : long
         return;
     }
     
-    let digit = num % 10;
-    let rest = num / 10;
-    if (rest > 0) printNum(rest);
+    let digit = num % base;
+    let rest = num / base;
+    if (rest > 0) printNumAny(rest, base);
     printDigit(digit);
 }
 
 func printDigit(digit : long) : long
 {
-    let digits = "0123456789";
+    let digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     print(digits + digit * 2, 1);
 }
 
