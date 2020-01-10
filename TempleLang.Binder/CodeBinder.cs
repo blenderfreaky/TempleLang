@@ -22,7 +22,7 @@
             Locals = symbols;
         }
 
-        public override IDeclaration? FindDeclaration(S.Expression expr) => Parent?.FindDeclaration(expr);
+        public override IDeclaration? FindDeclaration(S.SyntaxNode expr) => Parent?.FindDeclaration(expr);
 
         public IValue FindValue(S.Identifier expr)
         {

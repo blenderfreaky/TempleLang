@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using TempleLang.Bound;
     using TempleLang.Bound.Declarations;
     using TempleLang.Bound.Expressions;
     using TempleLang.Bound.Primitives;
@@ -87,10 +88,13 @@
             return new NamespaceDeclaration(Declaration.Name, declarations);
         }
 
-        public override IDeclaration? FindDeclaration(S.Expression expression)
+        public override IDeclaration? FindDeclaration(S.SyntaxNode expression)
         {
             switch (expression)
             {
+                case S.TypeSpecifier expr:
+                    return FindDeclarationCore(expr);
+
                 case S.AccessExpression expr:
                     return FindDeclarationCore(expr);
 
@@ -103,12 +107,57 @@
             }
         }
 
+        public IDeclaration? FindDeclarationCore(S.TypeSpecifier expr)
+        {
+            var lhs = FindDeclaration(expr.Identifiers[0]);
+
+            //TODO
+            return lhs;
+        }
+
         public IDeclaration? FindDeclarationCore(S.AccessExpression expr)
         {
             var lhs = FindDeclaration(expr.Accessee);
 
-            //TODO
-            return lhs;
+            if (lhs is ITypeInfo type)
+            {
+                if (!type.TryGetMember(expr.Accessor.Name, out var member)) return lhs;
+                return lhs; // TODO: member
+            }
+
+            if (!(expr.Accessee is S.Identifier ident)) return lhs;
+
+            return FindNamespace(new[] { ident })?.FindDeclaration(expr.Accessor);
+        }
+
+        private NamespaceBinder? FindNamespace(IEnumerable<S.Identifier> idents) =>
+            Namespaces.Find(x => x.Declaration.Name.Value == idents.First().Name)
+                ?? (Parent is NamespaceBinder namespaceBinder
+                    ? namespaceBinder.FindNamespace(idents)
+                    : null);
+
+        public IDeclaration? FindDeclarationCore(IEnumerable<S.Identifier> idents)
+        {
+            var @namespace = FindNamespace(idents);
+
+            if (@namespace != null) return @namespace.FindDeclarationCore(idents.Skip(1));
+
+            var first = FindDeclaration(idents.First());
+
+            return first == null ? null : DiveType(first, idents.Skip(1));
+        }
+
+        private IDeclaration? DiveType(IDeclaration declaration, IEnumerable<S.Identifier> idents)
+        {
+            if (declaration is ITypeInfo type)
+            {
+                type.TryGetMember(idents.First().Name, out var member);
+
+                if (idents.Skip(1).Any()) return DiveType(declaration /*TODO: member*/, idents.Skip(1));
+                return declaration;
+            }
+
+            return null;
         }
 
         public IDeclaration? FindDeclarationCore(S.Identifier expr)

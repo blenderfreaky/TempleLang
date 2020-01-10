@@ -201,7 +201,7 @@
                 }
 
                 //TODO
-                throw new NotImplementedException();
+                return Parent.
                 //return new IE.AccessExpression(val, op, expr.Accessor.PositionedText, ValueFlags.Readable, PrimitiveType.Bool);
             }
             else if (op == AccessOperationType.Static)
@@ -231,6 +231,6 @@
             return new InvalidExpression();
         }
 
-        public IValue BindExpression(Identifier expr) => FindValue(expr)!;
+        public IValue BindExpression(Identifier expr) => FindValue(expr);
     }
 }

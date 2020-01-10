@@ -35,9 +35,9 @@
             HasErrors |= error;
         }
 
-        public abstract IDeclaration? FindDeclaration(S.Expression expression);
+        public abstract IDeclaration? FindDeclaration(S.SyntaxNode expression);
 
-        public ITypeInfo FindType(S.Expression expression)
+        public ITypeInfo FindType(S.TypeSpecifier expression)
         {
             var returnType = FindDeclaration(expression) as ITypeInfo;
 
