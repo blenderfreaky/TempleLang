@@ -201,8 +201,8 @@
                 }
 
                 //TODO
-                return Parent.
-                //return new IE.AccessExpression(val, op, expr.Accessor.PositionedText, ValueFlags.Readable, PrimitiveType.Bool);
+                //return Parent.
+                return new IE.AccessExpression(val, op, expr.Accessor.PositionedText, ValueFlags.Readable, PrimitiveType.Bool);
             }
             else if (op == AccessOperationType.Static)
             {

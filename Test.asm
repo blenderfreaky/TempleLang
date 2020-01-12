@@ -1,37 +1,17 @@
 section .data
 FALSE: equ     0
 TRUE: equ     1
-ptrC0: db      __utf16__(`Start\n`)
-longC1: equ     6
-longC2: equ     8
-longC3: equ     10
-ptrC4: db      __utf16__(`-`)
-ptrC5: db      __utf16__(`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`)
-longC6: equ     2
-longC7: equ     11
+longC0: equ     2
+longC1: equ     10
+ptrC2: db      __utf16__(`-`)
+ptrC3: db      __utf16__(`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ`)
+longC4: equ     11
 section .text
     global  _start
     extern  GetStdHandle
     extern  WriteConsoleW
 _start: ; _start() : long
-        sub     rsp, 72 ; Allocate stack
-    
-      ; _ = call print(Start\n, 6)
-        mov     rcx, ptrC0 ; Pass parameter #0
-        mov     rdx, longC1 ; Pass parameter #1
-        call    print
-      ; /
-    
-      ; <>T2 = call fac(8)
-        mov     rcx, longC2 ; Pass parameter #0
-        call    fac
-        mov     qword [rsp + 16], rax ; Assign return value to <>T2
-      ; /
-    
-      ; _ = call printNum(<>T2)
-        mov     rcx, qword [rsp + 16] ; Pass parameter #0
-        call    printNum
-      ; /
+        sub     rsp, 24 ; Allocate stack
     
       ; .T1:
     .T1:         
@@ -39,25 +19,211 @@ _start: ; _start() : long
     
       ; .__exit:
     .__exit:         
-      ; /
+      ; /   
     
-    .__exit:          ; Function exit/return label
-        add     rsp, 72 ; Return stack
+        add     rsp, 24 ; Return stack
         ret     
     
-yeet: ; yeet() : long
-        sub     rsp, 24 ; Allocate stack
+fib: ; fib(inp : long) : long
+        sub     rsp, 128 ; Allocate stack
     
-      ; .T3:
-    .T3:         
+      ; inp = param 0
+        mov     qword [rsp + 16], rcx ; Read parameter #0
+      ; /
+    
+      ; <>T4 = inp ComparisonEqual 0
+        mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
+        cmp     rbx, FALSE ; Set condition codes according to operands
+        je      .CG0 ; Jump to True if the comparison is true
+        mov     rbx, FALSE ; Assign false to output
+        jmp     .CG1 ; Jump to Exit
+    .CG0:          ; True
+        mov     rbx, TRUE ; Assign true to output
+    .CG1:          ; Exit
+        mov     qword [rsp + 24], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; <>T5 = inp ComparisonEqual 1
+        mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
+        cmp     rbx, TRUE ; Set condition codes according to operands
+        je      .CG2 ; Jump to True if the comparison is true
+        mov     rbx, FALSE ; Assign false to output
+        jmp     .CG3 ; Jump to Exit
+    .CG2:          ; True
+        mov     rbx, TRUE ; Assign true to output
+    .CG3:          ; Exit
+        mov     qword [rsp + 32], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; <>T3 = <>T4 LogicalOr <>T5
+        mov     rbx, qword [rsp + 24] ; Move RHS into register so operation is possible
+        or      rbx, qword [rsp + 32]
+        mov     qword [rsp + 40], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; If <>T3 Jump .T6:
+        mov     rbx, qword [rsp + 40] ; Move condition into register so operation is possible
+        test    rbx, rbx ; Set condition codes according to condition
+        jnz     .T6 ; Jump if condition is true/non-zero
+      ; /
+    
+      ; Jump .T7:
+        jmp     .T7
+      ; /
+    
+      ; .T6:
+    .T6:         
+      ; /
+    
+      ; return inp
+        mov     rax, qword [rsp + 16] ; Return inp
+        jmp     .__exit
+      ; /
+    
+      ; .T7:
+    .T7:         
+      ; /
+    
+      ; <>T10 = inp Subtract 1
+        mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
+        sub     rbx, TRUE
+        mov     qword [rsp + 48], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; <>T9 = call fib(<>T10)
+        mov     rcx, qword [rsp + 48] ; Pass parameter #0
+        call    fib
+        mov     qword [rsp + 72], rax ; Assign return value to <>T9
+      ; /
+    
+      ; <>T12 = inp Subtract 2
+        mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
+        sub     rbx, longC0
+        mov     qword [rsp + 56], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; <>T11 = call fib(<>T12)
+        mov     rcx, qword [rsp + 56] ; Pass parameter #0
+        call    fib
+        mov     qword [rsp + 80], rax ; Assign return value to <>T11
+      ; /
+    
+      ; <>T8 = <>T9 Add <>T11
+        mov     rbx, qword [rsp + 72] ; Move RHS into register so operation is possible
+        add     rbx, qword [rsp + 80]
+        mov     qword [rsp + 64], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; return <>T8
+        mov     rax, qword [rsp + 64] ; Return <>T8
+        jmp     .__exit
+      ; /
+    
+      ; .T2:
+    .T2:         
       ; /
     
       ; .__exit:
     .__exit:         
       ; /
     
-    .__exit:          ; Function exit/return label
-        add     rsp, 24 ; Return stack
+        add     rsp, 128 ; Return stack
+        ret     
+    
+roundDownTo10: ; roundDownTo10(inp : long) : long
+        sub     rsp, 88 ; Allocate stack
+    
+      ; inp = param 0
+        mov     qword [rsp + 16], rcx ; Read parameter #0
+      ; /
+    
+      ; <>T14 = inp ComparisonGreaterThanOrEqual 0
+        mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
+        cmp     rbx, FALSE ; Set condition codes according to operands
+        jge     .CG0 ; Jump to True if the comparison is true
+        mov     rbx, FALSE ; Assign false to output
+        jmp     .CG1 ; Jump to Exit
+    .CG0:          ; True
+        mov     rbx, TRUE ; Assign true to output
+    .CG1:          ; Exit
+        mov     qword [rsp + 24], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; If <>T14 Jump .T15:
+        mov     rbx, qword [rsp + 24] ; Move condition into register so operation is possible
+        test    rbx, rbx ; Set condition codes according to condition
+        jnz     .T15 ; Jump if condition is true/non-zero
+      ; /
+    
+      ; <>T19 = Negation inp
+        mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
+        neg     rbx
+        mov     qword [rsp + 32], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; <>T18 = <>T19 Remainder 10
+        mov     rbx, qword [rsp + 32] ; Move RHS into register so operation is possible
+        xor     rdx, rdx ; Empty out higher bits of dividend
+        mov     rax, qword [rsp + 32] ; Assign LHS to dividend
+        mov     rbx, longC1 ; Move divisor into RBX, as a register is required for idiv
+        idiv    rbx ; Assign remainder to RDX, quotient to RAX
+        mov     rbx, rdx ; Assign result to target memory
+        mov     qword [rsp + 40], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; <>T17 = inp Add <>T18
+        mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
+        add     rbx, qword [rsp + 40]
+        mov     qword [rsp + 48], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; return <>T17
+        mov     rax, qword [rsp + 48] ; Return <>T17
+        jmp     .__exit
+      ; /
+    
+      ; Jump .T16:
+        jmp     .T16
+      ; /
+    
+      ; .T15:
+    .T15:         
+      ; /
+    
+      ; <>T21 = inp Remainder 10
+        mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
+        xor     rdx, rdx ; Empty out higher bits of dividend
+        mov     rax, qword [rsp + 16] ; Assign LHS to dividend
+        mov     rbx, longC1 ; Move divisor into RBX, as a register is required for idiv
+        idiv    rbx ; Assign remainder to RDX, quotient to RAX
+        mov     rbx, rdx ; Assign result to target memory
+        mov     qword [rsp + 56], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; <>T20 = inp Subtract <>T21
+        mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
+        sub     rbx, qword [rsp + 56]
+        mov     qword [rsp + 64], rbx ; Assign result to actual target memory
+      ; /
+    
+      ; return <>T20
+        mov     rax, qword [rsp + 64] ; Return <>T20
+        jmp     .__exit
+      ; /
+    
+      ; .T16:
+    .T16:         
+      ; /
+    
+      ; .T13:
+    .T13:         
+      ; /
+    
+      ; .__exit:
+    .__exit:         
+      ; /
+    
+        add     rsp, 88 ; Return stack
         ret     
     
 pow: ; pow(base : long, exp : long) : long
@@ -75,26 +241,26 @@ pow: ; pow(base : long, exp : long) : long
         mov     qword [rsp + 32], TRUE
       ; /
     
-      ; Jump .T6:
-        jmp     .T6
+      ; Jump .T24:
+        jmp     .T24
       ; /
     
-      ; .T5:
-    .T5:         
+      ; .T23:
+    .T23:         
       ; /
     
-      ; <>T8 = PreDecrement exp
+      ; <>T26 = PreDecrement exp
         mov     rbx, qword [rsp + 24] ; Move RHS into register so operation is possible
         dec     rbx
         mov     qword [rsp + 24], rbx ; Assign temporary operand to actual operand
         mov     qword [rsp + 40], rbx ; Assign result to actual target memory
       ; /
     
-      ; .T6:
-    .T6:         
+      ; .T24:
+    .T24:         
       ; /
     
-      ; <>T9 = exp ComparisonGreaterThan 0
+      ; <>T27 = exp ComparisonGreaterThan 0
         mov     rbx, qword [rsp + 24] ; Move RHS into register so operation is possible
         cmp     rbx, FALSE ; Set condition codes according to operands
         jg      .CG0 ; Jump to True if the comparison is true
@@ -106,33 +272,33 @@ pow: ; pow(base : long, exp : long) : long
         mov     qword [rsp + 48], rbx ; Assign result to actual target memory
       ; /
     
-      ; If !<>T9 Jump .T7:
+      ; If !<>T27 Jump .T25:
         mov     rbx, qword [rsp + 48] ; Move condition into register so operation is possible
         test    rbx, rbx ; Set condition codes according to condition
-        jz      .T7 ; Jump if condition is false/zero
+        jz      .T25 ; Jump if condition is false/zero
       ; /
     
-      ; <>T11 = acc Multiply base
+      ; <>T29 = acc Multiply base
         mov     rbx, qword [rsp + 32] ; Move RHS into register so operation is possible
         imul    rbx, qword [rsp + 16]
         mov     qword [rsp + 56], rbx ; Assign result to actual target memory
       ; /
     
-      ; _ = acc Assign <>T11
+      ; _ = acc Assign <>T29
         mov     rbx, qword [rsp + 56] ; Move RHS into register so operation is possible
         mov     qword [rsp + 32], rbx
       ; /
     
-      ; .T10:
-    .T10:         
+      ; .T28:
+    .T28:         
       ; /
     
-      ; Jump .T5:
-        jmp     .T5
+      ; Jump .T23:
+        jmp     .T23
       ; /
     
-      ; .T7:
-    .T7:         
+      ; .T25:
+    .T25:         
       ; /
     
       ; return acc
@@ -140,15 +306,14 @@ pow: ; pow(base : long, exp : long) : long
         jmp     .__exit
       ; /
     
-      ; .T4:
-    .T4:         
+      ; .T22:
+    .T22:         
       ; /
     
       ; .__exit:
     .__exit:         
       ; /
     
-    .__exit:          ; Function exit/return label
         add     rsp, 72 ; Return stack
         ret     
     
@@ -167,26 +332,26 @@ fac: ; fac(num : long) : long
         mov     qword [rsp + 32], TRUE
       ; /
     
-      ; Jump .T14:
-        jmp     .T14
+      ; Jump .T32:
+        jmp     .T32
       ; /
     
-      ; .T13:
-    .T13:         
+      ; .T31:
+    .T31:         
       ; /
     
-      ; <>T16 = PreIncrement i
+      ; <>T34 = PreIncrement i
         mov     rbx, qword [rsp + 32] ; Move RHS into register so operation is possible
         inc     rbx
         mov     qword [rsp + 32], rbx ; Assign temporary operand to actual operand
         mov     qword [rsp + 40], rbx ; Assign result to actual target memory
       ; /
     
-      ; .T14:
-    .T14:         
+      ; .T32:
+    .T32:         
       ; /
     
-      ; <>T17 = i ComparisonLessThanOrEqual num
+      ; <>T35 = i ComparisonLessThanOrEqual num
         mov     rbx, qword [rsp + 32] ; Move RHS into register so operation is possible
         cmp     rbx, qword [rsp + 16] ; Set condition codes according to operands
         jle     .CG0 ; Jump to True if the comparison is true
@@ -198,33 +363,33 @@ fac: ; fac(num : long) : long
         mov     qword [rsp + 48], rbx ; Assign result to actual target memory
       ; /
     
-      ; If !<>T17 Jump .T15:
+      ; If !<>T35 Jump .T33:
         mov     rbx, qword [rsp + 48] ; Move condition into register so operation is possible
         test    rbx, rbx ; Set condition codes according to condition
-        jz      .T15 ; Jump if condition is false/zero
+        jz      .T33 ; Jump if condition is false/zero
       ; /
     
-      ; <>T19 = acc Multiply i
+      ; <>T37 = acc Multiply i
         mov     rbx, qword [rsp + 24] ; Move RHS into register so operation is possible
         imul    rbx, qword [rsp + 32]
         mov     qword [rsp + 56], rbx ; Assign result to actual target memory
       ; /
     
-      ; _ = acc Assign <>T19
+      ; _ = acc Assign <>T37
         mov     rbx, qword [rsp + 56] ; Move RHS into register so operation is possible
         mov     qword [rsp + 24], rbx
       ; /
     
-      ; .T18:
-    .T18:         
+      ; .T36:
+    .T36:         
       ; /
     
-      ; Jump .T13:
-        jmp     .T13
+      ; Jump .T31:
+        jmp     .T31
       ; /
     
-      ; .T15:
-    .T15:         
+      ; .T33:
+    .T33:         
       ; /
     
       ; return acc
@@ -232,26 +397,25 @@ fac: ; fac(num : long) : long
         jmp     .__exit
       ; /
     
-      ; .T12:
-    .T12:         
+      ; .T30:
+    .T30:         
       ; /
     
       ; .__exit:
     .__exit:         
       ; /
     
-    .__exit:          ; Function exit/return label
         add     rsp, 72 ; Return stack
         ret     
     
-fib: ; fib(num : long) : long
+fibFast: ; fibFast(num : long) : long
         sub     rsp, 104 ; Allocate stack
     
       ; num = param 0
         mov     qword [rsp + 16], rcx ; Read parameter #0
       ; /
     
-      ; <>T21 = num ComparisonEqual 0
+      ; <>T39 = num ComparisonEqual 0
         mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
         cmp     rbx, FALSE ; Set condition codes according to operands
         je      .CG0 ; Jump to True if the comparison is true
@@ -263,18 +427,18 @@ fib: ; fib(num : long) : long
         mov     qword [rsp + 24], rbx ; Assign result to actual target memory
       ; /
     
-      ; If <>T21 Jump .T22:
+      ; If <>T39 Jump .T40:
         mov     rbx, qword [rsp + 24] ; Move condition into register so operation is possible
         test    rbx, rbx ; Set condition codes according to condition
-        jnz     .T22 ; Jump if condition is true/non-zero
+        jnz     .T40 ; Jump if condition is true/non-zero
       ; /
     
-      ; Jump .T23:
-        jmp     .T23
+      ; Jump .T41:
+        jmp     .T41
       ; /
     
-      ; .T22:
-    .T22:         
+      ; .T40:
+    .T40:         
       ; /
     
       ; return 0
@@ -282,8 +446,8 @@ fib: ; fib(num : long) : long
         jmp     .__exit
       ; /
     
-      ; .T23:
-    .T23:         
+      ; .T41:
+    .T41:         
       ; /
     
       ; _ = m1 Assign 0
@@ -298,32 +462,32 @@ fib: ; fib(num : long) : long
         mov     qword [rsp + 48], FALSE
       ; /
     
-      ; Jump .T25:
-        jmp     .T25
+      ; Jump .T43:
+        jmp     .T43
       ; /
     
-      ; .T24:
-    .T24:         
+      ; .T42:
+    .T42:         
       ; /
     
-      ; <>T27 = PreIncrement i
+      ; <>T45 = PreIncrement i
         mov     rbx, qword [rsp + 48] ; Move RHS into register so operation is possible
         inc     rbx
         mov     qword [rsp + 48], rbx ; Assign temporary operand to actual operand
         mov     qword [rsp + 56], rbx ; Assign result to actual target memory
       ; /
     
-      ; .T25:
-    .T25:         
+      ; .T43:
+    .T43:         
       ; /
     
-      ; <>T29 = num Subtract 1
+      ; <>T47 = num Subtract 1
         mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
         sub     rbx, TRUE
         mov     qword [rsp + 64], rbx ; Assign result to actual target memory
       ; /
     
-      ; <>T28 = i ComparisonLessThan <>T29
+      ; <>T46 = i ComparisonLessThan <>T47
         mov     rbx, qword [rsp + 48] ; Move RHS into register so operation is possible
         cmp     rbx, qword [rsp + 64] ; Set condition codes according to operands
         jl      .CG2 ; Jump to True if the comparison is true
@@ -335,10 +499,10 @@ fib: ; fib(num : long) : long
         mov     qword [rsp + 72], rbx ; Assign result to actual target memory
       ; /
     
-      ; If !<>T28 Jump .T26:
+      ; If !<>T46 Jump .T44:
         mov     rbx, qword [rsp + 72] ; Move condition into register so operation is possible
         test    rbx, rbx ; Set condition codes according to condition
-        jz      .T26 ; Jump if condition is false/zero
+        jz      .T44 ; Jump if condition is false/zero
       ; /
     
       ; _ = temp Assign m1
@@ -351,27 +515,27 @@ fib: ; fib(num : long) : long
         mov     qword [rsp + 32], rbx
       ; /
     
-      ; <>T31 = temp Add m2
+      ; <>T49 = temp Add m2
         mov     rbx, qword [rsp + 80] ; Move RHS into register so operation is possible
         add     rbx, qword [rsp + 40]
         mov     qword [rsp + 88], rbx ; Assign result to actual target memory
       ; /
     
-      ; _ = m2 Assign <>T31
+      ; _ = m2 Assign <>T49
         mov     rbx, qword [rsp + 88] ; Move RHS into register so operation is possible
         mov     qword [rsp + 40], rbx
       ; /
     
-      ; .T30:
-    .T30:         
+      ; .T48:
+    .T48:         
       ; /
     
-      ; Jump .T24:
-        jmp     .T24
+      ; Jump .T42:
+        jmp     .T42
       ; /
     
-      ; .T26:
-    .T26:         
+      ; .T44:
+    .T44:         
       ; /
     
       ; return m2
@@ -379,15 +543,14 @@ fib: ; fib(num : long) : long
         jmp     .__exit
       ; /
     
-      ; .T20:
-    .T20:         
+      ; .T38:
+    .T38:         
       ; /
     
       ; .__exit:
     .__exit:         
       ; /
     
-    .__exit:          ; Function exit/return label
         add     rsp, 104 ; Return stack
         ret     
     
@@ -400,7 +563,7 @@ printNum: ; printNum(num : long) : long
     
       ; _ = call printNumAny(num, 10)
         mov     rcx, qword [rsp + 16] ; Pass parameter #0
-        mov     rdx, longC3 ; Pass parameter #1
+        mov     rdx, longC1 ; Pass parameter #1
         call    printNumAny
       ; /
     
@@ -408,7 +571,6 @@ printNum: ; printNum(num : long) : long
     .__exit:         
       ; /
     
-    .__exit:          ; Function exit/return label
         add     rsp, 72 ; Return stack
         ret     
     
@@ -423,7 +585,7 @@ printNumAny: ; printNumAny(num : long, base : long) : long
         mov     qword [rsp + 24], rdx ; Read parameter #1
       ; /
     
-      ; <>T33 = num ComparisonLessThan 0
+      ; <>T51 = num ComparisonLessThan 0
         mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
         cmp     rbx, FALSE ; Set condition codes according to operands
         jl      .CG0 ; Jump to True if the comparison is true
@@ -435,33 +597,33 @@ printNumAny: ; printNumAny(num : long, base : long) : long
         mov     qword [rsp + 32], rbx ; Assign result to actual target memory
       ; /
     
-      ; If <>T33 Jump .T34:
+      ; If <>T51 Jump .T52:
         mov     rbx, qword [rsp + 32] ; Move condition into register so operation is possible
         test    rbx, rbx ; Set condition codes according to condition
-        jnz     .T34 ; Jump if condition is true/non-zero
+        jnz     .T52 ; Jump if condition is true/non-zero
       ; /
     
-      ; Jump .T35:
-        jmp     .T35
+      ; Jump .T53:
+        jmp     .T53
       ; /
     
-      ; .T34:
-    .T34:         
+      ; .T52:
+    .T52:         
       ; /
     
       ; _ = call print(-, 1)
-        mov     rcx, ptrC4 ; Pass parameter #0
+        mov     rcx, ptrC2 ; Pass parameter #0
         mov     rdx, TRUE ; Pass parameter #1
         call    print
       ; /
     
-      ; <>T37 = Negation num
+      ; <>T55 = Negation num
         mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
         neg     rbx
         mov     qword [rsp + 40], rbx ; Assign result to actual target memory
       ; /
     
-      ; _ = call printNum(<>T37)
+      ; _ = call printNum(<>T55)
         mov     rcx, qword [rsp + 40] ; Pass parameter #0
         call    printNum
       ; /
@@ -470,15 +632,15 @@ printNumAny: ; printNumAny(num : long, base : long) : long
         jmp     .__exit
       ; /
     
-      ; .T36:
-    .T36:         
+      ; .T54:
+    .T54:         
       ; /
     
-      ; .T35:
-    .T35:         
+      ; .T53:
+    .T53:         
       ; /
     
-      ; <>T38 = num Remainder base
+      ; <>T56 = num Remainder base
         mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
         xor     rdx, rdx ; Empty out higher bits of dividend
         mov     rax, qword [rsp + 16] ; Assign LHS to dividend
@@ -488,12 +650,12 @@ printNumAny: ; printNumAny(num : long, base : long) : long
         mov     qword [rsp + 48], rbx ; Assign result to actual target memory
       ; /
     
-      ; _ = digit Assign <>T38
+      ; _ = digit Assign <>T56
         mov     rbx, qword [rsp + 48] ; Move RHS into register so operation is possible
         mov     qword [rsp + 56], rbx
       ; /
     
-      ; <>T39 = num Divide base
+      ; <>T57 = num Divide base
         mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
         xor     rdx, rdx ; Empty out higher bits of dividend
         mov     rax, qword [rsp + 16] ; Assign LHS to dividend
@@ -503,12 +665,12 @@ printNumAny: ; printNumAny(num : long, base : long) : long
         mov     qword [rsp + 64], rbx ; Assign result to actual target memory
       ; /
     
-      ; _ = rest Assign <>T39
+      ; _ = rest Assign <>T57
         mov     rbx, qword [rsp + 64] ; Move RHS into register so operation is possible
         mov     qword [rsp + 72], rbx
       ; /
     
-      ; <>T40 = rest ComparisonGreaterThan 0
+      ; <>T58 = rest ComparisonGreaterThan 0
         mov     rbx, qword [rsp + 72] ; Move RHS into register so operation is possible
         cmp     rbx, FALSE ; Set condition codes according to operands
         jg      .CG2 ; Jump to True if the comparison is true
@@ -520,18 +682,18 @@ printNumAny: ; printNumAny(num : long, base : long) : long
         mov     qword [rsp + 80], rbx ; Assign result to actual target memory
       ; /
     
-      ; If <>T40 Jump .T41:
+      ; If <>T58 Jump .T59:
         mov     rbx, qword [rsp + 80] ; Move condition into register so operation is possible
         test    rbx, rbx ; Set condition codes according to condition
-        jnz     .T41 ; Jump if condition is true/non-zero
+        jnz     .T59 ; Jump if condition is true/non-zero
       ; /
     
-      ; Jump .T42:
-        jmp     .T42
+      ; Jump .T60:
+        jmp     .T60
       ; /
     
-      ; .T41:
-    .T41:         
+      ; .T59:
+    .T59:         
       ; /
     
       ; _ = call printNumAny(rest, base)
@@ -540,8 +702,8 @@ printNumAny: ; printNumAny(num : long, base : long) : long
         call    printNumAny
       ; /
     
-      ; .T42:
-    .T42:         
+      ; .T60:
+    .T60:         
       ; /
     
       ; _ = call printDigit(digit)
@@ -549,15 +711,14 @@ printNumAny: ; printNumAny(num : long, base : long) : long
         call    printDigit
       ; /
     
-      ; .T32:
-    .T32:         
+      ; .T50:
+    .T50:         
       ; /
     
       ; .__exit:
     .__exit:         
       ; /
     
-    .__exit:          ; Function exit/return label
         add     rsp, 152 ; Return stack
         ret     
     
@@ -569,37 +730,36 @@ printDigit: ; printDigit(digit : long) : long
       ; /
     
       ; _ = digits Assign 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
-        mov     rbx, ptrC5 ; Move RHS into register so operation is possible
+        mov     rbx, ptrC3 ; Move RHS into register so operation is possible
         mov     qword [rsp + 24], rbx
       ; /
     
-      ; <>T45 = digit Multiply 2
+      ; <>T63 = digit Multiply 2
         mov     rbx, qword [rsp + 16] ; Move RHS into register so operation is possible
-        imul    rbx, longC6
+        imul    rbx, longC0
         mov     qword [rsp + 32], rbx ; Assign result to actual target memory
       ; /
     
-      ; <>T44 = digits Add <>T45
+      ; <>T62 = digits Add <>T63
         mov     rbx, qword [rsp + 24] ; Move RHS into register so operation is possible
         add     rbx, qword [rsp + 32]
         mov     qword [rsp + 40], rbx ; Assign result to actual target memory
       ; /
     
-      ; _ = call print(<>T44, 1)
+      ; _ = call print(<>T62, 1)
         mov     rcx, qword [rsp + 40] ; Pass parameter #0
         mov     rdx, TRUE ; Pass parameter #1
         call    print
       ; /
     
-      ; .T43:
-    .T43:         
+      ; .T61:
+    .T61:         
       ; /
     
       ; .__exit:
     .__exit:         
       ; /
     
-    .__exit:          ; Function exit/return label
         add     rsp, 88 ; Return stack
         ret     
     
@@ -614,19 +774,19 @@ print: ; print(ptr : ptr, len : long) : long
         mov     qword [rsp + 24], rdx ; Read parameter #1
       ; /
     
-      ; <>T48 = Negation 11
-        mov     rbx, longC7 ; Move RHS into register so operation is possible
+      ; <>T66 = Negation 11
+        mov     rbx, longC4 ; Move RHS into register so operation is possible
         neg     rbx
         mov     qword [rsp + 32], rbx ; Assign result to actual target memory
       ; /
     
-      ; <>T47 = call GetStdHandle(<>T48)
+      ; <>T65 = call GetStdHandle(<>T66)
         mov     rcx, qword [rsp + 32] ; Pass parameter #0
         call    GetStdHandle
-        mov     qword [rsp + 48], rax ; Assign return value to <>T47
+        mov     qword [rsp + 48], rax ; Assign return value to <>T65
       ; /
     
-      ; _ = stdOut Assign <>T47
+      ; _ = stdOut Assign <>T65
         mov     rbx, qword [rsp + 48] ; Move RHS into register so operation is possible
         mov     qword [rsp + 40], rbx
       ; /
@@ -635,35 +795,34 @@ print: ; print(ptr : ptr, len : long) : long
         mov     qword [rsp + 56], FALSE
       ; /
     
-      ; <>T50 = Reference numberOfCharsWritten
+      ; <>T68 = Reference numberOfCharsWritten
         mov     qword [rsp + 64], rsp ; Assign stackpointer
         add     qword [rsp + 64], 56 ; and subtract to get correct position
       ; /
     
-      ; <>T49 = call WriteConsoleW(stdOut, ptr, len, <>T50, 0)
+      ; <>T67 = call WriteConsoleW(stdOut, ptr, len, <>T68, 0)
         mov     rcx, qword [rsp + 40] ; Pass parameter #0
         mov     rdx, qword [rsp + 16] ; Pass parameter #1
         mov     r8, qword [rsp + 24] ; Pass parameter #2
         mov     r9, qword [rsp + 64] ; Pass parameter #3
         mov     qword [rsp + 152], FALSE ; Pass parameter #4
         call    WriteConsoleW
-        mov     qword [rsp + 72], rax ; Assign return value to <>T49
+        mov     qword [rsp + 72], rax ; Assign return value to <>T67
       ; /
     
-      ; return <>T49
-        mov     rax, qword [rsp + 72] ; Return <>T49
+      ; return <>T67
+        mov     rax, qword [rsp + 72] ; Return <>T67
         jmp     .__exit
       ; /
     
-      ; .T46:
-    .T46:         
+      ; .T64:
+    .T64:         
       ; /
     
       ; .__exit:
     .__exit:         
       ; /
     
-    .__exit:          ; Function exit/return label
         add     rsp, 160 ; Return stack
         ret     
     

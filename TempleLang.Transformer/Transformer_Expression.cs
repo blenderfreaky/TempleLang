@@ -61,6 +61,7 @@
             yield return exitLabel;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "RCS1227:Validate arguments correctly.", Justification = "Not relevant")]
         private IEnumerable<IInstruction> TransformExpressionCore(CallExpression expr, IAssignableValue target)
         {
             if (!(expr.Callee is CallableValue callable)) throw new InvalidOperationException();

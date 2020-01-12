@@ -42,11 +42,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		OtherCode.tl = OtherCode.tl
 		Test.asm = Test.asm
 		Test.tl = Test.tl
+		Test.tlil = Test.tlil
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.CodeGenerator.NASM", "TempleLang.CodeGenerator.NASM\TempleLang.CodeGenerator.NASM.csproj", "{C9640599-1ADA-4E87-9C1E-FBC36729E6A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempleLang.Transformer", "TempleLang.Transformer\TempleLang.Transformer.csproj", "{AC4999E5-3C09-4E4E-BC2E-320E6570AC4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Transformer", "TempleLang.Transformer\TempleLang.Transformer.csproj", "{AC4999E5-3C09-4E4E-BC2E-320E6570AC4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

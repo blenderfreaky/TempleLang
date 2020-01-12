@@ -19,7 +19,7 @@
         public override string ToString() => $"({Operator.Value}{Value})";
 
         public static new readonly Parser<Expression, Token> Parser =
-            CreateParser(PostfixExpression.Parser, Parse.Token(
+            CreateParser(CallExpression.Parser, Parse.Token(
                 Token.Increment, Token.Decrement,
                 Token.LogicalNot, Token.BitwiseNot,
                 Token.Add, Token.Subtract,

@@ -28,7 +28,7 @@
 
         public static new readonly Parser<Expression, Token> Parser =
             Parse.BinaryOperatorLeftToRight(
-                BinaryExpression.Assignment,
+                AccessExpression.Parser,
                 Parse.Epsilon<object?, Token>(),
                 ParameterListParser,
                 (callee, parameters, _) => new CallExpression(callee, parameters.Parameters, FileLocation.Concat(callee.Location, parameters.Location)));

@@ -2,12 +2,23 @@ namespace Program;
 
 func _start() : long
 {
-    Sys.print("Start\n", 6);
+    //Sys.print("Start\n", 6);
     //printNum(fac(8));
-    Sys.printNum(1);
+    //Sys.printNum(1);
 }
 
-func yeet() : long {}
+func fib(inp : long) : long
+{
+    if inp == 0 || inp == 1 return inp;
+
+    return fib(inp-1) + fib(inp-2);
+}
+
+func roundDownTo10(inp : long, ) : long
+{
+    if inp >= 0 return inp - inp%10;
+    else return inp + (-inp)%10;
+}
 
 func pow(base : long, exp : long) : long
 {
@@ -33,7 +44,7 @@ func fac(num : long) : long
     return acc;
 }
 
-func fib(num : long) : long
+func fibFast(num : long) : long
 {
     if num == 0 return 0;
 

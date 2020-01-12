@@ -68,7 +68,7 @@
 
             foreach (var instruction in Instructions.SelectMany((x, i) => CompileInstruction(i, x))) yield return instruction;
 
-            yield return NasmInstruction.Label(".__exit").WithComment("Function exit/return label");
+            //yield return NasmInstruction.Label(".__exit").WithComment("Function exit/return label");
             yield return NasmInstruction.Call("add", Param(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString())).WithComment("Return stack");
             yield return NasmInstruction.Call(name: "ret");
             yield return NasmInstruction.Empty();
@@ -215,6 +215,12 @@
             [BinaryOperatorType.Subtract, PrimitiveType.Long] = "sub",
             [BinaryOperatorType.Subtract, PrimitiveType.Pointer] = "sub",
             [BinaryOperatorType.Multiply, PrimitiveType.Long] = "imul",
+            [BinaryOperatorType.BitwiseAnd, PrimitiveType.Long] = "and",
+            [BinaryOperatorType.LogicalAnd, PrimitiveType.Long] = "and",
+            [BinaryOperatorType.LogicalAnd, PrimitiveType.Bool] = "and",
+            [BinaryOperatorType.BitwiseOr, PrimitiveType.Long] = "or",
+            [BinaryOperatorType.LogicalOr, PrimitiveType.Long] = "or",
+            [BinaryOperatorType.LogicalOr, PrimitiveType.Bool] = "or",
             [BinaryOperatorType.Assign] = "mov",
         };
 
@@ -302,7 +308,42 @@
             {
                 if (lhsMemory != targetMemory) yield return Move(targetMemory, lhsMemory).WithComment("Assign LHS to target memory");
 
-                yield return NasmInstruction.Call(_binaryOperators[inst.Operator, inst.OperandType], Param(targetMemory), Param(rhsMemory));
+                // When comparing longs bitwise comparison can fail, so do it with branching
+                if ((inst.Operator == BinaryOperatorType.LogicalAnd || inst.Operator == BinaryOperatorType.LogicalOr)
+                    && inst.OperandType == PrimitiveType.Long)
+                {
+                    var lhsTrueLabel = "." + RequestName();
+                    var trueLabel = "." + RequestName();
+                    var falseLabel = "." + RequestName();
+                    var exitLabel = "." + RequestName();
+
+                    yield return NasmInstruction.Call("test", Param(targetMemory), Param(targetMemory)).WithComment("Check whether LHS is true");
+                    yield return NasmInstruction.Call("jnz", new LabelParameter(lhsTrueLabel)).WithComment("Check whether LHS is true");
+
+                    if (inst.Operator == BinaryOperatorType.LogicalOr)
+                    {
+                        yield return NasmInstruction.Call("test", Param(rhsMemory), Param(rhsMemory)).WithComment("Check whether RHS is true");
+                        yield return NasmInstruction.Call("jnz", trueLabel).WithComment("Jump to True if RHS is true");
+                    }
+                    yield return NasmInstruction.Label(falseLabel).WithComment("False");
+                    yield return Move(targetMemory, FalseConstant).WithComment("Assign false to output");
+                    yield return Jump(exitLabel).WithComment("Jump to Exit");
+
+                    yield return NasmInstruction.Label(lhsTrueLabel).WithComment("LHS True");
+                    yield return NasmInstruction.Call("test", Param(rhsMemory), Param(rhsMemory)).WithComment("Check whether RHS is true");
+                    if (inst.Operator == BinaryOperatorType.LogicalAnd)
+                    {
+                        yield return NasmInstruction.Call("jz", falseLabel).WithComment("Jump to False if RHS is false");
+                    }
+                    yield return NasmInstruction.Label(trueLabel).WithComment("True");
+                    yield return Move(targetMemory, TrueConstant).WithComment("Assign true to output");
+
+                    yield return NasmInstruction.Label(exitLabel).WithComment("Exit");
+                }
+                else
+                {
+                    yield return NasmInstruction.Call(_binaryOperators[inst.Operator, inst.OperandType], Param(targetMemory), Param(rhsMemory));
+                }
             }
 
             if (actualTargetMemory != targetMemory) yield return Move(actualTargetMemory, targetMemory).WithComment("Assign result to actual target memory");

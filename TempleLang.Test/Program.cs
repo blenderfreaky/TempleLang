@@ -21,7 +21,7 @@
 
             if (compiled == null) return;
 
-            var file = TempleLangHelper.GenerateExecutable(compiled, "Test", "../../../../", "../../../../");
+            var file = TempleLangHelper.GenerateExecutable(compiled, "Test", "../../../../", "../../../../", true);
             stopwatch.Stop();
 
             Console.WriteLine(file != null ? "Success" : "Failure");

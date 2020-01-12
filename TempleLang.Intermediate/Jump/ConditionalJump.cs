@@ -22,7 +22,7 @@
             Inverted = inverted;
         }
 
-        public override string ToString() => $"If {(Inverted ? "!" : "")}{Condition} Jump {Target}";
+        public override string ToString() => $"If {(Inverted ? "!" : "")}{Condition} Jump {Target.Name}";
 
         public override bool Equals(object? obj) => obj is ConditionalJump jump && EqualityComparer<LabelInstruction>.Default.Equals(Target, jump.Target) && EqualityComparer<IReadableValue>.Default.Equals(Condition, jump.Condition) && Inverted == jump.Inverted;
 

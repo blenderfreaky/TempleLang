@@ -1,0 +1,160 @@
+; func _start() : long
+.T1:
+.__exit:
+
+; func fib(inp : long) : long
+inp = param 0
+<>T4 = inp ComparisonEqual 0
+<>T5 = inp ComparisonEqual 1
+<>T3 = <>T4 LogicalOr <>T5
+If <>T3 Jump .T6:
+Jump .T7:
+.T6:
+return inp
+.T7:
+<>T10 = inp Subtract 1
+<>T9 = call fib(<>T10)
+<>T12 = inp Subtract 2
+<>T11 = call fib(<>T12)
+<>T8 = <>T9 Add <>T11
+return <>T8
+.T2:
+.__exit:
+
+; func roundDownTo10(inp : long) : long
+inp = param 0
+<>T14 = inp ComparisonGreaterThanOrEqual 0
+If <>T14 Jump .T15:
+<>T19 = Negation inp
+<>T18 = <>T19 Remainder 10
+<>T17 = inp Add <>T18
+return <>T17
+Jump .T16:
+.T15:
+<>T21 = inp Remainder 10
+<>T20 = inp Subtract <>T21
+return <>T20
+.T16:
+.T13:
+.__exit:
+
+; func pow(base : long, exp : long) : long
+base = param 0
+exp = param 1
+_ = acc Assign 1
+Jump .T24:
+.T23:
+<>T26 = PreDecrement exp
+.T24:
+<>T27 = exp ComparisonGreaterThan 0
+If !<>T27 Jump .T25:
+<>T29 = acc Multiply base
+_ = acc Assign <>T29
+.T28:
+Jump .T23:
+.T25:
+return acc
+.T22:
+.__exit:
+
+; func fac(num : long) : long
+num = param 0
+_ = acc Assign 1
+_ = i Assign 1
+Jump .T32:
+.T31:
+<>T34 = PreIncrement i
+.T32:
+<>T35 = i ComparisonLessThanOrEqual num
+If !<>T35 Jump .T33:
+<>T37 = acc Multiply i
+_ = acc Assign <>T37
+.T36:
+Jump .T31:
+.T33:
+return acc
+.T30:
+.__exit:
+
+; func fibFast(num : long) : long
+num = param 0
+<>T39 = num ComparisonEqual 0
+If <>T39 Jump .T40:
+Jump .T41:
+.T40:
+return 0
+.T41:
+_ = m1 Assign 0
+_ = m2 Assign 1
+_ = i Assign 0
+Jump .T43:
+.T42:
+<>T45 = PreIncrement i
+.T43:
+<>T47 = num Subtract 1
+<>T46 = i ComparisonLessThan <>T47
+If !<>T46 Jump .T44:
+_ = temp Assign m1
+_ = m1 Assign m2
+<>T49 = temp Add m2
+_ = m2 Assign <>T49
+.T48:
+Jump .T42:
+.T44:
+return m2
+.T38:
+.__exit:
+
+; func printNum(num : long) : long
+num = param 0
+_ = call printNumAny(num, 10)
+.__exit:
+
+; func printNumAny(num : long, base : long) : long
+num = param 0
+base = param 1
+<>T51 = num ComparisonLessThan 0
+If <>T51 Jump .T52:
+Jump .T53:
+.T52:
+_ = call print(-, 1)
+<>T55 = Negation num
+_ = call printNum(<>T55)
+return 
+.T54:
+.T53:
+<>T56 = num Remainder base
+_ = digit Assign <>T56
+<>T57 = num Divide base
+_ = rest Assign <>T57
+<>T58 = rest ComparisonGreaterThan 0
+If <>T58 Jump .T59:
+Jump .T60:
+.T59:
+_ = call printNumAny(rest, base)
+.T60:
+_ = call printDigit(digit)
+.T50:
+.__exit:
+
+; func printDigit(digit : long) : long
+digit = param 0
+_ = digits Assign 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
+<>T63 = digit Multiply 2
+<>T62 = digits Add <>T63
+_ = call print(<>T62, 1)
+.T61:
+.__exit:
+
+; func print(ptr : ptr, len : long) : long
+ptr = param 0
+len = param 1
+<>T66 = Negation 11
+<>T65 = call GetStdHandle(<>T66)
+_ = stdOut Assign <>T65
+_ = numberOfCharsWritten Assign 0
+<>T68 = Reference numberOfCharsWritten
+<>T67 = call WriteConsoleW(stdOut, ptr, len, <>T68, 0)
+return <>T67
+.T64:
+.__exit:

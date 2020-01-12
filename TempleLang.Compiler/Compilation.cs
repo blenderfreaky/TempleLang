@@ -1,5 +1,6 @@
 ﻿namespace TempleLang.Compiler
 {
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Bound.Primitives;
@@ -40,8 +41,18 @@
 
                 yield return NasmInstruction.LabeledCall(
                     label: constant.Value.LabelName,
-                    name: constant.Value.IsAddress ? "db" : "equ",
+                    name: constant.Value.IsAddress ? "dq" : "equ",
                     new LiteralParameter(isString ? $"__utf16__(`{constant.Key.ValueText}`)" : constant.Key.ValueText));
+            }
+        }
+
+        public IEnumerable<string> WriteIntermediate()
+        {
+            foreach (var intermediate in ProcedureCompilations)
+            {
+                yield return "; func " + intermediate.Procedure.Signature;
+                foreach (var instruction in intermediate.Instructions) yield return instruction.ToString();
+                yield return "";
             }
         }
     }

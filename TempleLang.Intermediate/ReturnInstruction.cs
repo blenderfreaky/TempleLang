@@ -11,7 +11,7 @@
             ReturnValue = returnValue;
         }
 
-        public override string ToString() => $"return {ReturnValue}";
+        public override string ToString() => $"Return {ReturnValue}";
 
         public override bool Equals(object? obj) => obj is ReturnInstruction instruction && EqualityComparer<IReadableValue?>.Default.Equals(ReturnValue, instruction.ReturnValue);
 

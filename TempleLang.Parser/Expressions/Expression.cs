@@ -29,6 +29,6 @@
             .Or(Identifier.Parser)
             .Or(ParenthesizedExpression);
 
-        public static readonly Parser<Expression, Token> Parser = CallExpression.Parser;
+        public static readonly Parser<Expression, Token> Parser = BinaryExpression.Assignment;
     }
 }

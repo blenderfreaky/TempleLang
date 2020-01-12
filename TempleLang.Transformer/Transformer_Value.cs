@@ -7,7 +7,7 @@
 
     public partial class Transformer
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "RCS1227:Validate arguments correctly.", Justification = "<Pending>")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "RCS1227:Validate arguments correctly.", Justification = "Not relevant")]
         public IEnumerable<IInstruction> TransformValue(IValue value, IAssignableValue target)
         {
             if (!(value.ReturnType is PrimitiveType type)) throw new InvalidOperationException("Internal Failure: Binder failed binding high-level locals to primitives");

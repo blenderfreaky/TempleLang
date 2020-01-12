@@ -62,7 +62,8 @@
             Compilation compilation,
             string name,
             string tempPath,
-            string execPath)
+            string execPath,
+            bool writeIL = false)
         {
             var builder = new StringBuilder();
 
@@ -81,11 +82,17 @@
             tempPath = Path.GetFullPath(tempPath);
             string asmFile = Path.Combine(tempPath, name + ".asm");
             string objFile = Path.Combine(tempPath, name + ".obj");
+            string ilFile = Path.Combine(tempPath, name + ".tlil");
             execPath = Path.GetFullPath(execPath);
             string exeFile = Path.Combine(execPath, name + ".exe");
 
             Directory.CreateDirectory(tempPath);
             File.WriteAllText(asmFile, code);
+
+            if (writeIL)
+            {
+                File.WriteAllText(ilFile, string.Join(Environment.NewLine, compilation.WriteIntermediate()));
+            }
 
             string nasmArguments = $"-f win64 -o \"{objFile}\" \"{asmFile}\"";
             Console.WriteLine("> nasm " + nasmArguments);

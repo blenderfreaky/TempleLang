@@ -11,7 +11,7 @@
             Target = target;
         }
 
-        public override string ToString() => $"Jump {Target}";
+        public override string ToString() => $"Jump {Target.Name}";
 
         public override bool Equals(object? obj) => obj is UnconditionalJump jump && EqualityComparer<LabelInstruction>.Default.Equals(Target, jump.Target);
 
