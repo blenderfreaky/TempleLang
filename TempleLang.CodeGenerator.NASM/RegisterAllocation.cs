@@ -115,6 +115,11 @@
             }
         }
 
+        private void CalculateLiveRanges()
+        {
+
+        }
+
         private void AllocateRegisters()
         {
             foreach (var interval in LiveIntervals)

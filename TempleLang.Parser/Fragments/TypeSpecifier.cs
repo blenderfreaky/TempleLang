@@ -17,7 +17,7 @@ namespace TempleLang.Parser
         }
 
         public static readonly Parser<TypeSpecifier, Token> Parser =
-            from identifiers in Identifier.Parser.SeparatedBy(Parse.Token(Token.Accessor))
+            from identifiers in Identifier.Parser.SeparatedBy(Parse.Token(Token.Accessor), least: 1)
             select new TypeSpecifier(identifiers);
     }
 }

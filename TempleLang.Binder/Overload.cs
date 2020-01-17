@@ -9,7 +9,7 @@
         public static IExpression FindBinaryOperator(IExpression lhs, IExpression rhs, BinaryOperatorType operatorType, IDiagnosticReceiver diagnosticReceiver, FileLocation location)
         {
             // Temporary basic implementation
-            if (lhs.ReturnType == rhs.ReturnType || (lhs.ReturnType == PrimitiveType.Pointer && rhs.ReturnType == PrimitiveType.Long))
+            //if (lhs.ReturnType == rhs.ReturnType || (lhs.ReturnType == PrimitiveType.Pointer && rhs.ReturnType == PrimitiveType.Long))
             {
                 var returnType = operatorType switch
                 {
@@ -37,16 +37,14 @@
                 return new UnaryExpression(operand, operatorType, PrimitiveType.Pointer);
             }
 
-            if (operand.ReturnType != PrimitiveType.Pointer || operatorType == UnaryOperatorType.Reference)
-            {
                 var returnType = operatorType switch
                 {
                     UnaryOperatorType.Reference => PrimitiveType.Pointer,
+                    UnaryOperatorType.Dereference => PrimitiveType.Long,
                     _ => operand.ReturnType
                 };
 
                 return new UnaryExpression(operand, operatorType, operand.ReturnType);
-            }
 
             diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidOperandTypes, location, true);
             return new InvalidExpression(location);

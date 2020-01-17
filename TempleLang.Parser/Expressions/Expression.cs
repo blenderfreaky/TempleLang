@@ -27,6 +27,7 @@
         public static readonly Parser<Expression, Token> Atomic =
             Literal.Parser.OfType<Expression, Token>()
             .Or(Identifier.Parser)
+            .Or(CastExpression.Parser)
             .Or(ParenthesizedExpression);
 
         public static readonly Parser<Expression, Token> Parser = BinaryExpression.Assignment;

@@ -7,6 +7,19 @@ func _start() : long
     //Sys.printNum(1);
 }
 
+func arrTest() : long
+{
+    let arr = alloc(10);
+
+    deref arr = 2;
+    deref (arr + 1) = 3;
+    
+    printNum((long)deref arr);
+    printNum((long)deref (arr+1));
+
+    return 0;
+}
+
 func fib(inp : long) : long
 {
     if inp == 0 || inp == 1 return inp;
@@ -61,47 +74,71 @@ func fibFast(num : long) : long
     return m2;
 }
 
-namespace Sys
+func alloc(size : long) : ptr
 {
-    func printNum(num : long) : long => printNumAny(num, 10);
-
-    func printNumAny(num : long, base : long) : long
-    {
-        if (num < 0)
-        {
-            print("-", 1);
-            printNum(-num);
-            return;
-        }
-    
-        let digit = num % base;
-        let rest = num / base;
-        if (rest > 0) printNumAny(rest, base);
-        printDigit(digit);
-    }
-
-    func printDigit(digit : long) : long
-    {
-        let digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        // * 2 because strings are UTF-16
-        print(digits + digit * 2, 1);
-    }
-
-    func print(ptr:ptr, len:long) : long
-    {
-        let stdOut = GetStdHandle(-11);
-        let numberOfCharsWritten = 0;
-        return WriteConsoleW(stdOut, ptr, len, ref numberOfCharsWritten, 0);
-    }
-
-    func GetStdHandle(id : long) : ptr
-        using "kernel32.lib";
-
-    func WriteConsoleW(
-        stdOut : ptr,
-        message : ptr,
-        messageLength : long,
-        numberOfCharsWritten : ptr,
-        zero : long) : long
-        using "kernel32.lib";
+    let heapHandle = GetProcessHeap();
+    return HeapAlloc(heapHandle, 0, size);
 }
+
+func free(position : ptr) : bool
+{
+    let heapHandle = GetProcessHeap();
+    return HeapFree(heapHandle, 0, position);
+}
+
+func printNum(num : long) : long => printNumAny(num, 10);
+
+func printNumAny(num : long, base : long) : long
+{
+    if (num < 0)
+    {
+        print("-", 1);
+        printNum(-num);
+        return;
+    }
+    
+    let digit = num % base;
+    let rest = num / base;
+    if (rest > 0) printNumAny(rest, base);
+    printDigit(digit);
+}
+
+func printDigit(digit : long) : long
+{
+    let digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    // * 2 because strings are UTF-16
+    print(digits + digit * 2, 1);
+}
+
+func print(ptr:ptr, len:long) : long
+{
+    let stdOut = GetStdHandle(-11);
+    let numberOfCharsWritten = 0;
+    return WriteConsoleW(stdOut, ptr, len, ref numberOfCharsWritten, 0);
+}
+
+func GetStdHandle(id : long) : ptr
+    using "kernel32.lib";
+
+func WriteConsoleW(
+    stdOut : ptr,
+    message : ptr,
+    messageLength : long,
+    numberOfCharsWritten : ptr,
+    zero : long) : long
+    using "kernel32.lib";
+        
+func HeapAlloc(
+    heapHandle : ptr,
+    flags : long,
+    size : long) : ptr
+    using "kernel32.lib";
+        
+func HeapFree(
+    heapHandle : ptr,
+    flags : long,
+    pos : ptr) : bool
+    using "kernel32.lib";
+    
+func GetProcessHeap() : ptr
+    using "kernel32.lib";

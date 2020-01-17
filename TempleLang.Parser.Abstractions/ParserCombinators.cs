@@ -230,8 +230,10 @@
                     {
                         if (i < least)
                         {
-                            return ParserResult.Error<T, List<T>, TToken>(result);
-                            //return ParserResult.Error<List<T>, TToken>("Too few elements. Expected at least " + least, remainder);
+                            return
+                                result.IsSuccessful
+                                ? ParserResult.Error<List<T>, TToken>("Too few elements. Expected at least " + least, remainder)
+                                : ParserResult.Error<T, List<T>, TToken>(result);
                         }
 
                         return ParserResult.Success(elements, result.RemainingLexemes);

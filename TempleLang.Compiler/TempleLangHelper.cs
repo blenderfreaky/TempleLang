@@ -25,7 +25,11 @@
 
             if (!result.IsSuccessful) return result;
 
-            if (result.RemainingLexemes.Length > 1) return ParserResult.Error<T, Token>("Error matching " + result.RemainingLexemes[result.RemainingLexemes.Length - 1], result.RemainingLexemes);
+            if (result.RemainingLexemes.Length > 1)
+            {
+                var remaining = result.RemainingLexemes[0] + (result.RemainingLexemes.Length > 1 ? " " + result.RemainingLexemes[1] : "");
+                return ParserResult.Error<T, Token>("Error matching " + remaining, result.RemainingLexemes);
+            }
 
             return result;
         }

@@ -14,6 +14,7 @@
                 UnaryExpression expr => TransformExpressionCore(expr, target),
                 TernaryExpression expr => TransformExpressionCore(expr, target),
                 CallExpression expr => TransformExpressionCore(expr, target),
+                CastExpression expr => TransformExpressionCore(expr, target),
                 IValue expr => TransformValue(expr, target),
                 _ => throw new ArgumentException(nameof(expression)),
             };
@@ -77,5 +78,8 @@
 
             yield return new CallInstruction(callable.Callable.FullyQualifiedName, parameterResults, target);
         }
+
+        private IEnumerable<IInstruction> TransformExpressionCore(CastExpression expr, IAssignableValue target) =>
+            TransformExpression(expr.Castee, target);
     }
 }

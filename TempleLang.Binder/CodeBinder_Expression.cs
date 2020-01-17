@@ -7,30 +7,30 @@
     using TempleLang.Bound.Expressions;
     using TempleLang.Diagnostic;
     using TempleLang.Lexer;
-    using TempleLang.Parser;
 
     using IE = Bound.Expressions;
     using S = Parser;
 
     public partial class CodeBinder : Binder
     {
-        public IExpression? BindNullableExpression(Expression? syntaxExpression) =>
+        public IExpression? BindNullableExpression(S.Expression? syntaxExpression) =>
             syntaxExpression == null ? null : BindExpression(syntaxExpression);
 
-        public IExpression BindExpression(Expression? syntaxExpression) => syntaxExpression switch
+        public IExpression BindExpression(S.Expression? syntaxExpression) => syntaxExpression switch
         {
-            PrefixExpression expr => BindExpression(expr),
-            PostfixExpression expr => BindExpression(expr),
+            S.PrefixExpression expr => BindExpression(expr),
+            S.PostfixExpression expr => BindExpression(expr),
             S.BinaryExpression expr => BindExpression(expr),
             S.TernaryExpression expr => BindExpression(expr),
             S.AccessExpression expr => BindExpression(expr),
             S.CallExpression expr => BindExpression(expr),
-            Identifier expr => BindExpression(expr),
-            Literal expr => BindLiteral(expr),
+            S.CastExpression expr => BindExpression(expr),
+            S.Identifier expr => BindExpression(expr),
+            S.Literal expr => BindLiteral(expr),
             _ => throw new ArgumentException(nameof(syntaxExpression)),
         };
 
-        public IExpression BindExpression(PrefixExpression expr)
+        public IExpression BindExpression(S.PrefixExpression expr)
         {
             var val = BindExpression(expr.Value);
 
@@ -57,7 +57,7 @@
             return Overload.FindUnaryOperator(val, op, this, expr.Location);
         }
 
-        public IExpression BindExpression(PostfixExpression expr)
+        public IExpression BindExpression(S.PostfixExpression expr)
         {
             var val = BindExpression(expr.Value);
 
@@ -231,6 +231,15 @@
             return new InvalidExpression();
         }
 
-        public IValue BindExpression(Identifier expr) => FindValue(expr);
+        public IExpression BindExpression(S.CastExpression expr)
+        {
+            var targetType = FindType(expr.TargetType);
+
+            var castee = BindExpression(expr.Castee);
+
+            return new CastExpression(targetType, castee);
+        }
+
+        public IValue BindExpression(S.Identifier expr) => FindValue(expr);
     }
 }
