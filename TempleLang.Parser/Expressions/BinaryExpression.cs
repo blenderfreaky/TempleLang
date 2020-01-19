@@ -54,6 +54,7 @@
         public static readonly Parser<Expression, Token> Assignment =
             CreateParserRightToLeft(TernaryExpression.Parser, Parse.Token(
                 Token.Assign,
+                Token.ReferenceAssign,
                 Token.AddCompoundAssign,
                 Token.SubtractCompoundAssign,
                 Token.MultiplyCompoundAssign,

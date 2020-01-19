@@ -78,7 +78,9 @@
                 case Procedure procedure:
                     var transformed = Transformer.TransformStatementWithParameters(procedure.EntryPoint, procedure.Parameters).ToList();
 
-                    var allocation = RegisterAllocation.Generate(transformed);
+                    var cfg = CFGNode.ConstructCFG(transformed);
+                    LivenessAnalysis.PerformAnalysis(cfg);
+                    var allocation = RegisterAllocation.Generate(cfg);
 
                     yield return new ProcedureCompilation(procedure, transformed, ConstantTable, FalseConstant, TrueConstant, allocation);
                     break;

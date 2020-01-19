@@ -68,7 +68,7 @@
 
             foreach (var instruction in Instructions.SelectMany((x, i) => CompileInstruction(i, x))) yield return instruction;
 
-            //yield return NasmInstruction.Label(".__exit").WithComment("Function exit/return label");
+            yield return NasmInstruction.Label(".__exit").WithComment("Function exit/return label");
             yield return NasmInstruction.Call("add", Param(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString())).WithComment("Return stack");
             yield return NasmInstruction.Call(name: "ret");
             yield return NasmInstruction.Empty();
@@ -98,7 +98,7 @@
 
         private IMemory? TryGetMemory(IReadableValue memory) => memory switch
         {
-            Variable mem => RegisterAllocation.AssignedLocation[mem],
+            Variable mem => RegisterAllocation.AssignedLocation.TryGetValue(mem, out var assignedMem) ? assignedMem : null,
             Constant mem => ConstantTable[mem],
             DiscardValue mem => null,
             _ => throw new ArgumentException(nameof(memory)),
@@ -148,7 +148,7 @@
         private IEnumerable<NasmInstruction> CompileCore(UnaryComputationAssignment inst)
         {
             var actualOperandMemory = GetMemory(inst.Operand);
-            var actualTargetMemory = GetMemory(inst.Target);
+            var actualTargetMemory = TryGetMemory(inst.Target);
 
             var targetMemory = actualTargetMemory;
             var operandMemory = actualOperandMemory;
@@ -162,14 +162,32 @@
 
             switch (inst.Operator)
             {
+                case UnaryOperatorType.PreDecrement:
+                case UnaryOperatorType.PreIncrement:
+                    yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Param(operandMemory));
+                    if (actualOperandMemory != operandMemory) yield return Move(actualOperandMemory, operandMemory).WithComment("Assign temporary operand to actual operand");
+
+                    if (targetMemory != null && targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
+                    break;
+
+                case UnaryOperatorType.PostDecrement:
+                case UnaryOperatorType.PostIncrement:
+                    if (targetMemory != null && targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
+
+                    yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Param(operandMemory));
+                    if (actualOperandMemory != operandMemory) yield return Move(actualOperandMemory, operandMemory).WithComment("Assign temporary operand to actual operand");
+                    break;
+
                 case UnaryOperatorType.Dereference:
-                    if (inst.OperandType != PrimitiveType.Long) throw new InvalidOperationException("Dereferncing operand of invalid type");
+                    if (inst.OperandType != PrimitiveType.Pointer) throw new InvalidOperationException("Dereferncing operand of invalid type");
+                    if (targetMemory == null) throw new InvalidOperationException("Invalid Unary Operation assigning to discard");
 
                     yield return Move(targetMemory, new DereferenceParameter(Param(operandMemory))).WithComment($"Dereference {inst.Operand}");
                     break;
 
                 case UnaryOperatorType.Reference:
                     if (inst.OperandType != PrimitiveType.Long) throw new ArgumentException(nameof(inst));
+                    if (targetMemory == null) throw new InvalidOperationException("Invalid Unary Operation assigning to discard");
 
                     if (operandMemory is StackLocation stackLocation)
                     {
@@ -182,30 +200,16 @@
                     }
                     break;
 
-                case UnaryOperatorType.PreDecrement:
-                case UnaryOperatorType.PreIncrement:
-                    yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Param(operandMemory));
-                    if (actualOperandMemory != operandMemory) yield return Move(actualOperandMemory, operandMemory).WithComment("Assign temporary operand to actual operand");
-
-                    if (targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
-                    break;
-
-                case UnaryOperatorType.PostDecrement:
-                case UnaryOperatorType.PostIncrement:
-                    if (targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
-
-                    yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Param(operandMemory));
-                    if (actualOperandMemory != operandMemory) yield return Move(actualOperandMemory, operandMemory).WithComment("Assign temporary operand to actual operand");
-                    break;
-
                 default:
+                    if (targetMemory == null) throw new InvalidOperationException("Invalid Unary Operation assigning to discard");
                     if (targetMemory != operandMemory) yield return Move(targetMemory, operandMemory).WithComment("Assign operand to target");
 
                     yield return NasmInstruction.Call(_unaryOperators[inst.Operator, inst.OperandType], Param(targetMemory));
                     break;
             }
 
-            if (actualTargetMemory != targetMemory) yield return Move(actualTargetMemory, targetMemory).WithComment("Assign result to actual target memory");
+            if (targetMemory != null && actualTargetMemory != null
+                && actualTargetMemory != targetMemory) yield return Move(actualTargetMemory, targetMemory).WithComment("Assign result to actual target memory");
         }
 
         private readonly OperatorTable<BinaryOperatorType> _binaryOperators = new OperatorTable<BinaryOperatorType>
@@ -242,7 +246,7 @@
 
             if (actualTargetMemory == null)
             {
-                if (inst.Operator == BinaryOperatorType.Assign) actualTargetMemory = lhsMemory;
+                if (inst.Operator == BinaryOperatorType.Assign || inst.Operator == BinaryOperatorType.ReferenceAssign) actualTargetMemory = lhsMemory;
                 else yield break;
             }
 
@@ -339,6 +343,10 @@
                     yield return Move(targetMemory, TrueConstant).WithComment("Assign true to output");
 
                     yield return NasmInstruction.Label(exitLabel).WithComment("Exit");
+                }
+                else if (inst.Operator == BinaryOperatorType.ReferenceAssign)
+                {
+                    yield return NasmInstruction.Call("mov", new DereferenceParameter(Param(targetMemory), WordSize.QWORD), Param(rhsMemory));
                 }
                 else
                 {

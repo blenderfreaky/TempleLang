@@ -22,13 +22,13 @@
             public override string ToString() => $"{Variable}: {FirstIndex} - {LastIndex}";
         }
 
-        public List<IInstruction> Instructions { get; }
+        public CFGNode[] CFGNodes { get; }
 
-        public static RegisterAllocation Generate(List<IInstruction> instructions) => new RegisterAllocation(instructions);
+        public static RegisterAllocation Generate(CFGNode[] instructions) => new RegisterAllocation(instructions);
 
-        private RegisterAllocation(List<IInstruction> instructions)
+        private RegisterAllocation(CFGNode[] cfgNodes)
         {
-            Instructions = instructions;
+            CFGNodes = cfgNodes;
 
             LiveIntervalsByVariable = new Dictionary<Variable, (int First, int Last)>();
 
@@ -63,61 +63,28 @@
         private Dictionary<Variable, (int First, int Last)> LiveIntervalsByVariable { get; }
         private List<LiveInterval> LiveIntervals { get; }
 
-        public IEnumerable<Variable> GetAllLiveAt(int index) => LiveIntervals.Where(x => x.FirstIndex <= index && x.LastIndex >= index).Select(x => x.Variable);
+        public IEnumerable<Variable> GetAllLiveAt(int index) => CFGNodes[index].Input; //LiveIntervals.Where(x => x.FirstIndex <= index && x.LastIndex >= index).Select(x => x.Variable);
 
         private void CalculateLiveIntervals()
         {
-            void adaptLiveIntervals(int index, IReadableValue? value)
+            for (int i = 0; i < CFGNodes.Length; i++)
             {
-                if (!(value is Variable var)) return;
+                var node = CFGNodes[i];
 
-                if (!LiveIntervalsByVariable.TryGetValue(var, out var pos))
+                // Both in and out to avoid off-by-one errors
+                // TODO: To be be optimized
+                foreach (var variable in node.Output.Union(node.Input))
                 {
-                    LiveIntervalsByVariable[var] = (index, index);
-                }
-                else
-                {
-                    LiveIntervalsByVariable[var] = (pos.First, index);
+                    if (LiveIntervalsByVariable.TryGetValue(variable, out var val))
+                    {
+                        LiveIntervalsByVariable[variable] = (val.First, i);
+                    }
+                    else
+                    {
+                        LiveIntervalsByVariable[variable] = (i, i);
+                    }
                 }
             }
-
-            for (int i = 0; i < Instructions.Count; i++)
-            {
-                switch (Instructions[i])
-                {
-                    case BinaryComputationAssignment inst:
-                        adaptLiveIntervals(i, inst.Target);
-                        adaptLiveIntervals(i, inst.Lhs);
-                        adaptLiveIntervals(i, inst.Rhs);
-                        break;
-
-                    case UnaryComputationAssignment inst:
-                        adaptLiveIntervals(i, inst.Target);
-                        adaptLiveIntervals(i, inst.Operand);
-                        break;
-
-                    case ConditionalJump inst:
-                        adaptLiveIntervals(i, inst.Condition);
-                        break;
-
-                    case ReturnInstruction inst:
-                        adaptLiveIntervals(i, inst.ReturnValue);
-                        break;
-
-                    case ParameterQueryAssignment inst:
-                        adaptLiveIntervals(i, inst.Target);
-                        break;
-
-                    case CallInstruction inst:
-                        foreach (var param in inst.Parameters) adaptLiveIntervals(i, param);
-                        break;
-                }
-            }
-        }
-
-        private void CalculateLiveRanges()
-        {
-
         }
 
         private void AllocateRegisters()

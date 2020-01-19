@@ -55,6 +55,7 @@
         BitshiftRight,
 
         Assign,
+        ReferenceAssign,
 
         ComparisonGreaterThan,
         ComparisonGreaterThanOrEqual,

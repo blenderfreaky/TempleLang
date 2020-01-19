@@ -5,13 +5,15 @@
     public struct DereferenceParameter : IParameter
     {
         public IParameter Parameter { get; }
+        public WordSize? WordSize { get; }
 
-        public DereferenceParameter(IParameter parameter)
+        public DereferenceParameter(IParameter parameter, WordSize? wordSize = null)
         {
             Parameter = parameter;
+            WordSize = wordSize;
         }
 
-        public string ToNASM() => "[" + Parameter.ToNASM() + "]";
+        public string ToNASM() => (WordSize != null ? WordSize.ToString().ToLowerInvariant() + " " : "") + "[" + Parameter.ToNASM() + "]";
 
         public override string ToString() => ToNASM();
 

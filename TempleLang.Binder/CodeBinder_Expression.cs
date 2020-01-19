@@ -100,6 +100,7 @@
                 Token.BitshiftRight => BinaryOperatorType.BitshiftRight,
 
                 Token.Assign => BinaryOperatorType.Assign,
+                Token.ReferenceAssign => BinaryOperatorType.ReferenceAssign,
 
                 Token.AddCompoundAssign => BinaryOperatorType.Add,
                 Token.SubtractCompoundAssign => BinaryOperatorType.Subtract,

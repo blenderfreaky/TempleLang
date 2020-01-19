@@ -11,7 +11,7 @@
             from result in parser
             from _ in predicate(result)
                     ? Parse.Value<T, TToken>(result)
-                    : Parse.Error<T, TToken>(errorMessage)
+                    : Parse.Error<T, TToken>(errorMessage + ", got " + result)
             select result;
 
         public static Parser<T, TToken> Or<T, TToken>(this Parser<T, TToken> left, Parser<T, TToken> right)
@@ -32,7 +32,11 @@
 
                 if (leftResult.IsSuccessful) return leftResult;
 
-                return right(input);
+                var rightResult = right(input);
+
+                if (rightResult.IsSuccessful) return rightResult;
+
+                return ParserResult.Error(leftResult, rightResult);
             };
         }
 
@@ -228,12 +232,9 @@
 
                     if (!sep.IsSuccessful)
                     {
-                        if (i < least)
+                        if (i < least-1)
                         {
-                            return
-                                result.IsSuccessful
-                                ? ParserResult.Error<List<T>, TToken>("Too few elements. Expected at least " + least, remainder)
-                                : ParserResult.Error<T, List<T>, TToken>(result);
+                            return ParserResult.Error<U, List<T>, TToken>(sep);
                         }
 
                         return ParserResult.Success(elements, result.RemainingLexemes);

@@ -52,6 +52,7 @@
         Decrement,
 
         Assign,
+        ReferenceAssign,
 
         AddCompoundAssign,
         SubtractCompoundAssign,

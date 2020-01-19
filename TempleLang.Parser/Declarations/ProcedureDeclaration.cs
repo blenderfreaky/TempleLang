@@ -49,7 +49,7 @@
                  from type in TypeSpecifier.Parser
                  select type).Maybe()
             from result in
-                ((from stmt in BlockStatement.Parser
+                (from stmt in BlockStatement.Parser
                   select new ProcedureDeclaration(stmt, name, returnType, parameters, FileLocation.Concat(start, stmt)))
                 .Or(
                   from _ in Parse.Token(Token.Arrow)
@@ -64,7 +64,7 @@
                         name,
                         returnType,
                         parameters,
-                        FileLocation.Concat(start, import))))
+                        FileLocation.Concat(start, import)))
             select result;
     }
 }

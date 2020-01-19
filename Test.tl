@@ -2,77 +2,91 @@ namespace Program;
 
 func _start() : long
 {
-    //Sys.print("Start\n", 6);
-    //printNum(fac(8));
-    //Sys.printNum(1);
+    print("Start\n", 6);
+    arrTest();
+    arrTest();
 }
 
 func arrTest() : long
 {
-    let arr = alloc(10);
-
-    deref arr = 2;
-    deref (arr + 1) = 3;
+    let size = 16;
+    let arr = alloc(size*8);
     
-    printNum((long)deref arr);
-    printNum((long)deref (arr+1));
+    for let i = 0; i < size; ++i
+    {
+        arrIndex(arr, i) <- 0;
+    }
+
+    arrIndex(arr, 0) <- 2;
+    arrIndex(arr, 1) <- 3;
+    
+    print("\nAll", 4);
+    for let i = 0; i < size; ++i
+    {
+        print("\n", 1);
+        printNum((long)deref arrIndex(arr, i));
+    }
+
+    free(arr);
 
     return 0;
 }
 
-func fib(inp : long) : long
-{
-    if inp == 0 || inp == 1 return inp;
+func arrIndex(arr : ptr, index : long) : ptr => arr + 7 + 8*index;
 
-    return fib(inp-1) + fib(inp-2);
-}
-
-func roundDownTo10(inp : long, ) : long
-{
-    if inp >= 0 return inp - inp%10;
-    else return inp + (-inp)%10;
-}
-
-func pow(base : long, exp : long) : long
-{
-    let acc = 1;
-
-    for ; exp > 0; --exp
-    {
-        acc *= base;
-    }
-
-    return acc;
-}
-
-func fac(num : long) : long
-{
-    let acc = 1;
-
-    for let i = 1; i <= num; ++i
-    {
-        acc *= i;
-    }
-
-    return acc;
-}
-
-func fibFast(num : long) : long
-{
-    if num == 0 return 0;
-
-    let m1 = 0;
-    let m2 = 1;
-
-    for let i = 0; i < num-1; ++i
-    {
-        let temp = m1;
-        m1 = m2;
-        m2 = temp + m2;
-    }
-
-    return m2;
-}
+//  func fib(inp : long) : long
+//  {
+//      if inp == 0 || inp == 1 return inp;
+//  
+//      return fib(inp-1) + fib(inp-2);
+//  }
+//  
+//  func roundDownTo10(inp : long, ) : long
+//  {
+//      if inp >= 0 return inp - inp%10;
+//      else return inp + (-inp)%10;
+//  }
+//  
+//  func pow(base : long, exp : long) : long
+//  {
+//      let acc = 1;
+//  
+//      for ; exp > 0; --exp
+//      {
+//          acc *= base;
+//      }
+//  
+//      return acc;
+//  }
+//  
+//  func fac(num : long) : long
+//  {
+//      let acc = 1;
+//  
+//      for let i = 1; i <= num; ++i
+//      {
+//          acc *= i;
+//      }
+//  
+//      return acc;
+//  }
+//  
+//  func fibFast(num : long) : long
+//  {
+//      if num == 0 return 0;
+//  
+//      let m1 = 0;
+//      let m2 = 1;
+//  
+//      for let i = 0; i < num-1; ++i
+//      {
+//          let temp = m1;
+//          m1 = m2;
+//          m2 = temp + m2;
+//      }
+//  
+//      return m2;
+//  }
 
 func alloc(size : long) : ptr
 {

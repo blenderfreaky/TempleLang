@@ -7,99 +7,42 @@ using TempleLang.Intermediate;
 
 namespace TempleLang.CodeGenerator.NASM
 {
-    public class LivenessAnalysis
+    public static class LivenessAnalysis
     {
-        public class CFGNode
+        public static void PerformAnalysis(CFGNode[] cfg)
         {
-            public IInstruction Instruction { get; }
-
-            public List<CFGNode> Successors { get; }
-
-            public List<IReadableValue> Inp { get; }
-            public List<IAssignableValue> Out { get; }
-
-            public List<IReadableValue> Use { get; }
-            public List<IAssignableValue> Def { get; }
-
-            public CFGNode(IInstruction instruction, CFGNode? directSuccessor)
+            while (true)
             {
-                Inp = new List<IReadableValue>();
-                Out = new List<IAssignableValue>();
-
-                Use = new List<IReadableValue>();
-                Def = new List<IAssignableValue>();
-
-                switch (instruction)
-                {
-                    case BinaryComputationAssignment inst:
-                        Def.Add(inst.Target);
-                        Use.Add(inst.Lhs);
-                        Use.Add(inst.Rhs);
-                        break;
-
-                    case UnaryComputationAssignment inst:
-                        Def.Add(inst.Target);
-                        Use.Add(inst.Operand);
-                        break;
-
-                    case ConditionalJump inst:
-                        Use.Add(inst.Condition);
-                        break;
-
-                    case ReturnInstruction inst:
-                        if (inst.ReturnValue != null) Use.Add(inst.ReturnValue);
-                        break;
-
-                    case ParameterQueryAssignment inst:
-                        Def.Add(inst.Target);
-                        break;
-
-                    case CallInstruction inst:
-                        Use.AddRange(inst.Parameters);
-                        break;
-                }
-
-                Successors = directSuccessor == null ? new List<CFGNode>(1) : new List<CFGNode>(2) { directSuccessor };
+                if (!Iteration(cfg)) break;
             }
         }
 
-        public IEnumerable<CFGNode> ConstructCFG(List<IInstruction> instructions)
+        public static bool Iteration(CFGNode[] cfg)
         {
-            CFGNode[] nodes = new CFGNode[instructions.Count];
+            // Why is anyChanges always true in the end?
+            bool anyChanges = false;
 
-            int end = instructions.Count - 1;
-            for (int i = end; i >= 0; i--)
+            for (int i = cfg.Length - 1; i >= 0; i--)
             {
-                nodes[i] = new CFGNode(instructions[i], i == end ? null : nodes[i + 1]);
+                var node = cfg[i];
+
+                var outputBefore = node.Output.ToList();
+                var inputBefore = node.Input.ToList();
+
+                foreach (var successor in node.Successors)
+                {
+                    node.Output.UnionWith(successor.Input);
+                }
+
+                node.Input.UnionWith(node.Output);
+                node.Input.ExceptWith(node.Def);
+                node.Input.UnionWith(node.Use);
+
+                anyChanges |= !outputBefore.SequenceEqual(node.Output);
+                anyChanges |= !inputBefore.SequenceEqual(node.Input);
             }
 
-            // Map Labels to instructions
-            Dictionary<LabelInstruction, IInstruction> labels = new Dictionary<LabelInstruction, IInstruction>();
-
-            List<LabelInstruction> activeLabels = new List<LabelInstruction>();
-
-            foreach (var instruction in instructions)
-            {
-                if (instruction is LabelInstruction label)
-                {
-                    activeLabels.Add(label);
-                }
-                else if (activeLabels.Count > 0)
-                {
-                    foreach (var activeLabel in activeLabels)
-                    {
-                        labels[activeLabel] = instruction;
-                    }
-                }
-            }
-
-            foreach (var node in nodes)
-            {
-                if (node.Instruction is ConditionalJump conditionalJump)
-                {
-                    cfgNppde
-                }
-            }
+            return anyChanges;
         }
     }
 }

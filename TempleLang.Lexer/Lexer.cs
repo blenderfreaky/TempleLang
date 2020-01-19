@@ -169,6 +169,7 @@
                     var lessType = SwitchOnNextCharacter(
                         Token.ComparisonLessThan,
                         ('=', Token.ComparisonLessThanOrEqual),
+                        ('-', Token.ReferenceAssign),
                         ('<', Token.BitshiftLeft));
                     if (lessType == Token.BitshiftLeft)
                     {
