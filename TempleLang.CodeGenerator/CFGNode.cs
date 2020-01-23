@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TempleLang.Bound.Expressions;
 using TempleLang.Intermediate;
 
-namespace TempleLang.CodeGenerator.NASM
+namespace TempleLang.CodeGenerator
 {
     public class CFGNode
     {
@@ -40,7 +41,8 @@ namespace TempleLang.CodeGenerator.NASM
             {
                 case BinaryComputationAssignment inst:
                     def(inst.Target);
-                    use(inst.Lhs);
+                    if (inst.Operator == BinaryOperatorType.Assign) def(inst.Lhs);
+                    else use(inst.Lhs);
                     use(inst.Rhs);
                     break;
 
@@ -62,12 +64,13 @@ namespace TempleLang.CodeGenerator.NASM
                     break;
 
                 case CallInstruction inst:
+                    def(inst.Target);
                     foreach (var param in inst.Parameters) use(param);
                     break;
             }
         }
 
-        public override string ToString() => $"In = {{ {string.Join(", ", Input)} }} Out = {{ {string.Join(", ", Output)} }}";
+        public override string ToString() => $"{Instruction} | In = {{ {string.Join(", ", Input)} }} Out = {{ {string.Join(", ", Output)} }}";
 
         public static CFGNode[] ConstructCFG(List<IInstruction> instructions)
         {

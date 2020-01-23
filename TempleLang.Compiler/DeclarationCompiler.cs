@@ -6,6 +6,7 @@
     using System.Linq;
     using TempleLang.Binder;
     using TempleLang.Bound.Declarations;
+    using TempleLang.CodeGenerator;
     using TempleLang.CodeGenerator.NASM;
     using TempleLang.Intermediate;
     using S = Parser;
@@ -76,7 +77,7 @@
                     break;
 
                 case Procedure procedure:
-                    var transformed = Transformer.TransformStatementWithParameters(procedure.EntryPoint, procedure.Parameters).ToList();
+                    var transformed = Transformer.TransformProceddureStatement(procedure.EntryPoint, procedure.Parameters).ToList();
 
                     var cfg = CFGNode.ConstructCFG(transformed);
                     LivenessAnalysis.PerformAnalysis(cfg);

@@ -1,27 +1,11 @@
-﻿namespace TempleLang.CodeGenerator.NASM
+﻿namespace TempleLang.CodeGenerator
 {
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Intermediate;
-
+    
     public sealed class RegisterAllocation
     {
-        private class LiveInterval
-        {
-            public Variable Variable { get; }
-            public int FirstIndex { get; }
-            public int LastIndex { get; }
-
-            public LiveInterval(Variable variable, int firstIndex, int lastIndex)
-            {
-                Variable = variable;
-                FirstIndex = firstIndex;
-                LastIndex = lastIndex;
-            }
-
-            public override string ToString() => $"{Variable}: {FirstIndex} - {LastIndex}";
-        }
-
         public CFGNode[] CFGNodes { get; }
 
         public static RegisterAllocation Generate(CFGNode[] instructions) => new RegisterAllocation(instructions);
@@ -47,15 +31,14 @@
             Active = new List<LiveInterval>();
 
             AllocateRegisters();
-            AssignedLocation = LiveIntervalsByVariable.ToDictionary(x => x.Key, _ => (IMemory)StackAlloc(8));
+            //AssignedLocation = LiveIntervalsByVariable.ToDictionary(x => x.Key, _ => (IMemory)StackAlloc(8));
         }
 
         public Dictionary<Variable, IMemory> AssignedLocation { get; }
         private Stack<Register> FreeGeneralPurposeRegisters { get; }
 
         public int StackOffset { get; private set; } =
-              8 // Return address
-            + 8 // Saved frame pointer
+            8 // Return address
             ;
 
         private List<LiveInterval> Active { get; }

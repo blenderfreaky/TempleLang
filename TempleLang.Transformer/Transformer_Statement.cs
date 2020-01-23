@@ -8,14 +8,24 @@
 
     public partial class Transformer
     {
-        public IEnumerable<IInstruction> TransformStatementWithParameters(IStatement statement, IReadOnlyList<Local> parameters)
+        public IEnumerable<IInstruction> TransformProceddureStatement(IStatement statement, IReadOnlyList<Local> parameters)
         {
             for (int i = 0; i < parameters.Count; i++)
             {
                 yield return new ParameterQueryAssignment(i, RequestUserLocal(parameters[i]));
             }
 
-            foreach (var instruction in TransformStatement(statement, null, default)) yield return instruction;
+            switch (statement)
+            {
+                case BlockStatement stmt:
+                    foreach (var instruction in TransformStatement(stmt, null, default)) yield return instruction;
+                    break;
+                case ExpressionStatement stmt:
+                    IReadableValue retVal;
+                    foreach (var instruction in GetValue(stmt.Expression, out retVal)) yield return instruction;
+                    yield return new ReturnInstruction(retVal);
+                    break;
+            }
         }
 
         public IEnumerable<IInstruction> TransformStatement(IStatement statement, LabelInstruction? parentEntryLabel, LabelInstruction? parentExitLabel) =>

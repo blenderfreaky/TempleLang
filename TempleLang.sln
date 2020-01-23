@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.CodeGenerator.NA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Transformer", "TempleLang.Transformer\TempleLang.Transformer.csproj", "{AC4999E5-3C09-4E4E-BC2E-320E6570AC4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TempleLang.CodeGenerator", "TempleLang.CodeGenerator\TempleLang.CodeGenerator.csproj", "{AB277345-7D45-4146-B891-6E0AAC45EDF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{AC4999E5-3C09-4E4E-BC2E-320E6570AC4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC4999E5-3C09-4E4E-BC2E-320E6570AC4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC4999E5-3C09-4E4E-BC2E-320E6570AC4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB277345-7D45-4146-B891-6E0AAC45EDF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB277345-7D45-4146-B891-6E0AAC45EDF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB277345-7D45-4146-B891-6E0AAC45EDF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB277345-7D45-4146-B891-6E0AAC45EDF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +125,7 @@ Global
 		{1E0945C0-507E-4C9C-8A77-333E2951FA05} = {62F0A80D-47E6-43A1-ADC2-2A4BAB8FF6DA}
 		{C9640599-1ADA-4E87-9C1E-FBC36729E6A2} = {89BB7A73-4E2C-4DB2-AD2E-08900628CC1D}
 		{AC4999E5-3C09-4E4E-BC2E-320E6570AC4B} = {74C38B6F-6E61-4E17-A213-059696CAA13C}
+		{AB277345-7D45-4146-B891-6E0AAC45EDF6} = {89BB7A73-4E2C-4DB2-AD2E-08900628CC1D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92D071EE-B8AC-4214-92DD-76CFB27CDA28}

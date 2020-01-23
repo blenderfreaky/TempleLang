@@ -26,10 +26,11 @@
             Name = name;
             ReturnType = returnType;
             Parameters = parameters;
-            EntryPoint = entryPoint;
+            EntryPoint = entryPoint;
+
         }
 
-        public override string ToString() => $"func {Signature} {EntryPoint}";
+        public override string ToString() => $"proc {Signature} {EntryPoint}";
 
         public string Signature => $"{Name}({string.Join(", ", Parameters)}) : {ReturnType?.ToString() ?? "void"}";
 

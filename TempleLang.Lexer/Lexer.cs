@@ -28,7 +28,7 @@
             ["deref"] = Token.Dereference,
             ["using"] = Token.Using,
             ["namespace"] = Token.Namespace,
-            ["func"] = Token.Func
+            ["proc"] = Token.Proc
         };
 
         public Lexer(TextReader textReader, SourceFile sourceFile)

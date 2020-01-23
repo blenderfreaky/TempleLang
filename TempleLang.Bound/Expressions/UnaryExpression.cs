@@ -46,9 +46,10 @@
 
         LogicalNot, BitwiseNot,
 
-        ERROR,
-        Negation,
+        ArithmeticNegation,
         Dereference,
         Reference,
+
+        ERROR,
     }
 }

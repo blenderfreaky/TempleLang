@@ -13,7 +13,8 @@
             WordSize = wordSize;
         }
 
-        public string ToNASM() => (WordSize != null ? WordSize.ToString().ToLowerInvariant() + " " : "") + "[" + Parameter.ToNASM() + "]";
+        public string ToNASM(bool includeWordSize = true) => (includeWordSize && WordSize != null ? WordSize.ToString().ToLowerInvariant() + " " : "")
+            + "[" + Parameter.ToNASM(false) + "]";
 
         public override string ToString() => ToNASM();
 

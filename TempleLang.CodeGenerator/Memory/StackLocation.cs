@@ -1,4 +1,4 @@
-﻿namespace TempleLang.CodeGenerator.NASM
+﻿namespace TempleLang.CodeGenerator
 {
     public struct StackLocation : IMemory
     {

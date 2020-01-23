@@ -7,18 +7,47 @@
 
     public static class Parse
     {
+        /// <summary>
+        /// Parses a singular lexeme from the input and advances the input by one.
+        /// Returns an error with <paramref name="errorMessage"/> if the input is empty.
+        /// </summary>
+        /// <typeparam name="TToken">The type of the tokens.</typeparam>
+        /// <param name="errorMessage">The error message to return.</param>
+        /// <returns>The parser created.</returns>
         public static Parser<Lexeme<TToken>, TToken> One<TToken>(string errorMessage) =>
             input =>
                 input.Length == 0
                 ? ParserResult.Error<Lexeme<TToken>, TToken>(errorMessage, input)
                 : ParserResult.Success(input[0], input.Advance(1));
 
+        /// <summary>
+        /// Returns a parser success of <paramref name="value"/>.
+        /// </summary>
+        /// <typeparam name="T">The return type of the parser.</typeparam>
+        /// <typeparam name="TToken">The type of the tokens.</typeparam>
+        /// <param name="value">The value to succeed with.</param>
+        /// <returns>The parser created.</returns>
         public static Parser<T, TToken> Value<T, TToken>(T value) =>
             input => ParserResult.Success(value, input);
 
+        /// <summary>
+        /// Returns a parser error with message <paramref name="errorMessage"/>.
+        /// </summary>
+        /// <typeparam name="T">The return type of the parser.</typeparam>
+        /// <typeparam name="TToken">The type of the tokens.</typeparam>
+        /// <param name="errorMessage">The error message to return.</param>
+        /// <returns>The parser created.</returns>
         public static Parser<T, TToken> Error<T, TToken>(string errorMessage) =>
             input => ParserResult.Error<T, TToken>(errorMessage, input);
 
+        /// <summary>
+        /// Parses a singular lexeme from the input and advances the input by one.
+        /// Returns an error with <paramref name="errorMessage"/> if the input is empty or doees not match <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TToken">The type of the tokens.</typeparam>
+        /// <param name="predicate">The Predicate to match the lexeme with.</param>
+        /// <param name="errorMessage">The error message to return.</param>
+        /// <returns>The parser created.</returns>
         public static Parser<Lexeme<TToken>, TToken> OneWithPredicate<TToken>(Predicate<Lexeme<TToken>> predicate, string errorMessage)
         {
             if (predicate is null)
@@ -29,11 +58,25 @@
             return One<TToken>(errorMessage).Predicate(predicate, errorMessage);
         }
 
+        /// <summary>
+        /// Matches a singular lexeme from the input with <paramref name="token"/>.
+        /// Returns a success with the lexeme if the lexeme was of the given token, fails otherwise.
+        /// </summary>
+        /// <typeparam name="TToken">The type of the tokens.</typeparam>
+        /// <param name="token">The token to match against.</param>
+        /// <returns>The parser created.</returns>
         public static Parser<Lexeme<TToken>, TToken> Token<TToken>(TToken token) =>
             OneWithPredicate<TToken>(
                 lexeme => EqualityComparer<TToken>.Default.Equals(lexeme.Token, token),
                 $"Expected {token}");
 
+        /// <summary>
+        /// Matches a singular lexeme from the input with <paramref name="tokens"/>.
+        /// Returns a success with the lexeme if the lexeme was of one of the given tokens, fails otherwise.
+        /// </summary>
+        /// <typeparam name="TToken">The type of the tokens.</typeparam>
+        /// <param name="tokens">The tokens to match against.</param>
+        /// <returns>The parser created.</returns>
         public static Parser<Lexeme<TToken>, TToken> Token<TToken>(params TToken[] tokens)
         {
             if (tokens is null)
@@ -46,6 +89,14 @@
                 $"Expected [{string.Join(", ", tokens)}]");
         }
 
+        /// <summary>
+        /// Creates a parser that parses using the parser returned by running <paramref name="parser"/>.
+        /// <paramref name="parser"/> is evaluated on every parse.
+        /// </summary>
+        /// <typeparam name="T">The return type of the parser.</typeparam>
+        /// <typeparam name="TToken">The type of the tokens.</typeparam>
+        /// <param name="parser">The function to fetch the parser.</param>
+        /// <returns>The parser created.</returns>
         public static Parser<T, TToken> Ref<T, TToken>(Func<Parser<T, TToken>> parser)
         {
             if (parser is null)
@@ -56,8 +107,18 @@
             return input => parser()(input);
         }
 
+        /// <summary>
+        /// Returns a parser success of <c>default(T)</c>.
+        /// </summary>
+        /// <typeparam name="T">The return type of the parser.</typeparam>
+        /// <typeparam name="TToken">The type of the tokens.</typeparam>
+        /// <returns>The parser created.</returns>
         public static Parser<T, TToken> Epsilon<T, TToken>() => Value<T, TToken>(default!);
 
+        /// <summary>
+        /// Stores a value in a referential data type. To be used like Parse.Ref(() => refContainer.Value).
+        /// </summary>
+        /// <typeparam name="T">The type of element stored.</typeparam>
         private class RefContainer<T>
             where T : class
         {
@@ -68,6 +129,13 @@
             public RefContainer(T? value) => Value = value;
         }
 
+        /// <summary>
+        /// Creates a recursive parser from a function which takes the created recursive parser as an argument.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TToken"></typeparam>
+        /// <param name="creator"></param>
+        /// <returns></returns>
         public static Parser<T, TToken> Recursive<T, TToken>(Func<Parser<T, TToken>, Parser<T, TToken>> creator)
         {
             if (creator is null)

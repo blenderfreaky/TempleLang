@@ -24,10 +24,12 @@
 
         public static new readonly Parser<ForStatement, Token> Parser =
             from forKeyword in Parse.Token(Token.For)
+            from lparen in Parse.Token(Token.LParens)
             from prefix in Statement.Parser.Or(Parse.Token(Token.Semicolon).As<Lexeme<Token>, Statement?, Token>(null))
             from condition in Expression.Parser.Or(Parse.Epsilon<Expression, Token>())
             from __ in Parse.Token(Token.Semicolon)
             from step in Expression.Parser.Or(Parse.Epsilon<Expression, Token>())
+            from rparen in Parse.Token(Token.RParens)
             from statement in Statement.Parser
             select new ForStatement(prefix, condition, step, statement, FileLocation.Concat(forKeyword, statement));
     }

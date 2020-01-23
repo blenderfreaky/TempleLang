@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TempleLang.CodeGenerator\TempleLang.CodeGenerator.csproj" />
     <ProjectReference Include="..\TempleLang.Intermediate\TempleLang.Intermediate.csproj" />
   </ItemGroup>
 

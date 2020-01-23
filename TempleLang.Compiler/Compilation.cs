@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Bound.Primitives;
+    using TempleLang.CodeGenerator;
     using TempleLang.CodeGenerator.NASM;
     using TempleLang.Intermediate;
 
@@ -50,7 +51,7 @@
         {
             foreach (var intermediate in ProcedureCompilations)
             {
-                yield return "; func " + intermediate.Procedure.Signature;
+                yield return "; proc " + intermediate.Procedure.Signature;
                 foreach (var instruction in intermediate.Instructions) yield return instruction.ToString();
                 yield return "";
             }

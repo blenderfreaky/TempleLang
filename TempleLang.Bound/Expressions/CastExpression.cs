@@ -26,5 +26,9 @@ namespace TempleLang.Bound.Expressions
             hashCode = (hashCode * -1521134295) + EqualityComparer<IExpression>.Default.GetHashCode(Castee);
             return hashCode;
         }
+
+        public static bool operator ==(CastExpression left, CastExpression right) => left.Equals(right);
+
+        public static bool operator !=(CastExpression left, CastExpression right) => !(left == right);
     }
 }

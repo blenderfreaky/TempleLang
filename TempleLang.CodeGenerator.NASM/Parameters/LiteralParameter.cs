@@ -11,7 +11,7 @@
             Text = text;
         }
 
-        public string ToNASM() => Text;
+        public string ToNASM(bool includeWordSize = true) => Text;
 
         public override string ToString() => ToNASM();
 

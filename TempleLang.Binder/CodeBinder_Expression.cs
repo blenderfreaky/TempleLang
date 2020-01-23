@@ -38,7 +38,7 @@
             {
                 Token.Increment => UnaryOperatorType.PreIncrement,
                 Token.Decrement => UnaryOperatorType.PreDecrement,
-                Token.Subtract => UnaryOperatorType.Negation,
+                Token.Subtract => UnaryOperatorType.ArithmeticNegation,
                 Token.BitwiseNot => UnaryOperatorType.BitwiseNot,
                 Token.LogicalNot => UnaryOperatorType.LogicalNot,
                 Token.Dereference => UnaryOperatorType.Dereference,

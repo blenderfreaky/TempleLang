@@ -39,7 +39,7 @@
             $"let {Name}({string.Join(", ", Parameters)}){ReturnTypeAnnotation}{EntryPoint?.ToString() ?? (" using \"" + ImportedName!.Value.Value + "\"")}";
 
         public static new readonly Parser<ProcedureDeclaration, Token> Parser =
-            from start in Parse.Token(Token.Func)
+            from start in Parse.Token(Token.Proc)
             from name in Identifier.Parser
             from __ in Parse.Token(Token.LParens)
             from parameters in TypeAnnotatedName.Parser.SeparatedBy(Parse.Token(Token.Comma))

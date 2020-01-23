@@ -15,7 +15,7 @@
             Target = target;
         }
 
-        public override string ToString() => $"{Target} = call {Name}({string.Join(", ", Parameters)})";
+        public override string ToString() => $"{Target} = Call {Name}({string.Join(", ", Parameters)})";
 
         public override bool Equals(object? obj) => obj is CallInstruction instruction && Name == instruction.Name && EqualityComparer<IReadOnlyList<IReadableValue>>.Default.Equals(Parameters, instruction.Parameters) && EqualityComparer<IAssignableValue>.Default.Equals(Target, instruction.Target);
 

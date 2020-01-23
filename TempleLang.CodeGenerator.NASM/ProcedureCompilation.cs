@@ -51,17 +51,17 @@
             StackHomeSpace = Align(StackRegisterTemporary + (maxCallDeposit * 8));
 
             int maxParameters = calls.Count > 0
-                ? calls.Max(x => x.Call.Parameters.Count)
+                ? calls.Max(x => Math.Max(0, x.Call.Parameters.Count - 4)) // - 4 since the first 4 parameters are saved in registers
                 : 0;
 
-            StackEnd = StackHomeSpace + 32 + ((maxParameters - 4) * 8);
+            StackEnd = StackHomeSpace + 32 + Align(maxParameters * 8);
         }
 
         private int Align(int val) => (val / 8) % 2 == 0 ? val : val + 8;
 
         public IEnumerable<NasmInstruction> CompileInstructions()
         {
-            int stackSize = StackEnd + 8;
+            int stackSize = StackEnd;
 
             yield return NasmInstruction.Call("sub", Param(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString())).WithComment("Allocate stack");
             yield return NasmInstruction.Empty();
@@ -114,22 +114,22 @@
                 1 => Register.Get(RegisterName.RDX),
                 2 => Register.Get(RegisterName.R8),
                 3 => Register.Get(RegisterName.R9),
-                _ => new StackLocation(StackEnd - ((index - 4) * 8), 8),
+                _ => new StackLocation(32 + (index - 4) * 8, 8),
             };
         }
 
-        private static NasmInstruction Move(IMemory target, IParameter source) =>
+        private NasmInstruction Move(IMemory target, IParameter source) =>
             NasmInstruction.Call("mov", Param(target), source);
 
-        private static NasmInstruction Move(IMemory target, IMemory source) =>
+        private NasmInstruction Move(IMemory target, IMemory source) =>
             NasmInstruction.Call("mov", Param(target), Param(source));
 
-        private static NasmInstruction Jump(string label) =>
+        private NasmInstruction Jump(string label) =>
             NasmInstruction.Call("jmp", new LabelParameter(label));
 
-        private static MemoryParameter Param(IMemory memory) => new MemoryParameter(memory);
+        private MemoryParameter Param(IMemory memory) => new MemoryParameter(memory, StackEnd);
 
-        private static MemoryParameter Memory(RegisterName registerName) => new MemoryParameter(Register.Get(registerName));
+        private MemoryParameter Memory(RegisterName registerName) => Param(Register.Get(registerName));
 
         private int _counter = 0;
 
@@ -138,7 +138,7 @@
         private readonly OperatorTable<UnaryOperatorType> _unaryOperators = new OperatorTable<UnaryOperatorType>
         {
             [UnaryOperatorType.BitwiseNot, PrimitiveType.Long] = "not",
-            [UnaryOperatorType.Negation, PrimitiveType.Long] = "neg",
+            [UnaryOperatorType.ArithmeticNegation, PrimitiveType.Long] = "neg",
             [UnaryOperatorType.PreIncrement, PrimitiveType.Long] = "inc",
             [UnaryOperatorType.PostIncrement, PrimitiveType.Long] = "inc",
             [UnaryOperatorType.PreDecrement, PrimitiveType.Long] = "dec",

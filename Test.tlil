@@ -1,108 +1,114 @@
-; func _start() : long
-_ = call print(Start\n, 6)
-_ = call arrTest()
-_ = call arrTest()
+; proc _start() : long
+_ = Call print(Start\n, 6)
+_ = Call arrTest()
 
-; func arrTest() : long
+; proc arrTest() : long
 _ = size Assign 16
-<>T2 = size Multiply 8
-<>T1 = call alloc(<>T2)
+<>T1 = Call arrAlloc(size)
 _ = arr Assign <>T1
 _ = i Assign 0
-Jump .T4
-.T3:
-<>T6 = PreIncrement i
-.T4:
-<>T7 = i ComparisonLessThan size
-If !<>T7 Jump .T5
-<>T8 = call arrIndex(arr, i)
-_ = <>T8 ReferenceAssign 0
 Jump .T3
-.T5:
-<>T9 = call arrIndex(arr, 0)
-_ = <>T9 ReferenceAssign 2
-<>T10 = call arrIndex(arr, 1)
-_ = <>T10 ReferenceAssign 3
-_ = call print(\nAll, 4)
+.T2:
+<>T5 = PreIncrement i
+.T3:
+<>T6 = i ComparisonLessThan size
+If !<>T6 Jump .T4
+<>T7 = Call arrIndex(arr, i)
+_ = <>T7 ReferenceAssign 0
+Jump .T2
+.T4:
+<>T8 = Call arrIndex(arr, 0)
+_ = <>T8 ReferenceAssign 2
+<>T9 = Call arrIndex(arr, 1)
+_ = <>T9 ReferenceAssign 3
+_ = Call print(\nAll, 4)
 _ = i Assign 0
-Jump .T12
-.T11:
-<>T14 = PreIncrement i
-.T12:
-<>T15 = i ComparisonLessThan size
-If !<>T15 Jump .T13
-_ = call print(\n, 1)
-<>T17 = call arrIndex(arr, i)
-<>T16 = Dereference <>T17
-_ = call printNum(<>T16)
 Jump .T11
-.T13:
-_ = call free(arr)
+.T10:
+<>T13 = PreIncrement i
+.T11:
+<>T14 = i ComparisonLessThan size
+If !<>T14 Jump .T12
+_ = Call print(\n, 1)
+<>T16 = Call arrIndex(arr, i)
+<>T15 = Dereference <>T16
+_ = Call printNum(<>T15)
+Jump .T10
+.T12:
+_ = Call free(arr)
 Return 0
 
-; func arrIndex(arr : ptr, index : long) : ptr
+; proc arrAlloc(size : long) : ptr
+size = param 0
+<>T18 = size Multiply 8
+<>T17 = Call alloc(<>T18)
+Return <>T17
+
+; proc arrIndex(arr : ptr, index : long) : ptr
 arr = param 0
 index = param 1
-<>T18 = arr Add 7
-<>T19 = 8 Multiply index
-_ = <>T18 Add <>T19
+<>T20 = arr Add 7
+<>T21 = 8 Multiply index
+<>T19 = <>T20 Add <>T21
+Return <>T19
 
-; func alloc(size : long) : ptr
+; proc alloc(size : long) : ptr
 size = param 0
-<>T20 = call GetProcessHeap()
-_ = heapHandle Assign <>T20
-<>T21 = call HeapAlloc(heapHandle, 0, size)
-Return <>T21
-
-; func free(position : ptr) : bool
-position = param 0
-<>T22 = call GetProcessHeap()
+<>T22 = Call GetProcessHeap()
 _ = heapHandle Assign <>T22
-<>T23 = call HeapFree(heapHandle, 0, position)
+<>T23 = Call HeapAlloc(heapHandle, 0, size)
 Return <>T23
 
-; func printNum(num : long) : long
-num = param 0
-_ = call printNumAny(num, 10)
+; proc free(position : ptr) : bool
+position = param 0
+<>T24 = Call GetProcessHeap()
+_ = heapHandle Assign <>T24
+<>T25 = Call HeapFree(heapHandle, 0, position)
+Return <>T25
 
-; func printNumAny(num : long, base : long) : long
+; proc printNum(num : long) : long
+num = param 0
+<>T26 = Call printNumAny(num, 10)
+Return <>T26
+
+; proc printNumAny(num : long, base : long) : long
 num = param 0
 base = param 1
-<>T24 = num ComparisonLessThan 0
-If <>T24 Jump .T25
-Jump .T26
-.T25:
-_ = call print(-, 1)
-<>T27 = Negation num
-_ = call printNum(<>T27)
+<>T27 = num ComparisonLessThan 0
+If <>T27 Jump .T28
+Jump .T29
+.T28:
+_ = Call print(-, 1)
+<>T30 = ArithmeticNegation num
+_ = Call printNum(<>T30)
 Return 
-.T26:
-<>T28 = num Remainder base
-_ = digit Assign <>T28
-<>T29 = num Divide base
-_ = rest Assign <>T29
-<>T30 = rest ComparisonGreaterThan 0
-If <>T30 Jump .T31
-Jump .T32
-.T31:
-_ = call printNumAny(rest, base)
-.T32:
-_ = call printDigit(digit)
+.T29:
+<>T31 = num Remainder base
+_ = digit Assign <>T31
+<>T32 = num Divide base
+_ = rest Assign <>T32
+<>T33 = rest ComparisonGreaterThan 0
+If <>T33 Jump .T34
+Jump .T35
+.T34:
+_ = Call printNumAny(rest, base)
+.T35:
+_ = Call printDigit(digit)
 
-; func printDigit(digit : long) : long
+; proc printDigit(digit : long) : long
 digit = param 0
 _ = digits Assign 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
-<>T34 = digit Multiply 2
-<>T33 = digits Add <>T34
-_ = call print(<>T33, 1)
+<>T37 = digit Multiply 2
+<>T36 = digits Add <>T37
+_ = Call print(<>T36, 1)
 
-; func print(ptr : ptr, len : long) : long
+; proc print(ptr : ptr, len : long) : long
 ptr = param 0
 len = param 1
-<>T36 = Negation 11
-<>T35 = call GetStdHandle(<>T36)
-_ = stdOut Assign <>T35
+<>T39 = ArithmeticNegation 11
+<>T38 = Call GetStdHandle(<>T39)
+_ = stdOut Assign <>T38
 _ = numberOfCharsWritten Assign 0
-<>T38 = Reference numberOfCharsWritten
-<>T37 = call WriteConsoleW(stdOut, ptr, len, <>T38, 0)
-Return <>T37
+<>T41 = Reference numberOfCharsWritten
+<>T40 = Call WriteConsoleW(stdOut, ptr, len, <>T41, 0)
+Return <>T40

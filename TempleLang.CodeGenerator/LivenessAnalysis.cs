@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using TempleLang.Intermediate;
 
-namespace TempleLang.CodeGenerator.NASM
+namespace TempleLang.CodeGenerator
 {
     public static class LivenessAnalysis
     {
@@ -19,7 +19,6 @@ namespace TempleLang.CodeGenerator.NASM
 
         public static bool Iteration(CFGNode[] cfg)
         {
-            // Why is anyChanges always true in the end?
             bool anyChanges = false;
 
             for (int i = cfg.Length - 1; i >= 0; i--)

@@ -2,6 +2,6 @@
 {
     public interface IParameter
     {
-        string ToNASM();
+        string ToNASM(bool includeWordsize = true);
     }
 }

@@ -10,6 +10,7 @@
     <ProjectReference Include="..\TempleLang.Binder\TempleLang.Binder.csproj" />
     <ProjectReference Include="..\TempleLang.Bound\TempleLang.Bound.csproj" />
     <ProjectReference Include="..\TempleLang.CodeGenerator.NASM\TempleLang.CodeGenerator.NASM.csproj" />
+    <ProjectReference Include="..\TempleLang.CodeGenerator\TempleLang.CodeGenerator.csproj" />
     <ProjectReference Include="..\TempleLang.Diagnostic\TempleLang.Diagnostic.csproj" />
     <ProjectReference Include="..\TempleLang.Intermediate\TempleLang.Intermediate.csproj" />
     <ProjectReference Include="..\TempleLang.Lexer.Abstractions\TempleLang.Lexer.Abstractions.csproj" />

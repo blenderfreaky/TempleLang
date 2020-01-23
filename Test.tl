@@ -1,18 +1,17 @@
 namespace Program;
 
-func _start() : long
+proc _start() : long
 {
     print("Start\n", 6);
     arrTest();
-    arrTest();
 }
 
-func arrTest() : long
+proc arrTest() : long
 {
     let size = 16;
-    let arr = alloc(size*8);
+    let arr = arrAlloc(size);
     
-    for let i = 0; i < size; ++i
+    for (let i = 0; i < size; ++i)
     {
         arrIndex(arr, i) <- 0;
     }
@@ -21,7 +20,7 @@ func arrTest() : long
     arrIndex(arr, 1) <- 3;
     
     print("\nAll", 4);
-    for let i = 0; i < size; ++i
+    for (let i = 0; i < size; ++i)
     {
         print("\n", 1);
         printNum((long)deref arrIndex(arr, i));
@@ -32,77 +31,42 @@ func arrTest() : long
     return 0;
 }
 
-func arrIndex(arr : ptr, index : long) : ptr => arr + 7 + 8*index;
 
-//  func fib(inp : long) : long
-//  {
-//      if inp == 0 || inp == 1 return inp;
-//  
-//      return fib(inp-1) + fib(inp-2);
-//  }
-//  
-//  func roundDownTo10(inp : long, ) : long
-//  {
-//      if inp >= 0 return inp - inp%10;
-//      else return inp + (-inp)%10;
-//  }
-//  
-//  func pow(base : long, exp : long) : long
-//  {
-//      let acc = 1;
-//  
-//      for ; exp > 0; --exp
-//      {
-//          acc *= base;
-//      }
-//  
-//      return acc;
-//  }
-//  
-//  func fac(num : long) : long
-//  {
-//      let acc = 1;
-//  
-//      for let i = 1; i <= num; ++i
-//      {
-//          acc *= i;
-//      }
-//  
-//      return acc;
-//  }
-//  
-//  func fibFast(num : long) : long
-//  {
-//      if num == 0 return 0;
-//  
-//      let m1 = 0;
-//      let m2 = 1;
-//  
-//      for let i = 0; i < num-1; ++i
-//      {
-//          let temp = m1;
-//          m1 = m2;
-//          m2 = temp + m2;
-//      }
-//  
-//      return m2;
-//  }
+proc arrAlloc(size : long) : ptr => alloc(size * 8);
 
-func alloc(size : long) : ptr
+proc arrIndex(arr : ptr, index : long) : ptr => arr + 7 + 8*index;
+
+proc alloc(size : long) : ptr
 {
     let heapHandle = GetProcessHeap();
     return HeapAlloc(heapHandle, 0, size);
 }
 
-func free(position : ptr) : bool
+proc free(position : ptr) : bool
 {
     let heapHandle = GetProcessHeap();
     return HeapFree(heapHandle, 0, position);
 }
+        
+proc HeapAlloc(
+    heapHandle : ptr,
+    flags : long,
+    size : long) : ptr
+    using "kernel32.lib";
+        
+proc HeapFree(
+    heapHandle : ptr,
+    flags : long,
+    pos : ptr) : bool
+    using "kernel32.lib";
+    
+proc GetProcessHeap() : ptr
+    using "kernel32.lib";
 
-func printNum(num : long) : long => printNumAny(num, 10);
 
-func printNumAny(num : long, base : long) : long
+proc printNum(num : long) : long => printNumAny(num, 10);
+
+proc printNumAny(num : long, base : long) : long
 {
     if (num < 0)
     {
@@ -117,42 +81,30 @@ func printNumAny(num : long, base : long) : long
     printDigit(digit);
 }
 
-func printDigit(digit : long) : long
+proc printDigit(digit : long) : long
 {
     let digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    // * 2 because strings are UTF-16
+    //  ^~~~~~ This is a pointer
+
+    //           v This is pointer arithmetic
     print(digits + digit * 2, 1);
+    // * 2 because strings are UTF-16
 }
 
-func print(ptr:ptr, len:long) : long
+proc print(ptr:ptr, len:long) : long
 {
     let stdOut = GetStdHandle(-11);
     let numberOfCharsWritten = 0;
     return WriteConsoleW(stdOut, ptr, len, ref numberOfCharsWritten, 0);
 }
 
-func GetStdHandle(id : long) : ptr
+proc GetStdHandle(id : long) : ptr
     using "kernel32.lib";
 
-func WriteConsoleW(
+proc WriteConsoleW(
     stdOut : ptr,
     message : ptr,
     messageLength : long,
     numberOfCharsWritten : ptr,
     zero : long) : long
-    using "kernel32.lib";
-        
-func HeapAlloc(
-    heapHandle : ptr,
-    flags : long,
-    size : long) : ptr
-    using "kernel32.lib";
-        
-func HeapFree(
-    heapHandle : ptr,
-    flags : long,
-    pos : ptr) : bool
-    using "kernel32.lib";
-    
-func GetProcessHeap() : ptr
     using "kernel32.lib";
