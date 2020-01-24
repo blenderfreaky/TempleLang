@@ -3,14 +3,14 @@
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Intermediate;
-    
+
     public sealed class RegisterAllocation
     {
         public CFGNode[] CFGNodes { get; }
 
-        public static RegisterAllocation Generate(CFGNode[] instructions) => new RegisterAllocation(instructions);
+        public static RegisterAllocation Generate(CFGNode[] instructions, Dictionary<Variable, IMemory> preallocatedValues) => new RegisterAllocation(instructions, preallocatedValues);
 
-        private RegisterAllocation(CFGNode[] cfgNodes)
+        private RegisterAllocation(CFGNode[] cfgNodes, Dictionary<Variable, IMemory> preallocatedValues)
         {
             CFGNodes = cfgNodes;
 
@@ -23,7 +23,7 @@
                 .OrderBy(x => x.FirstIndex)
                 .ToList();
 
-            AssignedLocation = new Dictionary<Variable, IMemory>();
+            AssignedLocation = preallocatedValues ?? new Dictionary<Variable, IMemory>();
             FreeGeneralPurposeRegisters = new Stack<Register>(
                 Register.All
                 .Where(x => x.Size == RegisterSize.Bytes8 && (x.Flags & RegisterFlags.GeneralPurpose) != 0));
@@ -46,7 +46,7 @@
         private Dictionary<Variable, (int First, int Last)> LiveIntervalsByVariable { get; }
         private List<LiveInterval> LiveIntervals { get; }
 
-        public IEnumerable<Variable> GetAllLiveAt(int index) => CFGNodes[index].Input; //LiveIntervals.Where(x => x.FirstIndex <= index && x.LastIndex >= index).Select(x => x.Variable);
+        public IEnumerable<Variable> GetAllInAt(int index) => CFGNodes[index].Input;
 
         private void CalculateLiveIntervals()
         {
@@ -55,7 +55,7 @@
                 var node = CFGNodes[i];
 
                 // Both in and out to avoid off-by-one errors
-                // TODO: To be be optimized
+                // TODO: To be optimized
                 foreach (var variable in node.Output.Union(node.Input))
                 {
                     if (LiveIntervalsByVariable.TryGetValue(variable, out var val))
@@ -83,7 +83,7 @@
                 {
                     var register = FreeGeneralPurposeRegisters.Pop();
                     Active.Add(interval);
-                    AssignedLocation[interval.Variable] = register;
+                    AssignLocation(interval.Variable, register);
                 }
             }
         }
@@ -106,20 +106,26 @@
 
         private void Spill(LiveInterval interval)
         {
-            var spilled = Active.Last();
+            //var spilled = Active.Last();
 
-            if (spilled.LastIndex > interval.LastIndex)
-            {
-                AssignedLocation[interval.Variable] = AssignedLocation[spilled.Variable];
-                AssignedLocation[spilled.Variable] = StackAlloc(8);
+            //if (spilled.LastIndex > interval.LastIndex)
+            //{
+            //    AssignedLocation[interval.Variable] = AssignedLocation[spilled.Variable];
+            //    AssignedLocation[spilled.Variable] = StackAlloc(8);
 
-                Active.Remove(spilled);
-                Active.Add(interval);
-            }
-            else
-            {
-                AssignedLocation[interval.Variable] = StackAlloc(8);
-            }
+            //    Active.Remove(spilled);
+            //    Active.Add(interval);
+            //}
+            //else
+            //{
+            AssignLocation(interval.Variable, StackAlloc(8));
+            //}
+        }
+
+        private void AssignLocation(Variable var, IMemory mem)
+        {
+            if (AssignedLocation.ContainsKey(var)) return;
+            AssignedLocation[var] = mem;
         }
 
         private StackLocation StackAlloc(int size)

@@ -3,7 +3,81 @@ namespace Program;
 proc _start() : long
 {
     print("Start\n", 6);
-    arrTest();
+    printNum(1);
+ 
+
+    let size = 10;
+    let arr = arrInit(size);
+    let seed = 14214;
+
+    for (let i = 0; i < size; ++i)
+    {
+        seed = pseudoRandom(seed);
+        arrIndex(arr, i) <- seed % (size * 2);
+    }
+
+    printArr(arr, size);
+    
+    print("\n", 1);
+    quickSort(arr, size);
+    printArr(arr, size);
+}
+
+proc pseudoRandom(seed : long) : long => (seed * 94813) % 42133;
+
+proc quickSort(arr : ptr, size : long) : long => quickSortCore(arr, 0, size-1);
+
+proc quickSortCore(arr : ptr, lo : long, hi : long) : long
+{
+    if lo >= hi return 0;
+
+    let partition = partition(arr, lo, hi);
+    quickSortCore(arr, lo, partition - 1);
+    quickSortCore(arr, partition + 1, hi);
+}
+
+proc partition(arr : ptr, lo : long, hi : long) : long
+{
+    let pivot = deref arrIndex(arr, hi);
+
+    let i = lo;
+
+    for (let j = lo; j <= hi; ++j)
+    {
+        let elem = deref arrIndex(arr, j);
+        if elem < pivot
+        {
+            arrIndex(arr, j) <- deref arrIndex(arr, i);
+            arrIndex(arr, i) <- elem;
+            i += 1;
+        }
+    }
+
+    arrIndex(arr, hi) <- deref arrIndex(arr, i);
+    arrIndex(arr, i) <- pivot;
+
+    return i;
+}
+
+proc arrInit(size : long) : ptr
+{
+    let arr = arrAlloc(size);
+    
+    for (let i = 0; i < size; ++i)
+    {
+        arrIndex(arr, i) <- 0;
+    }
+
+    return arr;
+}
+
+proc printArr(arr : ptr, size : long) : long
+{
+    for (let i = 0; i < size; ++i)
+    {
+        if i > 0 print(", ", 2);
+        printNum((long)deref arrIndex(arr, i));
+    }
 }
 
 proc arrTest() : long
@@ -31,6 +105,7 @@ proc arrTest() : long
     return 0;
 }
 
+proc arrSize(arr : ptr) : long => deref arrIndex(arr, -1);
 
 proc arrAlloc(size : long) : ptr => alloc(size * 8);
 

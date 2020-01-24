@@ -77,11 +77,18 @@
                     break;
 
                 case Procedure procedure:
-                    var transformed = Transformer.TransformProceddureStatement(procedure.EntryPoint, procedure.Parameters).ToList();
+                    var (transformed, parameters) = Transformer.TransformProcedureStatement(procedure.EntryPoint, procedure.Parameters);
 
                     var cfg = CFGNode.ConstructCFG(transformed);
                     LivenessAnalysis.PerformAnalysis(cfg);
-                    var allocation = RegisterAllocation.Generate(cfg);
+                    var allocation = RegisterAllocation.Generate(cfg, parameters
+                        .Select((x, i) => (x, i)).Where(x => x.i != 3).ToDictionary(
+                            x => x.x,
+                            x => ProcedureCompilation.ParameterLocation(x.i)));
+                    if (parameters.Count >= 3)
+                    {
+                        transformed.Insert(0, new ParameterQueryAssignment(3, parameters[2]));
+                    }
 
                     yield return new ProcedureCompilation(procedure, transformed, ConstantTable, FalseConstant, TrueConstant, allocation);
                     break;

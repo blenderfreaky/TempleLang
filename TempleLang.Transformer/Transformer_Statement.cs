@@ -1,6 +1,7 @@
 ﻿namespace TempleLang.Intermediate
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Bound.Expressions;
@@ -8,23 +9,20 @@
 
     public partial class Transformer
     {
-        public IEnumerable<IInstruction> TransformProceddureStatement(IStatement statement, IReadOnlyList<Local> parameters)
+        public (List<IInstruction> Instructions, List<Variable> Parameters) TransformProcedureStatement(IStatement statement, IReadOnlyList<Local> parameters)
         {
-            for (int i = 0; i < parameters.Count; i++)
-            {
-                yield return new ParameterQueryAssignment(i, RequestUserLocal(parameters[i]));
-            }
+            var transformedParameters = parameters.Select(RequestUserLocal).ToList();
 
             switch (statement)
             {
                 case BlockStatement stmt:
-                    foreach (var instruction in TransformStatement(stmt, null, default)) yield return instruction;
-                    break;
+                    return (TransformStatement(stmt, null, default).ToList(), transformedParameters);
                 case ExpressionStatement stmt:
-                    IReadableValue retVal;
-                    foreach (var instruction in GetValue(stmt.Expression, out retVal)) yield return instruction;
-                    yield return new ReturnInstruction(retVal);
-                    break;
+                    var expr = GetValue(stmt.Expression, out var retVal);
+                    var returnInstructions = new IInstruction[] { new ReturnInstruction(retVal) };
+                    return (expr.Concat(returnInstructions).ToList(), transformedParameters);
+                default:
+                    throw new InvalidOperationException();
             }
         }
 

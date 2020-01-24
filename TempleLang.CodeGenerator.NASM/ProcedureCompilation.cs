@@ -45,7 +45,7 @@
 
             int maxCallDeposit = calls.Count > 0
                 ? // Check how many variables are live at the instruction and get the max
-                  calls.Max(x => RegisterAllocation.GetAllLiveAt(x.Index).Count())
+                  calls.Max(x => RegisterAllocation.GetAllInAt(x.Index).Count())
                 : 0;
 
             StackHomeSpace = Align(StackRegisterTemporary + (maxCallDeposit * 8));
@@ -106,7 +106,7 @@
 
         private IMemory GetMemory(IReadableValue memory) => TryGetMemory(memory) ?? throw new InvalidOperationException($"Unmapped memory value {memory}");
 
-        private IMemory ParameterLocation(int index)
+        public static IMemory ParameterLocation(int index)
         {
             return index switch
             {
@@ -401,20 +401,22 @@
         private IEnumerable<NasmInstruction> CompileCore(int index, CallInstruction inst)
         {
             var lives = RegisterAllocation
-                .GetAllLiveAt(index)
+                .GetAllInAt(index)
                 .Select(x => GetMemory(x))
                 .Where(x => !(x is StackLocation)) // Don't move if already on the stack
+                .Distinct() // HACK
                 .Select((x, i) => (Variable: x, Temporary: new StackLocation(RegisterAllocation.StackOffset + 8 + (i * 8), 8)))
-                .ToList();
+                .ToDictionary(x => x.Variable, x => x.Temporary);
 
             foreach (var live in lives)
             {
-                yield return Move(live.Temporary, live.Variable).WithComment("Store live variable onto stack");
+                yield return Move(live.Value, live.Key).WithComment("Store live variable onto stack");
             }
 
             for (int i = 0; i < inst.Parameters.Count; i++)
             {
-                yield return Move(ParameterLocation(i), GetMemory(inst.Parameters[i])).WithComment($"Pass parameter #{i}");
+                var paramMemory = GetMemory(inst.Parameters[i]);
+                yield return Move(ParameterLocation(i), lives.TryGetValue(paramMemory, out var stackLocation) ? stackLocation : paramMemory).WithComment($"Pass parameter #{i}");
             }
 
             yield return NasmInstruction.Call("call", new LabelParameter(inst.Name));
@@ -426,7 +428,7 @@
 
             foreach (var live in lives)
             {
-                yield return Move(live.Variable, live.Temporary).WithComment("Restore live variable from stack");
+                yield return Move(live.Key, live.Value).WithComment("Restore live variable from stack");
             }
         }
 
