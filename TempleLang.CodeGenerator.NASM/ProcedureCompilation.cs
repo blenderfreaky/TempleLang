@@ -11,6 +11,7 @@
     public class ProcedureCompilation
     {
         public Procedure Procedure { get; }
+        public List<Variable> Parameters { get; }
         public List<IInstruction> Instructions { get; }
         public Dictionary<Constant, DataLocation> ConstantTable { get; }
         public DataLocation FalseConstant { get; }
@@ -22,6 +23,7 @@
 
         public ProcedureCompilation(
             Procedure procedure,
+            List<Variable> parameters,
             List<IInstruction> instructions,
             Dictionary<Constant, DataLocation> constantTable,
             DataLocation falseConstant,
@@ -29,6 +31,7 @@
             RegisterAllocation registerAllocation)
         {
             Procedure = procedure;
+            Parameters = parameters;
             Instructions = instructions;
             ConstantTable = constantTable;
             FalseConstant = falseConstant;
@@ -65,6 +68,8 @@
 
             yield return NasmInstruction.Call("sub", Param(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString())).WithComment("Allocate stack");
             yield return NasmInstruction.Empty();
+
+            if (Parameters.Count >= 3) yield return Move(GetMemory(Parameters[2]), ParameterLocation(2));
 
             foreach (var instruction in Instructions.SelectMany((x, i) => CompileInstruction(i, x))) yield return instruction;
 

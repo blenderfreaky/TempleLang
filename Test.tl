@@ -4,7 +4,6 @@ proc _start() : long
 {
     print("Start\n", 6);
     printNum(1);
- 
 
     let size = 10;
     let arr = arrInit(size);
@@ -21,6 +20,8 @@ proc _start() : long
     print("\n", 1);
     quickSort(arr, size);
     printArr(arr, size);
+
+    arrFree(arr);
 }
 
 proc pseudoRandom(seed : long) : long => (seed * 94813) % 42133;
@@ -71,6 +72,8 @@ proc arrInit(size : long) : ptr
     return arr;
 }
 
+proc arrFree(arr : ptr) : long => free(arr);
+
 proc printArr(arr : ptr, size : long) : long
 {
     for (let i = 0; i < size; ++i)
@@ -78,31 +81,6 @@ proc printArr(arr : ptr, size : long) : long
         if i > 0 print(", ", 2);
         printNum((long)deref arrIndex(arr, i));
     }
-}
-
-proc arrTest() : long
-{
-    let size = 16;
-    let arr = arrAlloc(size);
-    
-    for (let i = 0; i < size; ++i)
-    {
-        arrIndex(arr, i) <- 0;
-    }
-
-    arrIndex(arr, 0) <- 2;
-    arrIndex(arr, 1) <- 3;
-    
-    print("\nAll", 4);
-    for (let i = 0; i < size; ++i)
-    {
-        print("\n", 1);
-        printNum((long)deref arrIndex(arr, i));
-    }
-
-    free(arr);
-
-    return 0;
 }
 
 proc arrSize(arr : ptr) : long => deref arrIndex(arr, -1);
