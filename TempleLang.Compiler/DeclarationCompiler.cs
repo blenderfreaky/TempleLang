@@ -82,7 +82,7 @@
                     var cfg = CFGNode.ConstructCFG(transformed);
                     LivenessAnalysis.PerformAnalysis(cfg);
                     var allocation = RegisterAllocation.Generate(cfg, parameters
-                        .Select((x, i) => (x, i)).Where(x => x.i != 3).ToDictionary(
+                        .Select((x, i) => (x, i)).Where(x => x.i != 1).ToDictionary(
                             x => x.x,
                             x => ProcedureCompilation.ParameterLocation(x.i)));
 

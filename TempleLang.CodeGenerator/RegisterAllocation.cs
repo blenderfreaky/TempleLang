@@ -26,7 +26,8 @@
             AssignedLocation = preallocatedValues ?? new Dictionary<Variable, IMemory>();
             FreeGeneralPurposeRegisters = new Stack<Register>(
                 Register.All
-                .Where(x => x.Size == RegisterSize.Bytes8 && (x.Flags & RegisterFlags.GeneralPurpose) != 0));
+                .Where(x => x.Size == RegisterSize.Bytes8 && (x.Flags & RegisterFlags.GeneralPurpose) != 0
+                    && !AssignedLocation.ContainsValue(x)));
 
             Active = new List<LiveInterval>();
 
@@ -47,6 +48,7 @@
         private List<LiveInterval> LiveIntervals { get; }
 
         public IEnumerable<Variable> GetAllInAt(int index) => CFGNodes[index].Input;
+        public IEnumerable<Variable> GetAllOutAt(int index) => CFGNodes[index].Output;
 
         private void CalculateLiveIntervals()
         {
@@ -64,7 +66,7 @@
                     }
                     else
                     {
-                        LiveIntervalsByVariable[variable] = (i, i);
+                        LiveIntervalsByVariable[variable] = (i-1, i);
                     }
                 }
             }

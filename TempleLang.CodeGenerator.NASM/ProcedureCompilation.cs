@@ -69,7 +69,7 @@
             yield return NasmInstruction.Call("sub", Param(Register.Get(RegisterName.RSP)), new LiteralParameter(stackSize.ToString())).WithComment("Allocate stack");
             yield return NasmInstruction.Empty();
 
-            if (Parameters.Count >= 3) yield return Move(GetMemory(Parameters[2]), ParameterLocation(2));
+            if (Parameters.Count >= 2) yield return Move(GetMemory(Parameters[1]), ParameterLocation(1));
 
             foreach (var instruction in Instructions.SelectMany((x, i) => CompileInstruction(i, x))) yield return instruction;
 
@@ -82,6 +82,7 @@
         private IEnumerable<NasmInstruction> CompileInstruction(int i, IInstruction instruction)
         {
             yield return NasmInstruction.Comment(instruction.ToString());
+            yield return NasmInstruction.Comment("In = { " + string.Join(", ", RegisterAllocation.GetAllInAt(i)) + " }");
             foreach (var inst in instruction switch
             {
                 UnaryComputationAssignment inst => CompileCore(inst),
@@ -97,6 +98,7 @@
             {
                 yield return inst;
             }
+            yield return NasmInstruction.Comment("Out = { " + string.Join(", ", RegisterAllocation.GetAllOutAt(i)) + " }");
             yield return NasmInstruction.Comment("/");
             yield return NasmInstruction.Empty();
         }
@@ -351,7 +353,13 @@
                 }
                 else if (inst.Operator == BinaryOperatorType.ReferenceAssign)
                 {
-                    yield return NasmInstruction.Call("mov", new DereferenceParameter(Param(targetMemory), WordSize.QWORD), Param(rhsMemory));
+                    IMemory rhs = rhsMemory;
+                    if (rhs is StackLocation)
+                    {
+                        rhs = Register.Get(RegisterName.RBX);
+                        yield return Move(rhs, rhsMemory);
+                    }
+                    yield return NasmInstruction.Call("mov", new DereferenceParameter(Param(targetMemory), WordSize.QWORD), Param(rhs));
                 }
                 else
                 {
@@ -407,21 +415,21 @@
         {
             var lives = RegisterAllocation
                 .GetAllInAt(index)
-                .Select(x => GetMemory(x))
-                .Where(x => !(x is StackLocation)) // Don't move if already on the stack
-                .Distinct() // HACK
+                .Select(x => (Variable: x, Memory: GetMemory(x)))
+                .Where(x => !(x.Memory is StackLocation)) // Don't move if already on the stack
+                //.Distinct() // HACK
                 .Select((x, i) => (Variable: x, Temporary: new StackLocation(RegisterAllocation.StackOffset + 8 + (i * 8), 8)))
-                .ToDictionary(x => x.Variable, x => x.Temporary);
+                .ToDictionary(x => x.Variable.Memory, x => (x.Temporary, x.Variable.Variable));
 
             foreach (var live in lives)
             {
-                yield return Move(live.Value, live.Key).WithComment("Store live variable onto stack");
+                yield return Move(live.Value.Temporary, live.Key).WithComment("Store live variable onto stack (" + live.Value.Variable.ToString() + ")");
             }
 
             for (int i = 0; i < inst.Parameters.Count; i++)
             {
                 var paramMemory = GetMemory(inst.Parameters[i]);
-                yield return Move(ParameterLocation(i), lives.TryGetValue(paramMemory, out var stackLocation) ? stackLocation : paramMemory).WithComment($"Pass parameter #{i}");
+                yield return Move(ParameterLocation(i), lives.TryGetValue(paramMemory, out var stackLocation) ? stackLocation.Temporary : paramMemory).WithComment($"Pass parameter #{i}");
             }
 
             yield return NasmInstruction.Call("call", new LabelParameter(inst.Name));
@@ -431,9 +439,11 @@
                 yield return Move(GetMemory(inst.Target), Register.Get(RegisterName.RAX)).WithComment($"Assign return value to {inst.Target}");
             }
 
-            foreach (var live in lives)
+            var outVars = RegisterAllocation.GetAllOutAt(index);
+
+            foreach (var live in lives.Where(x => outVars.Contains(x.Value.Variable)))
             {
-                yield return Move(live.Key, live.Value).WithComment("Restore live variable from stack");
+                yield return Move(live.Key, live.Value.Temporary).WithComment("Restore live variable from stack (" + live.Value.Variable.ToString() + ")");
             }
         }
 

@@ -3,7 +3,6 @@ namespace Program;
 proc _start() : long
 {
     print("Start\n", 6);
-    printNum(1);
 
     let size = 10;
     let arr = arrInit(size);
