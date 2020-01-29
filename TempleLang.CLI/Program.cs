@@ -50,7 +50,10 @@
 
             if (compiled == null) return null;
 
-            execFile ??= Path.Combine(Path.GetDirectoryName(path) ?? throw new ArgumentException(nameof(path)), Path.GetFileNameWithoutExtension(path) + ".exe");
+            execFile ??= Path.Combine(
+                Path.GetDirectoryName(path) ?? throw new ArgumentException("Invalid path", nameof(path)),
+                Path.GetFileNameWithoutExtension(path) + ".exe");
+
             var file = TempleLangHelper.GenerateExecutable(compiled,
                                                            Path.GetFileNameWithoutExtension(path + Guid.NewGuid().ToString()),
                                                            tempPath,

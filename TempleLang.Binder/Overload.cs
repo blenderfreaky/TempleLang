@@ -25,8 +25,11 @@
                 return new BinaryExpression(lhs, rhs, operatorType, returnType);
             }
 
+            // Type errors currently disabled, not necessary without structs
+#pragma warning disable CS0162 // Unreachable code detected
             diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidOperandTypes, location, true);
             return new InvalidExpression(location);
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         public static IExpression FindUnaryOperator(IExpression operand, UnaryOperatorType operatorType, IDiagnosticReceiver diagnosticReceiver, FileLocation location)
@@ -46,8 +49,11 @@
 
             return new UnaryExpression(operand, operatorType, operand.ReturnType);
 
+            // Type errors currently disabled, not necessary without structs
+#pragma warning disable CS0162 // Unreachable code detected
             diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidOperandTypes, location, true);
             return new InvalidExpression(location);
+#pragma warning restore CS0162 // Unreachable code detected
         }
     }
 }

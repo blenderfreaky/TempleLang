@@ -8,10 +8,7 @@
     <!--<PublishTrimmed>true</PublishTrimmed>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishSingleFile>true</PublishSingleFile>-->
-    <Copyright>MIT</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>blenderfreaky.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
