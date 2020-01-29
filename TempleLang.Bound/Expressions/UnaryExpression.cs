@@ -16,7 +16,6 @@
             Operand = value;
             Operator = @operator;
             ReturnType = returnType;
-
         }
 
         public override string ToString() => $"{Operator}({Operand}) : {ReturnType}";

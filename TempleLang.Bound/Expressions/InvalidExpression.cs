@@ -17,6 +17,7 @@ namespace TempleLang.Bound.Expressions
         public override int GetHashCode() => 1369928374 + Location.GetHashCode();
 
         public static bool operator ==(InvalidExpression left, InvalidExpression right) => left.Equals(right);
+
         public static bool operator !=(InvalidExpression left, InvalidExpression right) => !(left == right);
     }
 }

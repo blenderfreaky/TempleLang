@@ -17,7 +17,6 @@
             TrueValue = trueValue;
             FalseValue = falseValue;
             ReturnType = returnType;
-
         }
 
         public override string ToString() => $"({Condition} ? {TrueValue} : {FalseValue}) : {ReturnType}";

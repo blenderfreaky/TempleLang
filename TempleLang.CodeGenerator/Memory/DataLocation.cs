@@ -16,6 +16,7 @@
         }
 
         public override string ToString() => $"{LabelName} ({Size} bytes{(IsAddress ? ", Address" : string.Empty)})";
+
         public override bool Equals(object? obj) => obj is DataLocation location && LabelName == location.LabelName && Size == location.Size && IsAddress == location.IsAddress;
 
         public override int GetHashCode()

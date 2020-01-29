@@ -2,7 +2,6 @@
 {
     using TempleLang.Lexer;
     using TempleLang.Parser.Abstractions;
-    using TempleLang.Parser;
 
     public class TypeAnnotatedName : Fragment
     {

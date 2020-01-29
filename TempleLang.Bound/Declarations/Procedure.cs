@@ -27,7 +27,6 @@
             ReturnType = returnType;
             Parameters = parameters;
             EntryPoint = entryPoint;
-
         }
 
         public override string ToString() => $"proc {Signature} {EntryPoint}";

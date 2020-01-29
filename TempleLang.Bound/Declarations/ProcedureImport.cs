@@ -28,7 +28,6 @@
             ReturnType = returnType;
             Parameters = parameters;
             ImportedName = importedName;
-
         }
 
         public override string ToString() =>

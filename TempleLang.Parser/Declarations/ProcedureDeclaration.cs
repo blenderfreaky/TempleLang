@@ -50,7 +50,7 @@
                  select type).Maybe()
             from result in
                 (from stmt in BlockStatement.Parser
-                  select new ProcedureDeclaration(stmt, name, returnType, parameters, FileLocation.Concat(start, stmt)))
+                 select new ProcedureDeclaration(stmt, name, returnType, parameters, FileLocation.Concat(start, stmt)))
                 .Or(
                   from _ in Parse.Token(Token.Arrow)
                   from stmt in ExpressionStatement.Parser

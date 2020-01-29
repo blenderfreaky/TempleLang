@@ -232,7 +232,7 @@
 
                     if (!sep.IsSuccessful)
                     {
-                        if (i < least-1)
+                        if (i < least - 1)
                         {
                             return ParserResult.Error<U, List<T>, TToken>(sep);
                         }

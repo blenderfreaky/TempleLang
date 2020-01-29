@@ -1,7 +1,6 @@
 ﻿namespace TempleLang.Intermediate
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using TempleLang.Bound.Expressions;
@@ -17,10 +16,12 @@
             {
                 case BlockStatement stmt:
                     return (TransformStatement(stmt, null, default).ToList(), transformedParameters);
+
                 case ExpressionStatement stmt:
                     var expr = GetValue(stmt.Expression, out var retVal);
                     var returnInstructions = new IInstruction[] { new ReturnInstruction(retVal) };
                     return (expr.Concat(returnInstructions).ToList(), transformedParameters);
+
                 default:
                     throw new InvalidOperationException();
             }

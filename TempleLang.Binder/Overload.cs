@@ -37,14 +37,14 @@
                 return new UnaryExpression(operand, operatorType, PrimitiveType.Pointer);
             }
 
-                var returnType = operatorType switch
-                {
-                    UnaryOperatorType.Reference => PrimitiveType.Pointer,
-                    UnaryOperatorType.Dereference => PrimitiveType.Long,
-                    _ => operand.ReturnType
-                };
+            var returnType = operatorType switch
+            {
+                UnaryOperatorType.Reference => PrimitiveType.Pointer,
+                UnaryOperatorType.Dereference => PrimitiveType.Long,
+                _ => operand.ReturnType
+            };
 
-                return new UnaryExpression(operand, operatorType, operand.ReturnType);
+            return new UnaryExpression(operand, operatorType, operand.ReturnType);
 
             diagnosticReceiver.ReceiveDiagnostic(DiagnosticCode.InvalidOperandTypes, location, true);
             return new InvalidExpression(location);

@@ -54,7 +54,7 @@
             int characterInt;
             char character;
 
-        Start:
+            Start:
 
             do
             {

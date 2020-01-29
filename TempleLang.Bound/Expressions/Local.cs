@@ -16,7 +16,6 @@
             Name = name;
             Flags = flags;
             ReturnType = returnType;
-
         }
 
         public override string ToString() => $"{Name} : {ReturnType}";

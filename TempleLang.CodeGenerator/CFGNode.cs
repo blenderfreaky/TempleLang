@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using TempleLang.Bound.Expressions;
 using TempleLang.Intermediate;
 
@@ -113,7 +109,7 @@ namespace TempleLang.CodeGenerator
                     UnconditionalJump unconditionalJump =>
                             unconditionalJump.Target,
 
-                            _ => null,
+                    _ => null,
                 };
 
                 if (target != null && labels.TryGetValue(target.Value, out var successor))
