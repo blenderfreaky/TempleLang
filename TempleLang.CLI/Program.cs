@@ -39,9 +39,10 @@
             var stopwatch = Stopwatch.StartNew();
             var text = File.ReadAllText(path);
 
-            Console.WriteLine("Starting Compilation of " + path);
+            string fullPath = Path.GetFullPath(path);
+            Console.WriteLine("Starting Compilation of " + fullPath);
 
-            var compiled = TempleLangHelper.Compile(text, new SourceFile(Path.GetFileName(path), Path.GetFullPath(path)), out var parserError, out var diagnostics);
+            var compiled = TempleLangHelper.Compile(text, new SourceFile(Path.GetFileName(path), fullPath), out var parserError, out var diagnostics);
 
             if (parserError != null) Console.WriteLine(parserError.ToString());
 

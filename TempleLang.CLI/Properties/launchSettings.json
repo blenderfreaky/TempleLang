@@ -2,7 +2,7 @@
   "profiles": {
     "TempleLang.Test": {
       "commandName": "Project",
-      "commandLineArgs": "--file \"../../../../QuickSort/QuickSort.tl\" --printIL --printASM"
+      "commandLineArgs": "--file \"../../../../../QuickSort/QuickSort.tl\" --printIL --printASM"
     }
   }
 }
