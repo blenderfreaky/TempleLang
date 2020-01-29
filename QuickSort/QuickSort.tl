@@ -6,7 +6,7 @@ proc _start() : long
 
     let size = 10;
     let arr = arrInit(size);
-    let seed = 14214;
+    let seed = 420;
 
     for (let i = 0; i < size; ++i)
     {

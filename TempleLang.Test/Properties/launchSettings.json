@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TempleLang.Test": {
+      "commandName": "Project",
+      "commandLineArgs": "--file \"../../../../QuickSort/QuickSort.tl\""
+    }
+  }
+}

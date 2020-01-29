@@ -1,2 +1,0 @@
-nasm -f win64 -o "C:\Users\blend\Documents\School\Info\BLL\TempleLang\Test.obj" "C:\Users\blend\Documents\School\Info\BLL\TempleLang\Test.asm"
-link /entry:_start /subsystem:console /out:"C:\Users\blend\Documents\School\Info\BLL\TempleLang\Test.exe" "C:\Users\blend\Documents\School\Info\BLL\TempleLang\Test.obj" "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\kernel32.lib" "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\kernel32.lib"

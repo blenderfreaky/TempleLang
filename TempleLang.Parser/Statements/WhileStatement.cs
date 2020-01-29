@@ -27,6 +27,7 @@
                 from statement in Statement.Parser
                 from __ in Parse.Token(Token.While)
                 from condition in Expression.Parser
+                from ___ in Parse.Token(Token.Semicolon)
                 select new WhileStatement(condition, statement, true));
     }
 }

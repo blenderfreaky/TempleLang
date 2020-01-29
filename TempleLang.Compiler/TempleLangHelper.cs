@@ -28,7 +28,7 @@
             if (result.RemainingLexemes.Length > 1)
             {
                 var remaining = result.RemainingLexemes[0] + (result.RemainingLexemes.Length > 1 ? " " + result.RemainingLexemes[1] : "");
-                return ParserResult.Error<T, Token>("Error matching " + remaining, result.RemainingLexemes);
+                return ParserResult.Error<T, Token>("Error matching " + remaining + " found " + result.Result, result.RemainingLexemes);
             }
 
             return result;
@@ -66,7 +66,7 @@
             Compilation compilation,
             string name,
             string tempPath,
-            string execPath,
+            string execFile,
             bool writeIL = false)
         {
             var builder = new StringBuilder();
@@ -86,9 +86,8 @@
             tempPath = Path.GetFullPath(tempPath);
             string asmFile = Path.Combine(tempPath, name + ".asm");
             string objFile = Path.Combine(tempPath, name + ".obj");
-            string ilFile = Path.Combine(tempPath, name + ".tlil");
-            execPath = Path.GetFullPath(execPath);
-            string exeFile = Path.Combine(execPath, name + ".exe");
+
+            string ilFile = Path.Combine(Path.GetDirectoryName(execFile), name + ".tlil");
 
             Directory.CreateDirectory(tempPath);
             File.WriteAllText(asmFile, code);
@@ -104,17 +103,17 @@
 
             if (!File.Exists(objFile)) return null;
 
-            Directory.CreateDirectory(execPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(execFile));
 
             //                                                                      Hack: LINK.EXE doesn't properly find kernel32.lib otherwise
             string linkLibraries = string.Join(" ", compilation.Imports.Select(x => $@"""C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\{x}"""));
-            string linkArguments = $"/entry:_start /debug /subsystem:console /out:\"{exeFile}\" \"{objFile}\" {linkLibraries}";
+            string linkArguments = $"/entry:_start /debug /subsystem:console /out:\"{execFile}\" \"{objFile}\" {linkLibraries}";
 
             Console.WriteLine("");
             Console.WriteLine("> link " + linkArguments);
             Process.Start("link", linkArguments).WaitForExit();
 
-            return File.Exists(exeFile) ? exeFile : null;
+            return File.Exists(execFile) ? execFile : null;
         }
     }
 }
