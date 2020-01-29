@@ -25,4 +25,10 @@ ERROR(S):
 
   --help            Display this help screen.
 
-  --version         Display version information.```
+  --version         Display version information.
+```
+
+## Example
+
+See [QuickSort](https://github.com/blenderfreaky/TempleLang/tree/master/QuickSort) for a small example of C-- code.
+To compile it run `./TempleLang.CLI --file QuickSort.tl`
