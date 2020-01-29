@@ -1,0 +1,198 @@
+; proc _start() : long
+_ = Call print(Start\n, 6)
+_ = size Assign 10
+<>T1 = Call arrInit(size)
+_ = arr Assign <>T1
+_ = seed Assign 420
+_ = i Assign 0
+Jump .T3
+.T2:
+<>T5 = PreIncrement i
+.T3:
+<>T6 = i ComparisonLessThan size
+If !<>T6 Jump .T4
+<>T7 = Call pseudoRandom(seed)
+_ = seed Assign <>T7
+<>T8 = Call arrIndex(arr, i)
+<>T10 = size Multiply 2
+<>T9 = seed Remainder <>T10
+_ = <>T8 ReferenceAssign <>T9
+Jump .T2
+.T4:
+_ = Call printArr(arr, size)
+_ = Call print(\n, 1)
+_ = Call quickSort(arr, size)
+_ = Call printArr(arr, size)
+_ = Call arrFree(arr)
+
+; proc pseudoRandom(seed : long) : long
+<>T12 = seed Multiply 94813
+<>T11 = <>T12 Remainder 42133
+Return <>T11
+
+; proc quickSort(arr : ptr, size : long) : long
+<>T14 = size Subtract 1
+<>T13 = Call quickSortCore(arr, 0, <>T14)
+Return <>T13
+
+; proc quickSortCore(arr : ptr, lo : long, hi : long) : long
+<>T15 = lo ComparisonGreaterThanOrEqual hi
+If <>T15 Jump .T16
+Jump .T17
+.T16:
+Return 0
+.T17:
+<>T18 = Call partition(arr, lo, hi)
+_ = partition Assign <>T18
+<>T19 = partition Subtract 1
+_ = Call quickSortCore(arr, lo, <>T19)
+<>T20 = partition Add 1
+_ = Call quickSortCore(arr, <>T20, hi)
+
+; proc partition(arr : ptr, lo : long, hi : long) : long
+<>T22 = Call arrIndex(arr, hi)
+<>T21 = Dereference <>T22
+_ = pivot Assign <>T21
+_ = i Assign lo
+_ = j Assign lo
+Jump .T24
+.T23:
+<>T26 = PreIncrement j
+.T24:
+<>T27 = j ComparisonLessThanOrEqual hi
+If !<>T27 Jump .T25
+<>T29 = Call arrIndex(arr, j)
+<>T28 = Dereference <>T29
+_ = elem Assign <>T28
+<>T30 = elem ComparisonLessThan pivot
+If <>T30 Jump .T31
+Jump .T32
+.T31:
+<>T33 = Call arrIndex(arr, j)
+<>T35 = Call arrIndex(arr, i)
+<>T34 = Dereference <>T35
+_ = <>T33 ReferenceAssign <>T34
+<>T36 = Call arrIndex(arr, i)
+_ = <>T36 ReferenceAssign elem
+<>T37 = i Add 1
+_ = i Assign <>T37
+.T32:
+Jump .T23
+.T25:
+<>T38 = Call arrIndex(arr, hi)
+<>T40 = Call arrIndex(arr, i)
+<>T39 = Dereference <>T40
+_ = <>T38 ReferenceAssign <>T39
+<>T41 = Call arrIndex(arr, i)
+_ = <>T41 ReferenceAssign pivot
+Return i
+
+; proc arrInit(size : long) : ptr
+<>T42 = Call arrAlloc(size)
+_ = arr Assign <>T42
+_ = i Assign 0
+Jump .T44
+.T43:
+<>T46 = PreIncrement i
+.T44:
+<>T47 = i ComparisonLessThan size
+If !<>T47 Jump .T45
+<>T48 = Call arrIndex(arr, i)
+_ = <>T48 ReferenceAssign 0
+Jump .T43
+.T45:
+Return arr
+
+; proc arrFree(arr : ptr) : long
+<>T49 = Call free(arr)
+Return <>T49
+
+; proc printArr(arr : ptr, size : long) : long
+_ = i Assign 0
+Jump .T51
+.T50:
+<>T53 = PreIncrement i
+.T51:
+<>T54 = i ComparisonLessThan size
+If !<>T54 Jump .T52
+<>T55 = i ComparisonGreaterThan 0
+If <>T55 Jump .T56
+Jump .T57
+.T56:
+_ = Call print(, , 2)
+.T57:
+<>T59 = Call arrIndex(arr, i)
+<>T58 = Dereference <>T59
+_ = Call printNum(<>T58)
+Jump .T50
+.T52:
+
+; proc arrSize(arr : ptr) : long
+<>T62 = ArithmeticNegation 1
+<>T61 = Call arrIndex(arr, <>T62)
+<>T60 = Dereference <>T61
+Return <>T60
+
+; proc arrAlloc(size : long) : ptr
+<>T64 = size Multiply 8
+<>T63 = Call alloc(<>T64)
+Return <>T63
+
+; proc arrIndex(arr : ptr, index : long) : ptr
+<>T66 = arr Add 7
+<>T67 = 8 Multiply index
+<>T65 = <>T66 Add <>T67
+Return <>T65
+
+; proc alloc(size : long) : ptr
+<>T68 = Call GetProcessHeap()
+_ = heapHandle Assign <>T68
+<>T69 = Call HeapAlloc(heapHandle, 0, size)
+Return <>T69
+
+; proc free(position : ptr) : bool
+<>T70 = Call GetProcessHeap()
+_ = heapHandle Assign <>T70
+<>T71 = Call HeapFree(heapHandle, 0, position)
+Return <>T71
+
+; proc printNum(num : long) : long
+<>T72 = Call printNumAny(num, 10)
+Return <>T72
+
+; proc printNumAny(num : long, base : long) : long
+<>T73 = num ComparisonLessThan 0
+If <>T73 Jump .T74
+Jump .T75
+.T74:
+_ = Call print(-, 1)
+<>T76 = ArithmeticNegation num
+_ = Call printNum(<>T76)
+Return 
+.T75:
+<>T77 = num Remainder base
+_ = digit Assign <>T77
+<>T78 = num Divide base
+_ = rest Assign <>T78
+<>T79 = rest ComparisonGreaterThan 0
+If <>T79 Jump .T80
+Jump .T81
+.T80:
+_ = Call printNumAny(rest, base)
+.T81:
+_ = Call printDigit(digit)
+
+; proc printDigit(digit : long) : long
+_ = digits Assign 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
+<>T83 = digit Multiply 2
+<>T82 = digits Add <>T83
+_ = Call print(<>T82, 1)
+
+; proc print(ptr : ptr, len : long) : long
+<>T85 = ArithmeticNegation 11
+<>T84 = Call GetStdHandle(<>T85)
+_ = stdOut Assign <>T84
+_ = numberOfCharsWritten Assign 0
+<>T87 = Reference numberOfCharsWritten
+<>T86 = Call WriteConsoleW(stdOut, ptr, len, <>T87, 0)
+Return <>T86
