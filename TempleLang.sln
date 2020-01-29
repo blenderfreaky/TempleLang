@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2_Parser", "2_Parser", "{A8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Lexer", "TempleLang.Lexer\TempleLang.Lexer.csproj", "{E60DBF2D-20FE-4542-8FDA-66F06EF63B63}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Test", "TempleLang.Test\TempleLang.Test.csproj", "{DDD12E43-9089-484E-9D76-57CC9D0C95F4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Parser", "TempleLang.Parser\TempleLang.Parser.csproj", "{EF359EDF-7736-49CF-96A9-D29BCECBE92F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Parser.Abstractions", "TempleLang.Parser.Abstractions\TempleLang.Parser.Abstractions.csproj", "{AC5682DF-F89A-4031-8D1D-4DB117EE261D}"
@@ -48,6 +46,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.Transformer", "T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.CodeGenerator", "TempleLang.CodeGenerator\TempleLang.CodeGenerator.csproj", "{AB277345-7D45-4146-B891-6E0AAC45EDF6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TempleLang.CLI", "TempleLang.CLI\TempleLang.CLI.csproj", "{1825280E-647A-4AD6-B29D-3289CB014560}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,10 +62,6 @@ Global
 		{E60DBF2D-20FE-4542-8FDA-66F06EF63B63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E60DBF2D-20FE-4542-8FDA-66F06EF63B63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E60DBF2D-20FE-4542-8FDA-66F06EF63B63}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DDD12E43-9089-484E-9D76-57CC9D0C95F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DDD12E43-9089-484E-9D76-57CC9D0C95F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DDD12E43-9089-484E-9D76-57CC9D0C95F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DDD12E43-9089-484E-9D76-57CC9D0C95F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EF359EDF-7736-49CF-96A9-D29BCECBE92F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EF359EDF-7736-49CF-96A9-D29BCECBE92F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF359EDF-7736-49CF-96A9-D29BCECBE92F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -106,6 +102,10 @@ Global
 		{AB277345-7D45-4146-B891-6E0AAC45EDF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB277345-7D45-4146-B891-6E0AAC45EDF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB277345-7D45-4146-B891-6E0AAC45EDF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1825280E-647A-4AD6-B29D-3289CB014560}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1825280E-647A-4AD6-B29D-3289CB014560}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1825280E-647A-4AD6-B29D-3289CB014560}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1825280E-647A-4AD6-B29D-3289CB014560}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
