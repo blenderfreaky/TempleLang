@@ -8,7 +8,7 @@
     <!--<PublishTrimmed>true</PublishTrimmed>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishSingleFile>true</PublishSingleFile>-->
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT Liscense</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
