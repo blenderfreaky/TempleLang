@@ -11,7 +11,7 @@ To use the CLI, run `./TempleLang.CLI --help` for help.
 
 ```
 TempleLang.CLI 1.0.0
-Copyright (C) 2020 TempleLang.CLI
+MIT Liscense
 
 ERROR(S):
   Required option 'f, file' is missing.
