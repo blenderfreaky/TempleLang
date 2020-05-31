@@ -13,9 +13,6 @@ To use the CLI, run `./TempleLang.CLI --help` for help.
 TempleLang.CLI 1.0.0
 MIT Liscense
 
-ERROR(S):
-  Required option 'f, file' is missing.
-
   -f, --file        Required. File to compile
 
   -t, --target      Path to place the .exe in
