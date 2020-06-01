@@ -113,7 +113,7 @@
             Console.WriteLine("> link " + linkArguments);
             Process.Start("link", linkArguments).WaitForExit();
 
-            return File.Exists(execFile) ? execFile : null;
+            return File.Exists(execFile) ? Path.GetFullPath(execFile) : null;
         }
     }
 }
