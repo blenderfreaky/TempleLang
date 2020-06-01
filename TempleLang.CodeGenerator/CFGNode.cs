@@ -104,10 +104,10 @@ namespace TempleLang.CodeGenerator
                 LabelInstruction? target = node.Instruction switch
                 {
                     ConditionalJump conditionalJump =>
-                            conditionalJump.Target,
+                        conditionalJump.Target,
 
                     UnconditionalJump unconditionalJump =>
-                            unconditionalJump.Target,
+                        unconditionalJump.Target,
 
                     _ => null,
                 };

@@ -56,18 +56,18 @@
 
             Start:
 
-            do
-            {
-                characterInt = AdvanceChar();
-
-                if (characterInt == -1)
+                do
                 {
-                    return MakeLexeme(Token.EoF);
-                }
+                    characterInt = AdvanceChar();
 
-                character = (char)characterInt;
-            }
-            while (char.IsWhiteSpace(character));
+                    if (characterInt == -1)
+                        {
+                            return MakeLexeme(Token.EoF);
+                        }
+
+                    character = (char)characterInt;
+                }
+                while (char.IsWhiteSpace(character));
 
             if (character == '/' && PeekChar() == '/')
             {
@@ -89,55 +89,55 @@
             {
                 case '+':
                     return MakeLexeme(SwitchOnNextCharacter(
-                       Token.Add,
-                       ('+', Token.Increment),
-                       ('=', Token.AddCompoundAssign)));
+                        Token.Add,
+                        ('+', Token.Increment),
+                        ('=', Token.AddCompoundAssign)));
 
                 case '-':
                     return MakeLexeme(SwitchOnNextCharacter(
-                       Token.Subtract,
-                       ('-', Token.Decrement),
-                       ('=', Token.SubtractCompoundAssign)));
+                        Token.Subtract,
+                        ('-', Token.Decrement),
+                        ('=', Token.SubtractCompoundAssign)));
 
                 case '*':
                     return MakeLexeme(SwitchOnNextCharacter(
-                       Token.Multiply,
-                       ('=', Token.MultiplyCompoundAssign)));
+                        Token.Multiply,
+                        ('=', Token.MultiplyCompoundAssign)));
 
                 case '/':
                     return MakeLexeme(SwitchOnNextCharacter(
-                       Token.Divide,
-                       ('=', Token.DivideCompoundAssign)));
+                        Token.Divide,
+                        ('=', Token.DivideCompoundAssign)));
 
                 case '%':
                     return MakeLexeme(SwitchOnNextCharacter(
-                       Token.Remainder,
-                       ('=', Token.RemainderCompoundAssign)));
+                        Token.Remainder,
+                        ('=', Token.RemainderCompoundAssign)));
 
                 case '!':
                     return MakeLexeme(
-                       SwitchOnNextCharacter(Token.LogicalNot,
-                       ('=', Token.ComparisonNotEqual)));
+                        SwitchOnNextCharacter(Token.LogicalNot,
+                        ('=', Token.ComparisonNotEqual)));
 
                 case '~':
                     return MakeLexeme(
-                       Token.BitwiseNot);
+                        Token.BitwiseNot);
 
                 case '^':
                     return MakeLexeme(SwitchOnNextCharacter(
-                       Token.BitwiseXor,
-                       ('=', Token.BitwiseXorCompoundAssign)));
+                        Token.BitwiseXor,
+                        ('=', Token.BitwiseXorCompoundAssign)));
 
                 case '=':
                     return MakeLexeme(SwitchOnNextCharacter(
-                       Token.Assign,
-                       ('=', Token.ComparisonEqual),
-                       ('>', Token.Arrow)));
+                        Token.Assign,
+                        ('=', Token.ComparisonEqual),
+                        ('>', Token.Arrow)));
 
                 case ':':
                     return MakeLexeme(SwitchOnNextCharacter(
-                       Token.Colon,
-                       (':', Token.StaticAccessor)));
+                        Token.Colon,
+                        (':', Token.StaticAccessor)));
 
                 case '&':
                     var andType = SwitchOnNextCharacter(
@@ -298,8 +298,8 @@
                     LexNumber(ref reachedDot);
 
                     return reachedDot
-                       ? MakeLexeme(Token.FloatLiteral)
-                       : MakeLexeme(Token.IntegerLiteral);
+                        ? MakeLexeme(Token.FloatLiteral)
+                        : MakeLexeme(Token.IntegerLiteral);
                 }
             }
 

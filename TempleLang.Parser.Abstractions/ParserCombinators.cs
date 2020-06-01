@@ -10,8 +10,8 @@
         public static Parser<T, TToken> Predicate<T, TToken>(this Parser<T, TToken> parser, Predicate<T> predicate, string errorMessage) =>
             from result in parser
             from _ in predicate(result)
-                    ? Parse.Value<T, TToken>(result)
-                    : Parse.Error<T, TToken>(errorMessage + ", got " + result)
+                     ? Parse.Value<T, TToken>(result)
+                     : Parse.Error<T, TToken>(errorMessage + ", got " + result)
             select result;
 
         public static Parser<T, TToken> Or<T, TToken>(this Parser<T, TToken> left, Parser<T, TToken> right)

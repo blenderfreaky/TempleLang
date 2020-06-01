@@ -52,9 +52,9 @@
                 (from stmt in BlockStatement.Parser
                  select new ProcedureDeclaration(stmt, name, returnType, parameters, FileLocation.Concat(start, stmt)))
                 .Or(
-                  from _ in Parse.Token(Token.Arrow)
-                  from stmt in ExpressionStatement.Parser
-                  select new ProcedureDeclaration(stmt, name, returnType, parameters, FileLocation.Concat(start, stmt)))
+                 from _ in Parse.Token(Token.Arrow)
+                 from stmt in ExpressionStatement.Parser
+                 select new ProcedureDeclaration(stmt, name, returnType, parameters, FileLocation.Concat(start, stmt)))
                 .Or(from _ in Parse.Token(Token.Using)
                     from import in Parse.Token(Token.StringLiteral)
                     from __ in Parse.Token(Token.Semicolon)
