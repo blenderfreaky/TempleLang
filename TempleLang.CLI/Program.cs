@@ -9,16 +9,19 @@
 
     public class CompilerOptions
     {
-        [Option('f', "file", Required = true, HelpText = "File to compile")]
+        [Option('f', "file", Required = true, HelpText = "File to compile.")]
         public string? SourceCode { get; set; }
 
-        [Option('t', "target", HelpText = "Path to place the .exe in")]
+        [Option('t', "target", HelpText = "Path to place the .exe in.")]
         public string? Target { get; set; }
 
-        [Option('i', "printIL", HelpText = "Whether to output the intermediate language to the target directory")]
+        [Option('r', "run", HelpText = "Run the generated executable upon successful compilation.")]
+        public bool RunResult { get; set; }
+
+        [Option('i', "printIL", HelpText = "Output the intermediate language to the target directory.")]
         public bool PrintIL { get; set; }
 
-        [Option('a', "printASM", HelpText = "Whether to output the assembler to the target directory")]
+        [Option('a', "printASM", HelpText = "Output the assembler to the target directory.")]
         public bool PrintASM { get; set; }
     }
 
@@ -30,7 +33,16 @@
             {
                 var targetPath = Path.GetDirectoryName(x.Target ?? x.SourceCode!) ?? throw new InvalidOperationException("Invalid sourcecode path");
                 var tempPath = x.PrintASM ? Path.Combine(targetPath, "ASM") : Path.GetTempPath();
-                Compile(x.SourceCode!, tempPath, x.Target, x.PrintIL);
+                var execFile = Compile(x.SourceCode!, tempPath, x.Target, x.PrintIL);
+
+                if (execFile == null) return;
+
+                Console.WriteLine($"Saved executable to {execFile}.");
+
+                if (!x.RunResult) return;
+
+                Console.WriteLine($"Running result.\n\n{new string('-', 20)}\n");
+                Process.Start(execFile).WaitForExit();
             });
         }
 
