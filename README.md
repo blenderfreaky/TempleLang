@@ -11,15 +11,17 @@ To use the CLI, run `./TempleLang.CLI --help` for help.
 
 ```
 TempleLang.CLI 1.0.0
-MIT Liscense
+Copyright (C) 2020 TempleLang.CLI
 
-  -f, --file        Required. File to compile
+  -f, --file        Required. File to compile.
 
-  -t, --target      Path to place the .exe in
+  -t, --target      Path to place the .exe in.
 
-  -i, --printIL     Whether to output the intermediate language to the target directory
+  -r, --run         Run the generated executable upon successful compilation.
 
-  -a, --printASM    Whether to output the assembler to the target directory
+  -i, --printIL     Output the intermediate language to the target directory.
+
+  -a, --printASM    Output the assembler to the target directory.
 
   --help            Display this help screen.
 
